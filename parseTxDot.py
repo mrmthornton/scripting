@@ -397,12 +397,9 @@ def main():
     #print sheet
     #data = [[sheet.cell_value(r, c) for c in range(sheet.ncols)] for r in range(sheet.nrows)]
 
-    plates =  []
     with open('plates.csv', 'r') as plateFile:
         csvInput = csv.reader(plateFile)
-        for row in csvInput:
-            plates.append(row[0])
-    plateFile.close()
+        plates = [row[0] for row in csvInput]
     print plates
 
     with open('testFile.txt','r') as infile:
@@ -429,9 +426,7 @@ def main():
                         csvString = csvStringFromList(listData)
                         outfile.write(csvString)
             outfile.flush()
-            outfile.close()
-            infile.close()
-            print "main: Finished parsing TxDot file."
+    print "main: Finished parsing TxDot file."
 
 if __name__ == '__main__':
     main()
