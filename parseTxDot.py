@@ -11,9 +11,10 @@
 
 import re
 import io
-import xlrd
-import xlwt
-import xlutils
+#import xlrd
+#import xlwt
+#import xlutils
+import csv
 
 linePattern = re.compile('^.+')
 wordPattern = re.compile('\w+')
@@ -127,7 +128,6 @@ def findResponseType(plate, fileString):
         endNum += startNum
         print  '\nfindResponseType:', targetType, startNum, endNum
         return [targetType, startNum, endNum]
-
 
     startNum, endNum = findStartEnd(fileString,startPattern, endPattern)
     if startNum != None:
@@ -399,15 +399,9 @@ def main():
 
     plates =  []
     with open('plates.csv', 'r') as plateFile:
-        while True:
-            csvLine = plateFile.readline()
-            csvString = str(csvLine)
-            if csvString == '':
-                break
-            csvValue = csvPattern.search(csvString)
-            csvString = csvValue.group().replace(',' , '')
-            csvString.strip()
-            plates.append(csvString)
+        csvInput = csv.reader(plateFile)
+        for row in csvInput:
+            plates.append(row[0])
     plateFile.close()
     print plates
 
