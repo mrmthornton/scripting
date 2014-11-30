@@ -1,0 +1,21 @@
+
+how to handle text with cr lf in the middle ?
+choose earlies date, issued or reg dt ?
+assert dates are not in the future
+assert key in is the same as key out
+RTS database
+alpha-numerics only. #nnn should be assigned address2 without #
+does placard work ?
+optimize findStartEnd()
+move re.compile()'s out of loops
+fill in parsePermit()
+
+DONE  save excel to csv
+DONE  input from  infile.csv
+      query web page
+      fill form
+      scrape results
+work  parse 
+DONE  write to outfile.csv
+      save to excel current format
+
