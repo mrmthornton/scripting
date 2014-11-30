@@ -12,7 +12,17 @@
 import re
 import io
 import xlrd
-import xlwr
+import xlwt
+import xlutils
+
+linePattern = re.compile('^.+')
+wordPattern = re.compile('\w+')
+csvPattern = re.compile('[A-Z0-9 .#]*,')
+commaToEOLpattern = re.compile(',[A-Z0-9 .#]+$')
+LICpattern = re.compile('^LIC ')
+issuedPattern = re.compile('ISSUED ')
+reg_dtPattern = re.compile('REG DT ')
+datePattern = re.compile('[0-9]{2,2}/[0-9]{2,2}/[0-9]{4,4}') # mo/dy/year
 
 def findStartEnd(fileString,startPattern, endPattern):
     # the iterator is used to search for all possible endLoc instances,
@@ -148,17 +158,8 @@ def parseRecord(responseType, typeString):
         return parseCanceled(responseType, typeString)
     return None
 
-
-#['response type', 'plate', 'name', 'addr', 'apt', 'city', 'state', 'zip', 'owned']
-linePattern = re.compile('^.+')
-wordPattern = re.compile('\w+')
-csvPattern = re.compile('[A-Z0-9 .#]*,')
-commaToEOLpattern = re.compile(',[A-Z0-9 .#]+$')
-LICpattern = re.compile('^LIC ')
-issuedPattern = re.compile('ISSUED ')
-reg_dtPattern = re.compile('REG DT ')
-datePattern = re.compile('[0-9]{2,2}/[0-9]{2,2}/[0-9]{4,4}') # mo/dy/year
-
+# parse<RESPONSETYPE>() return a list of strings as follows
+# ['response type', 'plate', 'name', 'addr', 'apt', 'city', 'state', 'zip', 'owned']
 def parseNoRecord(responseType, typeString):
     noRecordPattern = re.compile('REG 00 ')
     header = noRecordPattern.search(typeString)
@@ -389,11 +390,27 @@ def csvStringFromList(listData):
     csvString += '\n'
     return csvString
 
-
 def main():
-    plates = ['BRS1234', 'PLATE100', 'PLATE99', '88K8888', 'OK1AHO', 'OKLAHO', '5F1234']
-    #plates = ['889463G', '20N7867', 'DMY8231', '5F0629', '27E344', '27E344'
-    #                                , '1E16714', '1A30026', 'BCM3557', '289868']
+
+    #workbook = xlrd.open_workbook('plates.xlsx')
+    #sheet = workbook.sheet_by_index(0)
+    #print sheet
+    #data = [[sheet.cell_value(r, c) for c in range(sheet.ncols)] for r in range(sheet.nrows)]
+
+    plates =  []
+    with open('plates.csv', 'r') as plateFile:
+        while True:
+            csvLine = plateFile.readline()
+            csvString = str(csvLine)
+            if csvString == '':
+                break
+            csvValue = csvPattern.search(csvString)
+            csvString = csvValue.group().replace(',' , '')
+            csvString.strip()
+            plates.append(csvString)
+    plateFile.close()
+    print plates
+
     with open('testFile.txt','r') as infile:
         with open('data.csv', 'w') as outfile:
             outfile.truncate()
@@ -419,6 +436,7 @@ def main():
                         outfile.write(csvString)
             outfile.flush()
             outfile.close()
+            infile.close()
             print "main: Finished parsing TxDot file."
 
 if __name__ == '__main__':
