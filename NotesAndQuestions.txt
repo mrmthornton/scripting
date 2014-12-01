@@ -2,9 +2,9 @@ Primary breakdown of work:
 
 DONE     save excel to csv
 DONE     input from  infile.csv
-         query web page
-         fill form
-         scrape results
+working  query web page
+working  fill form
+working  scrape results
 working  parse 
 DONE     write to outfile.csv
          save to excel current format

@@ -403,8 +403,8 @@ def main():
     print plates
 
     with open('testFile.txt','r') as infile:
-        with open('data.csv', 'w') as outfile:
-            outfile.truncate()
+        with open('data.csv', 'a') as outfile:
+            #outfile.truncate()
             fileString = infile.read()
             for plate in plates:
                 foundCurrentPlate = False
@@ -425,6 +425,7 @@ def main():
                         listData = parseRecord(responseType, typeString)
                         csvString = csvStringFromList(listData)
                         outfile.write(csvString)
+            outfile.write('------------------------------------------------\n')
             outfile.flush()
     print "main: Finished parsing TxDot file."
 

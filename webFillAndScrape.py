@@ -9,8 +9,10 @@ import urllib2
 import webbrowser
 from lxml import html
 
-url = 'https://duckduckgo.com/html'       # target URL
-data = urllib.urlencode({'q':'Python'})   # html form of 'q gets value Python'
+#url = 'https://duckduckgo.com/html'       # target URL
+#data = urllib.urlencode({'q':'Python'})   # html form of 'q gets value Python'
+url = 'https://accounts.google.com/ServiceLoginAuth'       # target URL
+data = urllib.urlencode({'Email':'mrmthornton@gmail.com', 'Passwd':'randomGmail'})
 request = urllib2.Request(url, data)      # formulate a request
 results = urllib2.urlopen(request)        # open URL with DATA, get html
 content = results.read()                  # get string version of page
@@ -19,7 +21,7 @@ content = results.read()                  # get string version of page
 with open('page.html', 'w') as pageFile:  # open the file to store html
     pageFile.write(content)               # write to file
 
-#webbrowser.open('page.html')              # view the html
+webbrowser.open('page.html')              # view the html
 
 snippet = ''
 
