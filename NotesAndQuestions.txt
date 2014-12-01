@@ -1,3 +1,15 @@
+Procedure:
+
+1) open working spreadsheet
+2) enter five licence plate number in the multiple vehicle search page
+3) copy the entire text response
+4) paste, appending the text to response.txt
+5) repeat 2,3,4  
+6) parse response.txt
+7) open data.csv with ms Excel and copy entire file into appropriate cells
+8) copy 'values' from stripped cells and past to same cells
+
+
 Primary breakdown of work:
 
 DONE     save excel to csv
