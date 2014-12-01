@@ -30,13 +30,14 @@
 
 # The function output order does not affect grading.
 import re
+import io
+import urllib
+import urllib2
+import webbrowser
 
 
 def get_page(url):
     try:
-        import urllib
-        #import urllib2
-        #import urlparse
         return urllib.urlopen(url).read()
     except:
         return ""
@@ -86,7 +87,7 @@ def get_all_links(page):
             break
     return links
 
-def crawl_web(seed,max_depth):
+def crawl_web(seed, max_depth):
     depth = 0
     tocrawl = [seed]
     crawled = []
@@ -104,9 +105,9 @@ def crawl_web(seed,max_depth):
             depth = depth + 1
     return index
 
-anIndex = crawl_web("http://www.udacity.com/cs101x/index.html",0)
-for e in anIndex:
-    print e
+#anIndex = crawl_web("http://www.udacity.com/cs101x/index.html",0)
+#for e in anIndex:
+#    print e
 
 #anIndex = crawl_web("http://www.udacity.com/cs101x/index.html",1)
 #for e in anIndex:
@@ -116,7 +117,10 @@ for e in anIndex:
 #for e in anIndex:
 #    print e
 
-#anIndex = crawl_web("http://www.ntta.org",0)
-#for e in anIndex:
-#    print e
+url = 'file://C:/Users/IEUser/Documents/scripting/page.html'      # target URL
+depth = 0
+
+anIndex = crawl_web(url, depth)
+for e in anIndex:
+    print e
 
