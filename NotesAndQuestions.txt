@@ -23,6 +23,7 @@ DONE     write to outfile.csv
 
 
 Secondary issues:
+         multiple plate responses - same or different owner - start date , end date ?
          how to handle text with cr lf in the middle ?
          choose earlies date, issued or reg dt ?
          assert dates are not in the future
