@@ -30,7 +30,7 @@ Secondary issues:
          assert key-in is the same as key-out
          RTS database
          alpha-numerics only. #nnn should be assigned address2 without #
-         does placard work ?
+         does placard work ? should return no record
          optimize findStartEnd()
 DONE     move re.compile()'s out of loops
          fill in parsePermit()
