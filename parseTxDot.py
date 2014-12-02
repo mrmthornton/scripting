@@ -78,7 +78,7 @@ def findResponseType(plate, fileString):
     # STANDARD
     targetType = 'STANDARD'
     startPattern = re.compile('LIC ' + plate + ' [A-Z]{3,3}' + '/' '[0-9]{4,4}')
-    endPattern = re.compile(r'TITLE[.]')
+    endPattern = re.compile(r'TITLE[.]|NON-TITLED')
     startNum, endNum = findStartEnd(fileString,startPattern, endPattern)
     if startNum != None:
         print  '\nfindResponseType:', targetType, startNum, endNum

@@ -206,7 +206,7 @@ dual response ------------\n in zip?-----------------------------------------
 
 ------------------------unknown issue--------------------------------------
 
- LIC 1ABCD  DEC/2014 OLD # 1ABCD DEC/2014 EWT  3300 GWT   3300
+ LIC 1ABCD DEC/2014 OLD # 1ABCD DEC/2014 EWT  3300 GWT   3300
  DISABLED PERSON PLT, STKR            REG CLASS  25   $ 62.75 COLLIN CNTY
  TITLE 12345678901234567 ISSUED 02/10/2014 ODOMETER 28626 REG DT 02/07/2014
  YR:2012 MAK:TOYT MODL:CBA BDY STYL:4D VEH CLS:PASS       SALE PRC:   $18600.00

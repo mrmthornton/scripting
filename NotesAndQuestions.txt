@@ -26,7 +26,10 @@ DONE     write to outfile.csv
 
 Secondary issues:
          multiple plate responses - same or different owner - start date , end date ?
-         multi line records break at hard count.? how to handle text with cr lf in the middle ?
+working  how to handle text with \n in it ? 
+ working  wo\n rd(.|,)
+ working  750\n 10
+ unknown  addline with \n 
          choose earlies date, issued or reg dt ?
          assert dates are not in the future
          assert key-in is the same as key-out
@@ -35,7 +38,7 @@ Secondary issues:
          does placard work ? should return no record
          optimize findStartEnd()
 DONE     move re.compile()'s out of loops
-         fill in parsePermit()
+DONE     fill in parsePermit()
 
 
 Notes:
