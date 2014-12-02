@@ -162,7 +162,7 @@ dual response ------------\n in zip?-----------------------------------------
 
 -------unknown possible \n  ---------------------------------------------------
   
- LIC YELP  FEB/2015 OLD # YELP FEB/2015 EWT  2800 GWT   2800
+ LIC YELP FEB/2015 OLD # YELP FEB/2015 EWT  2800 GWT   2800
  PER ANIMAL FRIENDLY PLT, STKR            REG CLASS  25   $ 64.25 COLLIN CNTY
  TITLE 12345678901234567 ISSUED 02/08/2011 ODOMETER 25375 REG DT 02/19/2014
  YR:2010 MAK:HOND MODL:UAX BDY STYL:CP VEH CLS:PASS       SALE PRC:       $0.00

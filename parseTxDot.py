@@ -27,14 +27,17 @@ datePattern = re.compile('[0-9]{2,2}/[0-9]{2,2}/[0-9]{4,4}') # mo/day/year
 dateYearFirstPattern = re.compile(r'\d{4,4}/\d{2,2}/\d{2,2}') # year/mo/day
 
 def repairLineBreaks(fileString):
-    lineBreakPattern = re.compile(r'\S+\n \S+\.') # find broken words
-    lineBreakIterator = lineBreakPattern.finditer(fileString)
+    #broken words have a pattern of  partial-word, newline(\n) white-space, partial word.
+    # end of line is signified by return-newline(\r\n)
+    wordBreakPattern = re.compile(r'[A-Z]+\n [A-Z]+(,|\.)') # find broken words
+    #numberBreakPattern = re.compile(r'\d+\n \d+') # find broken numbers
+    lineBreakIterator = wordBreakPattern.finditer(fileString)
     for broken in lineBreakIterator:
         fileString = fileString[:broken.start()] + broken.group().replace('\n ', '') + fileString[broken.end() + 1:]
         #word = broken.group()
         #print word
         #print word.replace('\n ', '')
-        #print fileString
+    #print fileString
     return fileString
 
 def findStartEnd(fileString,startPattern, endPattern):
@@ -75,7 +78,7 @@ def findResponseType(plate, fileString):
     # STANDARD
     targetType = 'STANDARD'
     startPattern = re.compile('LIC ' + plate + ' [A-Z]{3,3}' + '/' '[0-9]{4,4}')
-    endPattern = re.compile('TITLE' + '[.]')
+    endPattern = re.compile(r'TITLE[.]')
     startNum, endNum = findStartEnd(fileString,startPattern, endPattern)
     if startNum != None:
         print  '\nfindResponseType:', targetType, startNum, endNum
@@ -123,7 +126,8 @@ def findResponseType(plate, fileString):
     canceledStartPattern = re.compile('LIC ' + '[A-Z0-9]+' + ' [A-Z]{3,3}' + '/' '[0-9]{4,4}')
     canceledEndPattern = re.compile('TITLE' + '[.]')
     found = canceledPattern.search(fileString)
-    foundtemp = found.group()
+    foundtemp = found.group()     # found at least one cancelel pattern
+    # examine all start-positions for closest, but not past canceled-position
     if found != None:
         startCancel = found.start()
         startNumbers = canceledStartPattern.finditer(fileString)
@@ -134,20 +138,12 @@ def findResponseType(plate, fileString):
                 startNum = num
             else:
                 break
+        # find the end position
         foundEnd = canceledEndPattern.search(fileString[startNum:])
         endNum = foundEnd.end()
         endNum += startNum
         print  '\nfindResponseType:', targetType, startNum, endNum
         return [targetType, startNum, endNum]
-
-    startNum, endNum = findStartEnd(fileString,startPattern, endPattern)
-    if startNum != None:
-        print 'findResponseType:CANCELED:', startNum, endNum
-
-        assert found != None and startNum < found.start() and found.end() < endNum
-        print  '\nfindResponseType:', targetType, startNum, endNum
-        return [targetType, startNum, endNum]
-
     return None
 
 def parseRecord(responseType, typeString):

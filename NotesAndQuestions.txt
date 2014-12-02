@@ -12,14 +12,16 @@ Procedure:
 
 Primary breakdown of work:
 
-DONE     save excel to csv
+         plates in .xlsx format
+DONE     plates in .csv format
 DONE     input from  infile.csv
 working  query web page
 working  fill form
 working  scrape results
 working  parse 
 DONE     write to outfile.csv
-         save to excel current format
+         write to outfile.xlsx
+         integrate parsed information with original spreadsheet, assert plates match
 
 
 Secondary issues:
