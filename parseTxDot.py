@@ -23,7 +23,19 @@ commaToEOLpattern = re.compile(',[A-Z0-9 .#]+$')
 LICpattern = re.compile('^LIC ')
 issuedPattern = re.compile('ISSUED ')
 reg_dtPattern = re.compile('REG DT ')
-datePattern = re.compile('[0-9]{2,2}/[0-9]{2,2}/[0-9]{4,4}') # mo/dy/year
+datePattern = re.compile('[0-9]{2,2}/[0-9]{2,2}/[0-9]{4,4}') # mo/day/year
+dateYearFirstPattern = re.compile(r'\d{4,4}/\d{2,2}/\d{2,2}') # year/mo/day
+
+def repairLineBreaks(fileString):
+    lineBreakPattern = re.compile(r'\S+\n \S+\.') # find broken words
+    lineBreakIterator = lineBreakPattern.finditer(fileString)
+    for broken in lineBreakIterator:
+        fileString = fileString[:broken.start()] + broken.group().replace('\n ', '') + fileString[broken.end() + 1:]
+        #word = broken.group()
+        #print word
+        #print word.replace('\n ', '')
+        #print fileString
+    return fileString
 
 def findStartEnd(fileString,startPattern, endPattern):
     # the iterator is used to search for all possible endLoc instances,
@@ -80,10 +92,9 @@ def findResponseType(plate, fileString):
 
     # PERMIT
     targetType = 'PERMIT'
-    startPattern = re.compile('SELECTION REQUEST:' + '[\s]+' + 'PERMIT'
-                                                            + '[\s]+' + plate)
-    endPattern = re.compile('ISSUING OFFICE: ')
-    startNum, endNum = findStartEnd(fileString,startPattern, endPattern)
+    permitStartPattern = re.compile('SELECTION REQUEST:' + '[\s]+' + 'PERMIT' + '[\s]+' + plate)
+    permitEndPattern = re.compile('ISSUING OFFICE: ')
+    startNum, endNum = findStartEnd(fileString,permitStartPattern, permitEndPattern)
     if startNum != None:
         print  '\nfindResponseType:', targetType, startNum, endNum
         return [targetType, startNum, endNum]
@@ -281,15 +292,12 @@ def parseStandard(responseType, typeString):
         # if the renewal information exists.
         if Rname != '':
             name = Rname
+            name2 = ''
         if Raddr != '':
             addr = Raddr
-        if Raddr2 != '':
-            name2 = Raddr2
-        if Rcity != '':
+            addr2 = Raddr2
             city = Rcity
-        if Rstate != '':
             state = Rstate
-        if Rzip != '':
             zip = Rzip
     #print [responseType, plate, issued, reg_dt, name, name2, addr, addr2, city, state, zip]
     return [responseType, plate.strip(), name.strip(), addr.strip(), addr2.strip(), city.strip(), state.strip(), zip, issued]
@@ -329,7 +337,36 @@ def parseTxirp(responseType, typeString):
     return [responseType, plate.strip(), name.strip(), addr.strip(), '', city.strip(), state.strip(), zip, '']
 
 def parsePermit(responseType, typeString):
-    return [responseType]
+    permitHeaderPattern = re.compile(('ONE TRIP PERMIT:|30 DAY PERMIT:') + '\s+')
+    header = permitHeaderPattern.search(typeString)
+    typeString = typeString[header.end():]
+    nextWord = wordPattern.search(typeString)
+    plate = nextWord.group()
+    validDate = dateYearFirstPattern.search(typeString)
+    dateYearFirst = validDate.group()
+    issued = dateYearFirst[5:] + '/' + dateYearFirst[0:4]
+    typeString = typeString[validDate.end():]
+    permitNamePattern = re.compile('APPLICANT NAME :\s+')
+    header = permitNamePattern.search(typeString)
+    typeString = typeString[header.end():]
+    found = linePattern.search(typeString)
+    name = found.group()
+    typeString = typeString[found.end() + 1:] # remove, including \n
+    found = linePattern.search(typeString)
+    addr = found.group()
+    typeString = typeString[found.end() + 1:] # remove, including \n
+    found = linePattern.search(typeString)
+    cityToZip = found.group()
+    typeString = typeString[:found.end()]
+    nextWord = wordPattern.search(typeString)
+    city = nextWord.group()
+    typeString = typeString[nextWord.end() + 1:]
+    nextWord = wordPattern.search(typeString)
+    state = nextWord.group()
+    typeString = typeString[nextWord.end() + 1:]
+    nextWord = wordPattern.search(typeString)
+    zip = nextWord.group()
+    return [responseType, plate.strip(), name.strip(), addr.strip(), '', city, state, zip, issued]
 
 def parseTemporary(responseType, typeString):
     # find header and remove
@@ -340,8 +377,7 @@ def parseTemporary(responseType, typeString):
     nextWord = wordPattern.search(typeString)
     plate = nextWord.group()
     # find valid date string, and convert to issued date
-    validDatePattern = re.compile(r'\d{4,4}/\d{2,2}/\d{2,2}')
-    validDate = validDatePattern.search(typeString)
+    validDate = dateYearFirstPattern.search(typeString)
     dateYearFirst = validDate.group()
     issued = dateYearFirst[5:] + '/' + dateYearFirst[0:4]
     typeString = typeString[validDate.end():]
@@ -406,6 +442,7 @@ def main():
         with open('data.csv', 'a') as outfile:
             #outfile.truncate()
             fileString = infile.read()
+            fileString =  repairLineBreaks(fileString)
             for plate in plates:
                 foundCurrentPlate = False
                 while True:
@@ -414,7 +451,8 @@ def main():
                     except:
                         responseType = None
                         if foundCurrentPlate == False:
-                            print "\n", plate, 'No Informaton'
+                            print "\n", plate, ' No Informaton'
+                            outfile.write(',' + plate +', No Informaton\n')
                         break
                     if responseType != None:
                         foundCurrentPlate = True
