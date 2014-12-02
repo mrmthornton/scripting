@@ -1,13 +1,15 @@
 Procedure:
 
-1) open working spreadsheet
+Start, open working spreadsheet
+1) copy next 50 plates to plates.csv
 2) enter five licence plate number in the multiple vehicle search page
 3) copy the entire text response
 4) paste, appending the text to response.txt
 5) repeat 2,3,4  
 6) parse response.txt
 7) open data.csv with ms Excel and copy entire file into appropriate cells
-8) copy 'values' from stripped cells and past to same cells
+8) repeat from 1 until all plates are finished
+Finish, copy and paste 'values only' from cells with name, addr, and ownership 
 
 
 Primary breakdown of work:
@@ -27,8 +29,8 @@ DONE     write to outfile.csv
 Secondary issues:
          multiple plate responses - same or different owner - start date , end date ?
 working  how to handle text with \n in it ? 
- working  wo\n rd(.|,)
- working  750\n 10
+ working  BROK\n EN(.|,) - word ending in ',' or '.' with newline embedded
+ working  750\n 10       - 5 digit zip code with newline embedded
  unknown  addline with \n 
          choose earlies date, issued or reg dt ?
          assert dates are not in the future

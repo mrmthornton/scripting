@@ -116,7 +116,6 @@
  
  -------------30 day permit---------------------------------------------------
  
-  
  SELECTION REQUEST:  PERMIT 334466G      PERMIT ISSUANCE ID: 12345678901234567
         
  30 DAY PERMIT:      334466G  VALID:2014/01/07 15:33:46--2014/02/06 23:59:59   
@@ -129,12 +128,8 @@
  
 
 
-
 ----------temporary tag -------------------------------------------
  
-dual response ------------\n in zip?-----------------------------------------
-
-
  SELECTION REQUEST: TEMPORARY TAG  11S1111 
         
  TEMPORARY TAG:    11S1111   VALID:2014/09/02 00:00:00--2014/11/01 00:00:00    
@@ -160,7 +155,7 @@ dual response ------------\n in zip?-----------------------------------------
 
 
 
--------unknown possible \n  ---------------------------------------------------
+------- \n in keyword 'TITLE.'  ---------------------------------------------------
   
  LIC YELP FEB/2015 OLD # YELP FEB/2015 EWT  2800 GWT   2800
  PER ANIMAL FRIENDLY PLT, STKR            REG CLASS  25   $ 64.25 COLLIN CNTY
