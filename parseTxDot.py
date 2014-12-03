@@ -199,10 +199,18 @@ def parseDealer(responseType, typeString):
     nextWord = wordPattern.search(typeString)
     city = nextWord.group()
     typeString =  typeString[nextWord.end() + 1:]
-    # get state and remove
+    #get next word and remove
     nextWord = wordPattern.search(typeString)
-    state = nextWord.group()
+    word = nextWord.group()
     typeString =  typeString[nextWord.end() + 1:]
+    if len(word) != 2:
+        city = city + ' ' + word
+        # get state and remove
+        nextWord = wordPattern.search(typeString)
+        state = nextWord.group()
+        typeString =  typeString[nextWord.end() + 1:]
+    else:
+        state = word
     #get zip
     nextWord = wordPattern.search(typeString)
     zip = nextWord.group()
@@ -333,7 +341,7 @@ def parseTxirp(responseType, typeString):
     return [responseType, plate.strip(), name.strip(), addr.strip(), '', city.strip(), state.strip(), zip, '']
 
 def parsePermit(responseType, typeString):
-    permitHeaderPattern = re.compile(('ONE TRIP PERMIT:|30 DAY PERMIT:') + '\s+')
+    permitHeaderPattern = re.compile(('ONE TRIP PERMIT:|30 DAY PERMIT:|144-HOUR PERMIT:') + '\s+')
     header = permitHeaderPattern.search(typeString)
     typeString = typeString[header.end():]
     nextWord = wordPattern.search(typeString)
@@ -385,18 +393,26 @@ def parseTemporary(responseType, typeString):
     nextCsv = csvPattern.search(typeString)
     name = nextCsv.group().replace(',' , '')
     typeString = typeString[nextCsv.end():]
-    # get addr and remove
+    # get addr1 and remove
     nextCsv = csvPattern.search(typeString)
     addr = nextCsv.group().replace(',' , '')
+    typeString = typeString[nextCsv.end():]
+    # get addr2 and remove
+    nextCsv = csvPattern.search(typeString)
+    addr2 = nextCsv.group().replace(',' , '')
     typeString = typeString[nextCsv.end():]
     # get city and remove
     nextCsv = csvPattern.search(typeString)
     city = nextCsv.group().replace(',' , '')
     typeString = typeString[nextCsv.end():]
-    # get state and remove
-    nextCsv = csvPattern.search(typeString)
-    state = nextCsv.group().replace(',' , '')
-    typeString = typeString[nextCsv.end():]
+    if len(city) == 2:
+        state = city
+        city = addr2
+    else:
+        # get state and remove
+        nextCsv = csvPattern.search(typeString)
+        state = nextCsv.group().replace(',' , '')
+        typeString = typeString[nextCsv.end():]
     # get zip
     nextWord = wordPattern.search(typeString)
     zip = nextWord.group()
