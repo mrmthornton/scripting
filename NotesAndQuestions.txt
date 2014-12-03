@@ -35,12 +35,13 @@ working  how to handle text with \n in it ?
          choose earlies date, issued or reg dt ?
          assert dates are not in the future
          assert key-in is the same as key-out
-         RTS database
          alpha-numerics only. #nnn should be assigned address2 without #
          does placard work ? should return no record
          optimize findStartEnd()
-DONE     move re.compile()'s out of loops
+DONE     move re.compile()'s out of loops, where possible
 DONE     fill in parsePermit()
 
 
 Notes:
+	RTS database - Registration Title System database of all? records since 1998.
+

@@ -27,16 +27,34 @@ datePattern = re.compile('[0-9]{2,2}/[0-9]{2,2}/[0-9]{4,4}') # mo/day/year
 dateYearFirstPattern = re.compile(r'\d{4,4}/\d{2,2}/\d{2,2}') # year/mo/day
 
 def repairLineBreaks(fileString):
-    #broken words have a pattern of  partial-word, newline(\n) white-space, partial word.
-    # end of line is signified by return-newline(\r\n)
-    wordBreakPattern = re.compile(r'[A-Z]+\n [A-Z]+(,|\.)') # find broken words
-    #numberBreakPattern = re.compile(r'\d+\n \d+') # find broken numbers
-    lineBreakIterator = wordBreakPattern.finditer(fileString)
-    for broken in lineBreakIterator:
-        fileString = fileString[:broken.start()] + broken.group().replace('\n ', '') + fileString[broken.end() + 1:]
-        #word = broken.group()
-        #print word
-        #print word.replace('\n ', '')
+    #broken words have a pattern of
+    # partial-word, newline(\n) white-space, partial word, identifier,
+    # where the identifier is one of ' . , - '
+    wordBreakPattern = re.compile(r'[A-Z]+\n [A-Z]+(,|\.|-)') # find broken words
+    while True:
+        broken = wordBreakPattern.search(fileString)
+        if broken != None:
+            fileStringBegin = fileString[:broken.start()]
+            fileStringMiddle = broken.group()
+            fileStringMiddle = fileStringMiddle.replace('\n ', '')
+            fileStringEnd = fileString[broken.end():]
+            fileString = fileStringBegin + fileStringMiddle + fileStringEnd
+        else:
+            break
+#    numberBreakPattern = re.compile(r'\d+-*\n [-\d]+') # find broken numbers
+#    zipCodePlusPattern = re.compile(r'\d{5,5}-\d{4,4}')
+#    zipCodePattern = re.compile(r'\d{5,5}')
+#    while True:
+#        broken = numberBreakPattern.search(fileString)
+#        if broken != None:
+#            fileStringBegin = fileString[:broken.start()]
+#            fileStringMiddle = broken.group()
+#            fileStringMiddle = fileStringMiddle.replace('\n ', '')
+#            fileStringEnd = fileString[broken.end():]
+#            if re.search(zipCodePlusPattern, fileStringMiddle) != None:
+#                fileString = fileStringBegin + fileStringMiddle + fileStringEnd
+#        else:
+#            break
     #print fileString
     return fileString
 
@@ -111,6 +129,15 @@ def findResponseType(plate, fileString):
         print  '\nfindResponseType:', targetType, startNum, endNum
         return [targetType, startNum, endNum]
 
+    # SPECIAL
+    targetType = 'SPECIAL'
+    startPattern = re.compile(r'SPECIAL PLATE\s+' + plate)
+    endPattern = re.compile(r'CODE XYZ')
+    startNum, endNum = findStartEnd(fileString,startPattern, endPattern)
+    if startNum != None:
+        print  '\nfindResponseType:', targetType, startNum, endNum
+        return [targetType, startNum, endNum]
+
     # PLACARD
     targetType = 'PLACARD'
     startPattern = re.compile('SELECTION REQUEST:' + '[\s]+' + 'PLACARD')
@@ -146,6 +173,8 @@ def findResponseType(plate, fileString):
         return [targetType, startNum, endNum]
     return None
 
+# parse<RESPONSETYPE>() return a list of strings as follows
+# ['response type', 'plate', 'name', 'addr', 'apt', 'city', 'state', 'zip', 'owned']
 def parseRecord(responseType, typeString):
     if responseType == 'NORECORD':
         return parseNoRecord(responseType, typeString)
@@ -161,12 +190,12 @@ def parseRecord(responseType, typeString):
         return parsePermit(responseType, typeString)
     if responseType == 'TEMPORARY':
         return parseTemporary(responseType, typeString)
+    if responseType == 'SPECIAL':
+        return parseSpecial(responseType, typeString)
     if responseType == 'CANCELED':
         return parseCanceled(responseType, typeString)
     return None
 
-# parse<RESPONSETYPE>() return a list of strings as follows
-# ['response type', 'plate', 'name', 'addr', 'apt', 'city', 'state', 'zip', 'owned']
 def parseNoRecord(responseType, typeString):
     noRecordPattern = re.compile('REG 00 ')
     header = noRecordPattern.search(typeString)
@@ -341,7 +370,7 @@ def parseTxirp(responseType, typeString):
     return [responseType, plate.strip(), name.strip(), addr.strip(), '', city.strip(), state.strip(), zip, '']
 
 def parsePermit(responseType, typeString):
-    permitHeaderPattern = re.compile(('ONE TRIP PERMIT:|30 DAY PERMIT:|144-HOUR PERMIT:') + '\s+')
+    permitHeaderPattern = re.compile(r'(ONE TRIP PERMIT:|30 DAY PERMIT:|144-HOUR PERMIT:)\s+')
     header = permitHeaderPattern.search(typeString)
     typeString = typeString[header.end():]
     nextWord = wordPattern.search(typeString)
@@ -350,7 +379,7 @@ def parsePermit(responseType, typeString):
     dateYearFirst = validDate.group()
     issued = dateYearFirst[5:] + '/' + dateYearFirst[0:4]
     typeString = typeString[validDate.end():]
-    permitNamePattern = re.compile('APPLICANT NAME :\s+')
+    permitNamePattern = re.compile(r'(APPLICANT NAME :|BUSINESS  NAME :)\s+')
     header = permitNamePattern.search(typeString)
     typeString = typeString[header.end():]
     found = linePattern.search(typeString)
@@ -418,6 +447,48 @@ def parseTemporary(responseType, typeString):
     zip = nextWord.group()
     return [responseType, plate.strip(), name.strip(), addr.strip(), '', city.strip(), state.strip(), zip, issued]
 
+    # SPECIAL
+def parseSpecial(responseType, typeString):
+    #find and remove header
+    specialStartPattern = re.compile(r'SPECIAL PLATE\s+')
+    header = specialStartPattern.search(typeString)
+    typeString = typeString[header.end() + 1:]
+    # find plate and remove
+    found = linePattern.search(typeString)
+    typeString = typeString[found.end() + 1:]
+    plate = found.group()
+    # find next line, and remove
+    nextLine = linePattern.search(typeString)
+    typeString = typeString[nextLine.end() + 1:]
+    # find name and remove
+    nextLine = linePattern.search(typeString)
+    typeString = typeString[nextLine.end() + 1:]
+    name = nextLine.group()
+    # find addr and remove
+    nextLine = linePattern.search(typeString)
+    typeString = typeString[nextLine.end() + 1:]
+    addr = nextLine.group()
+    # find state and zip
+    stateAndZipPattern = re.compile('[A-Z]{2,2}\s+[0-9]{5,5}')
+    found = stateAndZipPattern.search(typeString)
+    state, zip = found.group().split()
+    addrString = typeString[:found.start()]
+    # find one or two lines,
+    # if the line2 is empty, line one is 'city'
+    # otherwise line one is 'addr2' and line2 is 'city'
+    nextLine = linePattern.search(addrString)
+    line1 = nextLine.group()
+    addrString = addrString[nextLine.end() + 1:]
+    nextLine = linePattern.search(addrString)
+    if nextLine != None:
+        line2 = nextLine.group()
+        if line2.strip() != '':
+            city = line2
+            addr2 = line1
+        else:
+            city = line1
+    return [responseType, plate.strip(), name.strip(), addr.strip(), '', city.strip(), state.strip(), zip, '']
+
 def parseCanceled(responseType, typeString):
     #save the plate
     plateCanceledPattern = re.compile(r'\w+' + '[ ]*' + 'CANCEL')
@@ -448,7 +519,7 @@ def main():
     with open('plates.csv', 'r') as plateFile:
         csvInput = csv.reader(plateFile)
         plates = [row[0] for row in csvInput]
-    print plates
+    #print plates
 
     with open('testFile.txt','r') as infile:
         with open('data.csv', 'a') as outfile:
@@ -463,7 +534,7 @@ def main():
                     except:
                         responseType = None
                         if foundCurrentPlate == False:
-                            print "\n", plate, ' No Informaton'
+                            print "\n", plate, ' Plate/Pattern not found'
                             outfile.write(',' + plate +', No Informaton\n')
                         break
                     if responseType != None:
@@ -475,7 +546,7 @@ def main():
                         listData = parseRecord(responseType, typeString)
                         csvString = csvStringFromList(listData)
                         outfile.write(csvString)
-            outfile.write('------------------------------------------------\n')
+            outfile.write('----------------\n')
             outfile.flush()
     print "main: Finished parsing TxDot file."
 
