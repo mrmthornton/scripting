@@ -1,0 +1,141 @@
+
+
+
+--------------no addr2------------------------------------
+
+SELECTION REQUEST: TEMPORARY TAG  52Y0747 
+        
+ TEMPORARY TAG:    52Y0747   VALID:2014/06/27 00:00:00--2014/08/26 00:00:00    
+ YR:0000 MAK:                                                                   
+ 
+        
+ DEALER TEMPORARY TAG - AGENT     
+ NAME:     MARIO MARTINEZ,6724 SHERMAN ST # A,HOUSTON,TX,77011-3526
+ 
+ REMARKS: ADDITIONAL TEMPORARY RECORDS AVAILABLE
+
+
+
+--------------special plate--------------------------
+
+ 2015 08 RTS SPECIAL PLATE ABC24                          
+  ISSUED TO
+  STEVEN JOBS               
+  410 I-27                     
+  SUITE  X                      
+  ATOWN            TX   75001
+                                    
+  CODE XYZ 08 2013 057 SLN24   000000   SP
+
+
+
+----------------no add2--------------------------------------
+   
+ SELECTION REQUEST: TEMPORARY TAG  20D2093 
+        
+ TEMPORARY TAG:    20D2093   VALID:2014/02/28 00:00:00--2014/04/29 00:00:00    
+ YR:0000 MAK:                                                                   
+ 
+        
+ DEALER TEMPORARY TAG - AGENT     
+ NAME:     JAMES STOVER,1008 W MAIN ST,ARLINGTON,TX,76013-1869
+
+  
+ 
+-----------------144 hr permit-------business-----------
+  
+ SELECTION REQUEST:  PERMIT 736030F      PERMIT ISSUANCE ID: 05746841342145927
+        
+ 144-HOUR PERMIT:    736030F  VALID:2013/03/11 14:59:03--2013/03/17 14:59:03   
+ BUSINESS  NAME :    F A M & SONS                                     
+                     5902 MIMOSA LN                            
+                     ROWLETT TX 75089                                           
+ 1996  VN 
+ VIN: 1DW1A5322WS136326                       
+ ISSUING OFFICE: DALLAS COUNTY
+
+
+
+----------------no addr2-----------------------------------
+
+   SELECTION REQUEST: TEMPORARY TAG  52Y0747 
+        
+ TEMPORARY TAG:    52Y0747   VALID:2014/06/27 00:00:00--2014/08/26 00:00:00    
+ YR:0000 MAK:                                                                   
+ 
+        
+ DEALER TEMPORARY TAG - AGENT     
+ NAME:     MARIO MARTINEZ,6724 SHERMAN ST # A,HOUSTON,TX,77011-3526
+ 
+ REMARKS: ADDITIONAL TEMPORARY RECORDS AVAILABLE
+ 
+ 
+ 
+------------------no addr2--------------------------- 
+
+ SELECTION REQUEST: TEMPORARY TAG  20D2093 
+        
+ TEMPORARY TAG:    20D2093   VALID:2014/02/28 00:00:00--2014/04/29 00:00:00    
+ YR:0000 MAK:                                                                   
+ 
+        
+ DEALER TEMPORARY TAG - AGENT     
+ NAME:     JAMES STOVER,1008 W MAIN ST,ARLINGTON,TX,76013-1869
+ 
+ 
+ 
+ ----------------144hr business permit----------------------------
+ 
+ SELECTION REQUEST:  PERMIT 736030F      PERMIT ISSUANCE ID: 05746841342145927
+        
+ 144-HOUR PERMIT:    736030F  VALID:2013/03/11 14:59:03--2013/03/17 14:59:03   
+ BUSINESS  NAME :    F A M & SONS                                     
+                     5902 MIMOSA LN                            
+                     ROWLETT TX 75089                                           
+ 1996  VN 
+ VIN: 1DW1A5322WS136326                       
+ ISSUING OFFICE: DALLAS COUNTY 
+ 
+
+
+---------------------30day permit-----------------
+
+ SELECTION REQUEST:  PERMIT 562949G      PERMIT ISSUANCE ID: 04333141771123046
+        
+ 30 DAY PERMIT:      562949G  VALID:2014/05/14 12:30:39--2014/06/13 23:59:59   
+ APPLICANT NAME :    CHRISTOPHER L ANDERSON                          
+                     1906 JUPITER RD                           
+                     PLANO TX 75074                                             
+ 1995 CHEVROLET VN 
+ VIN: 1GCDG15H0SF161868                       
+ ISSUING OFFICE: COLLIN COUNTY 
+ 
+
+
+-----------city parse problem------------------------
+  
+ 2015 12 DEALER            8E4239                         
+  ISSUED TO
+  JDM ENTERPRISE                
+  7376 US HIGHWAY 69 S          
+  LONE OAK            TX   75453
+  MASTER DEALER NUMBER P123877      
+  PLATE EXPIRES: 2015/12  PLATE STATUS: CURRENT            
+  CODE DL          116    
+
+
+
+---------------------- embedded \n problem-------------               
+ 
+ LIC 356529H JAN/2015 OLD # 60093K JAN/2015 EWT  1490 GWT   3850
+ TRLR PLT, STKR            REG CLASS  37   $ 56.00 ROCKWALL CNTY
+ TITLE 19900041686120438 ISSUED            ODOMETER N/A REG DT 02/18/2014
+ YR:1998 MAK:CMT  MODL:M16 BDY STYL:VN VEH CLS:S-MISC     SALE PRC:     $100.00
+ VIN: 49TCB1011W1035210 BODY VIN: N/A COLOR: WHITE 
+ PREV OWN  BTA INC,ROCKWALL,TX                    
+ OWNER     ACTION COMMERCIAL SERVICES LLC,MICHAEL PRIMEAUX,4418 ST HWY 276,,RO
+           CKWALL,TX,75032
+ RNWL RCP  ,P.O. BOX 1689,,ROCKWALL,TX,75032
+ PLATE AGE:  0  LAST ACTIVITY 02/19/2014 REPL   OFC: 199
+ REMARKS PLATE 60093K CANCELLED ON 2014/02/18.DATE OF ASSIGNMENT:2014/02/14.N
+ ON-TITLED-VEHICLE.
