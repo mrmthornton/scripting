@@ -41,20 +41,22 @@ def repairLineBreaks(fileString):
             fileString = fileStringBegin + fileStringMiddle + fileStringEnd
         else:
             break
-#    numberBreakPattern = re.compile(r'\d+-*\n [-\d]+') # find broken numbers
-#    zipCodePlusPattern = re.compile(r'\d{5,5}-\d{4,4}')
-#    zipCodePattern = re.compile(r'\d{5,5}')
-#    while True:
-#        broken = numberBreakPattern.search(fileString)
-#        if broken != None:
-#            fileStringBegin = fileString[:broken.start()]
-#            fileStringMiddle = broken.group()
-#            fileStringMiddle = fileStringMiddle.replace('\n ', '')
-#            fileStringEnd = fileString[broken.end():]
-#            if re.search(zipCodePlusPattern, fileStringMiddle) != None:
-#                fileString = fileStringBegin + fileStringMiddle + fileStringEnd
-#        else:
-#            break
+    numberBreakPattern = re.compile(r'\d+-\d*\n \d+|\d+\n \d*-\d+') # find broken numbers
+    zipPlusPattern = re.compile(r'\d{5,5}-\d{4,4}')
+    zipCodePattern = re.compile(r'\d{5,5}')
+    while True:
+        broken = numberBreakPattern.search(fileString)
+        if broken != None:
+            fileStringBegin = fileString[:broken.start()]
+            fileStringMiddle = broken.group()
+            fileStringMiddle = fileStringMiddle.replace('\n ', '')
+            fileStringEnd = fileString[broken.end():]
+            print fileStringMiddle
+            if re.search(zipPlusPattern, fileStringMiddle) != None:
+                fileString = fileStringBegin + fileStringMiddle + fileStringEnd
+                print fileStringMiddle
+        else:
+            break
     #print fileString
     return fileString
 
@@ -523,7 +525,7 @@ def main():
 
     with open('testFile.txt','r') as infile:
         with open('data.csv', 'a') as outfile:
-            #outfile.truncate()
+            outfile.truncate()
             fileString = infile.read()
             fileString =  repairLineBreaks(fileString)
             for plate in plates:
@@ -535,7 +537,7 @@ def main():
                         responseType = None
                         if foundCurrentPlate == False:
                             print "\n", plate, ' Plate/Pattern not found'
-                            outfile.write(',' + plate +', No Informaton\n')
+                            outfile.write(',' + plate + ' Plate/Pattern not found\n')
                         break
                     if responseType != None:
                         foundCurrentPlate = True

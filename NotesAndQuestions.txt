@@ -30,7 +30,8 @@ Secondary issues:
          multiple plate responses - same or different owner - start date , end date ?
 working  how to handle text with \n in it ? 
  working  BROK\n EN(.|,) - word ending in ',' or '.' with newline embedded
- working  750\n 10       - 5 digit zip code with newline embedded
+ working  750\n 10-1111  -ZipPlus with newline embedded
+          750\n 10       - 5 digit zip code with newline embedded
  unknown  addline with \n 
          choose earlies date, issued or reg dt ?
          assert dates are not in the future
