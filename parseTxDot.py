@@ -543,8 +543,8 @@ def main():
     #print sheet
     #data = [[sheet.cell_value(r, c) for c in range(sheet.ncols)] for r in range(sheet.nrows)]
 
-    #with open('plates.csv', 'r') as plateFile:
-    with open('plates-needreview.csv', 'r') as plateFile:
+    with open('plates.csv', 'r') as plateFile:
+    #with open('plates-needreview.csv', 'r') as plateFile:
         csvInput = csv.reader(plateFile)
         plates = [row[0] for row in csvInput]
     #print plates
