@@ -59,7 +59,7 @@ def repairLineBreaks(fileString):
             fileStringEnd = fileString[broken.end():]
             if re.search(zipPlusPattern, fileStringMiddle) != None:
                 fileString = fileStringBegin + fileStringMiddle + fileStringEnd
-                print 'repairLineBreaks:' + fileStringMiddle
+                #print 'repairLineBreaks:' + fileStringMiddle
         else:
             break
     #print 'repairLineBreaks:' + fileString
@@ -283,6 +283,12 @@ def parseStandard(responseType, typeString):
         typeString = typeString[nextRemove.end():]
         nextDate = datePattern.search(typeString)
         ownedStartDate = nextDate.group()
+    # get owner line and remove
+    ownerLinePattern = re.compile(r'OWNER.*,.*,.*,.*,.*,.*,\d{5,5}', re.DOTALL)
+    ownerLineFound = ownerLinePattern.search(typeString)
+    ownerLine = ownerLineFound.group()
+    ownerLine = ownerLine.replace("\n" , '')
+    print 'parseStandard: ' + ownerLine
     # get owner and remove
     ownerPattern = re.compile('OWNER\s+')
     nextRemove = ownerPattern.search(typeString)
