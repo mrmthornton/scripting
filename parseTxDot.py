@@ -283,12 +283,12 @@ def parseStandard(responseType, typeString):
         typeString = typeString[nextRemove.end():]
         nextDate = datePattern.search(typeString)
         ownedStartDate = nextDate.group()
-    # get owner line and remove
-    ownerLinePattern = re.compile(r'OWNER.*,.*,.*,.*,.*,.*,\d{5,5}', re.DOTALL)
-    ownerLineFound = ownerLinePattern.search(typeString)
-    ownerLine = ownerLineFound.group()
-    ownerLine = ownerLine.replace("\n" , '')
-    print 'parseStandard: ' + ownerLine
+#    # get owner line and remove
+#    ownerLinePattern = re.compile(r'OWNER.*,.*,.*,.*,.*,.*,\d{5,5}', re.DOTALL)
+#   ownerLineFound = ownerLinePattern.search(typeString)
+#    ownerLine = ownerLineFound.group()
+#    ownerLine = ownerLine.replace("\n" , '')
+#    print 'parseStandard: ' + ownerLine
     # get owner and remove
     ownerPattern = re.compile('OWNER\s+')
     nextRemove = ownerPattern.search(typeString)
@@ -436,7 +436,7 @@ def parsePermit(responseType, typeString):
         if found != None:
             state, zip = found.group().split()
             city = addr2[:found.start()]
-    return [responseType, plate.strip(), name.strip(), addr.strip(), '', city, state, zip, issued]
+    return [responseType, plate.strip(), name.strip(), addr.strip(), '', city.strip(), state, zip, issued]
 
 def parseTemporary(responseType, typeString):
     # find header and remove
