@@ -429,16 +429,13 @@ def parsePermit(responseType, typeString):
     found = stateAndZipPattern.search(typeString)
     if found != None:
         state, zip = found.group().split()
-        addrString = typeString[:found.start()]
-        city = typeString.strip()
+        city = typeString[:found.start()]
     # if addr2 line is city, state, zip
     else:
         found = stateAndZipPattern.search(addr2)
         if found != None:
             state, zip = found.group().split()
-            addrString = addr2[:found.start()]
-            city = addr2.strip()
-
+            city = addr2[:found.start()]
     return [responseType, plate.strip(), name.strip(), addr.strip(), '', city, state, zip, issued]
 
 def parseTemporary(responseType, typeString):
@@ -517,26 +514,13 @@ def parseSpecial(responseType, typeString):
     found = stateAndZipPattern.search(typeString)
     if found != None:
         state, zip = found.group().split()
-        addrString = typeString[:found.start()]
-        city = typeString.strip()
+        city = typeString[:found.start()]
     # if addr2 line is city, state, zip
     else:
         found = stateAndZipPattern.search(addr2)
         if found != None:
             state, zip = found.group().split()
-            addrString = addr2[:found.start()]
-            city = addr2.strip()
-
-
-#    addrString = addrString[nextLine.end() + 1:]
-#    nextLine = linePattern.search(addrString)
-#    if nextLine != None:
-#        line2 = nextLine.group()
-#        if line2.strip() != '':
-#            city = line2
-#            addr2 = line1
-#        else:
-#            city = line1
+            city = addr2[:found.start()]
     return [responseType, plate.strip(), name.strip(), addr.strip(), '', city.strip(), state.strip(), zip, '']
 
 def parseCanceled(responseType, typeString):
