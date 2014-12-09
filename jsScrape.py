@@ -10,6 +10,7 @@ from PyQt4 import QtWebKit
 import webbrowser
 #import jswebkit
 
+
 class WebkitDownloader( object ):
     def process_request( self, request, spider ):
         if( type(request) is not FormRequest ):
