@@ -65,6 +65,19 @@ def repairLineBreaks(fileString):
     #print 'repairLineBreaks:' + fileString
     return fileString
 
+def fixLine(lineString):
+    # repair lines broken with \n and/or \r and following spaces
+#    # get owner line and remove
+    ownerStartPattern = re.compile(r'OWNER')
+    ownerEndPattern = re.compile(r' RNWL RCP| PLATE AGE:| LIEN')
+    ownerStartFound = ownerStartPattern.search(typeString)
+    ownerStart = ownerStartFound.start()
+    ownerEndFound = ownerEndPattern.search(typeString)
+    ownerEnd = ownerEndFound.start()
+    ownerLine = typeString[ownerStartFound.start():ownerEndFound.start()]
+    print 'parseStandard: ' + ownerLine
+    return lineString
+
 def findStartEnd(fileString,startPattern, endPattern):
     # the iterator is used to search for all possible endLoc instances,
     # since the search of a substring uses a smaller set of numbers
@@ -283,12 +296,6 @@ def parseStandard(responseType, typeString):
         typeString = typeString[nextRemove.end():]
         nextDate = datePattern.search(typeString)
         ownedStartDate = nextDate.group()
-#    # get owner line and remove
-#    ownerLinePattern = re.compile(r'OWNER.*,.*,.*,.*,.*,.*,\d{5,5}', re.DOTALL)
-#   ownerLineFound = ownerLinePattern.search(typeString)
-#    ownerLine = ownerLineFound.group()
-#    ownerLine = ownerLine.replace("\n" , '')
-#    print 'parseStandard: ' + ownerLine
     # get owner and remove
     ownerPattern = re.compile('OWNER\s+')
     nextRemove = ownerPattern.search(typeString)
