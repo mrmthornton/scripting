@@ -1,5 +1,5 @@
-Line break in ZipCode 
-Line break in state
+This file contains mock responses. 
+All Personally Identifiable information has been removed.
 
 ------------------extra addr line and city has two words------------------------
 
@@ -23,7 +23,7 @@ Line break in state
   30000 LBJ FREEWAY SOUTH       
   SAN ANTONIO              TX   75001
                                     
-  CODE XYZ 12 2013 057 BOB 99  000000   SP
+  CODE XYZ 12 2013 057 99999  000000   SP
  
 -------------------------------------------------------------------------------- 
 
