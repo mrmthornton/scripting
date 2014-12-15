@@ -8,8 +8,7 @@
 import gtk
 from PyQt4 import QtWebKit
 import webbrowser
-#import jswebkit
-
+import jswebkit
 
 class WebkitDownloader( object ):
     def process_request( self, request, spider ):
