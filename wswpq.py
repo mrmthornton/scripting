@@ -18,11 +18,14 @@ def scrape_links(base_url, data):
     linkList = []
     for anchor in soup.findAll("a"):
         for name, value in anchor.attrs:
-            link = mechanize.Link(  base_url = base_url,
-                                    url = str(anchor['href']),
-                                    text = str(anchor.string),
-                                    tag = str(anchor.name),
-                                    attrs = [(str(name), str(value))])
+            if str(anchor['href']) != None:
+                link = mechanize.Link(  base_url = base_url,
+                                        url = str(anchor['href']),
+                                        text = str(anchor.string),
+                                        tag = str(anchor.name),
+                                        attrs = [(str(name), str(value))])
+            print str(anchor.string)
+            print str(anchor['href'])
             linkList.append(link)
     return linkList
 ##    links = [
