@@ -44,5 +44,11 @@ DONE     fill in parsePermit()
 
 
 Notes:
+	plates with white space in record?
+	do special plates, ie dealer have special lookup ? I.E. master record
+	are there keywords or symbols for use in pattern matching?
+
 	RTS database - Registration Title System database of all? records since 1998.
+
+	https://www.packtpub.com/books/content/web-scraping-python-part-2
 
