@@ -18,15 +18,15 @@ def scrape_links(base_url, data):
     linkList = []
     for anchor in soup.findAll("a"):
         for name, value in anchor.attrs:
-            if str(anchor['href']) != None:
+            if str(name) == 'href':
                 link = mechanize.Link(  base_url = base_url,
                                         url = str(anchor['href']),
                                         text = str(anchor.string),
                                         tag = str(anchor.name),
                                         attrs = [(str(name), str(value))])
-            print str(anchor.string)
-            print str(anchor['href'])
-            linkList.append(link)
+                print str(anchor.string)
+                print str(anchor['href'])
+                linkList.append(link)
     return linkList
 ##    links = [
 ##            mechanize.Link(base_url = base_url,
@@ -35,9 +35,8 @@ def scrape_links(base_url, data):
 ##                            tag = str(anchor.name),
 ##                            attrs = [(str(name), str(value))
 ##                                for name, value in anchor.attrs])
-#    mechanize.Link(base_url, url,            text,          tag,         attrs)
-#    mechanize.Link(base_url, anchor['href'], anchor.string, anchor.name, [str(name), str(value) for name, value in anchor.attrs])
-                #for anchor in soup.right.findAll("a")]  # original code, no soup.right ?
+                # in the original code the method 'soup.right.findAll() does not exist?
+                #for anchor in soup.right.findAll("a")]
 ##                for anchor in soup.findAll('href')
 ##            ]
 ##    return links
@@ -48,12 +47,17 @@ def scrape_articles(data):
     """
     # URL prefix is used to filter out other links
     # such as the ones pointing to books
+    articles = []
     ARTICLE_URL_PREFIX = 'http://www.packtpub.com/article/'
-
     soup = BeautifulSoup(data)
-    articles = [{'title': str(anchor.string), 'url': str(anchor['href'])}
-                for anchor in [li.a for li in soup.findAll('li')]
-                    if anchor['href'].startswith(ARTICLE_URL_PREFIX)]
+    for anchor in [li.a for li in soup.findAll('li')]:
+        if anchor != None:
+            for name, value in anchor.attrs:
+                if str(value).startswith(ARTICLE_URL_PREFIX):
+                    articles.append( {'title': str(anchor.string),
+                                        'url': str(anchor['href']) } )
+                    print {'title': str(anchor.string),
+                                        'url': str(anchor['href']) }
     return articles
 
 def main():
@@ -76,15 +80,14 @@ def main():
 
     links = scrape_links(BASE_URL, data)
 
-
     # Scrape articles in main page
     articles.extend(scrape_articles(data))
 
     # Scrape articles in linked pages
-    for link in links[1:]:
-        data = br.follow_link(link).get_data()
-        articles.extend(scrape_articles(data))
-        br.back()
+    ##for link in links[1:]:
+    ##    data = br.follow_link(link).get_data()
+    ##    articles.extend(scrape_articles(data))
+    ##    br.back()
 
     # Ouput is the list of titles and URLs for each article found
     print ("Article Network\n"
