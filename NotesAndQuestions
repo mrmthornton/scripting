@@ -50,5 +50,6 @@ Notes:
 
 	RTS database - Registration Title System database of all? records since 1998.
 
-	https://www.packtpub.com/books/content/web-scraping-python-part-2
-
+	cookies and authentication?
+	http://selenium-release.storage.googleapis.com/2.44/selenium-server-standalone-2.44.0.jar
+	java -jar selenium-server-standalone-2.44.0.jar
