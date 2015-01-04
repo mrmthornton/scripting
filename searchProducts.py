@@ -1,6 +1,6 @@
 from selenium import webdriver
 
-driver = webdriver.Ie()
+driver = webdriver.Firefox()
 driver.implicitly_wait(30)
 driver.maximize_window()
 
