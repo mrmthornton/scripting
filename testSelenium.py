@@ -5,6 +5,7 @@ Scrape packpub article network
 """
 from selenium import webdriver
 from BeautifulSoup import BeautifulSoup
+import mechanize
 import webbrowser  # for debug
 
 def scrape_links(base_url, data):
@@ -55,10 +56,13 @@ def main():
     articles = []
 
     # Get main page and get links to all article pages
-    BASE_URL = "http://www.packtpub.com/article-network"
-    driver = webdriver.PhantomJS()
+    BASE_URL = "https://www.packtpub.com/books/content/article-network"
+    driver = webdriver.Ie()
     driver.set_window_size(1024, 768)
     driver.get(BASE_URL)
+
+    br = mechanize.Browser()
+    data = br.open(BASE_URL).get_data()
     ## # save data as web page and view data in browser   ## for debug
     ##with open('page.html', 'w') as pageFile:  # open the file to store html
     ##    pageFile.write(data)               # write to file

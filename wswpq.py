@@ -49,7 +49,8 @@ def main():
     articles = []
 
     # Get main page and get links to all article pages
-    BASE_URL = "https://www.packtpub.com/article-network"
+    BASE_URL = "https://www.packtpub.com/books/content/article-network"
+    ##BASE_URL = "https://www.packtpub.com/books/content/blogs"
     br = mechanize.Browser()
     data = br.open(BASE_URL).get_data()
     ## # save data as web page and view data in browser
