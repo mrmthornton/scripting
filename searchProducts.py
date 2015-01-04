@@ -1,6 +1,13 @@
 from selenium import webdriver
 
+#select FireFox or IE or explicit port
 driver = webdriver.Firefox()
+
+driver = webdriver.Ie()
+
+driver = webdriver.Ie(port=5555)
+
+
 driver.implicitly_wait(30)
 driver.maximize_window()
 
