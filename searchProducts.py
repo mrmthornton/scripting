@@ -1,7 +1,7 @@
 from selenium import webdriver
 
-driver = webdriver.Ie()
-driver.implicitly_wait(30)
+driver = webdriver.Ie(port=5555)
+driver.implicitly_wait(15)
 driver.maximize_window()
 
 url = 'http://demo.magentocommerce.com/'
