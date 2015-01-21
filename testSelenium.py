@@ -56,8 +56,8 @@ def main():
     articles = []
 
     # Get main page and get links to all article pages
-    BASE_URL = "https://www.packtpub.com/books/content/article-network"
-    driver = webdriver.Ie()
+    BASE_URL = "http://www.packtpub.com/books/content/article-network"
+    driver = webdriver.Ie(port=5555)
     driver.set_window_size(1024, 768)
     driver.get(BASE_URL)
 

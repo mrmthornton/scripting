@@ -1,12 +1,15 @@
+# testing selenium
+# open a page
+# fill the search field and submit
+# scrape the results
+# close the page
+
+# works on win7, ie10
+
 from selenium import webdriver
 
-#select FireFox or IE or explicit port
-driver = webdriver.Firefox()
 
 driver = webdriver.Ie()
-
-driver = webdriver.Ie(port=5555)
-
 
 driver.implicitly_wait(30)
 driver.maximize_window()
