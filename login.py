@@ -5,7 +5,7 @@
 # close the page
 
 # works on win7, ie10
-import os
+import io
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 
@@ -29,21 +29,6 @@ passwordField.clear()
 passwordField.send_keys("randomaccess")
 passwordField.submit()
 
-e = []
-linkElements = driver.find_elements_by_tag_name("a")
-for linkText in linkElements:
-    e = linkTexts.
-
-#driver.find_elements_by_link_text("Junk")
-#driver.find_element_by_partial_link_text("/?_task=mail&amp;_mbox=Junk").click()
-#driver.find_element_by_class_name("mailbox junk").click()
-#driver.find_element(By.xpath("//a[@href='/?_task=mail&amp;_mbox=Junk']")).click()
-driver.find_element_by_xpath("//a[@href='/?_task=mail&amp;_mbox=Junk']").click()
-
-
-##print "Found " + str(len(clickOnSent)) + ' products:'
-
-##or product in clickOnSent:
-##    clickOnSent.click
-
-driver.quit()
+selectMenuItem = driver.find_element_by_xpath('//li[@class="mailbox"]/a[contains(@href, "Junk")]')
+selectMenuItem.click()
+#driver.quit()
