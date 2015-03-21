@@ -1,0 +1,949 @@
+This file contains mock responses. 
+All Personally Identifiable information has been removed.
+
+------------------extra addr line and city has two words------------------------
+
+ SELECTION REQUEST:  PERMIT 654321F      PERMIT ISSUANCE ID: 11111141333335553
+        
+ 30 DAY PERMIT:      654321F  VALID:2013/02/07 13:55:02--2013/03/09 00:00:00   
+ APPLICANT NAME :    MYOWN  NAME                        
+                     43211 NORTH POLE PKWY                   
+                     #123                                      
+                     LITTLE ELM TX 75001                                            
+ 2005 LAND BOAT v8 
+ VIN: 12345678901234567                       
+ ISSUING OFFICE: ANOTHER COUNTY
+
+--------------------------------------------------------------------------------
+
+  
+ 2014 12 RTS SPECIAL PLATE 99999                          
+  ISSUED TO
+  JIMBO JO COFFCOFF                
+  30000 LBJ FREEWAY SOUTH       
+  SAN ANTONIO              TX   75001
+                                    
+  CODE XYZ 12 2013 057 99999  000000   SP
+ 
+-------------------------------------------------------------------------------- 
+
+  
+ 2016 01 DEALER            1E1111                         
+  ISSUED TO
+  J LENO CARS, LLC            
+  6000 DENTON HWY               
+  DENTON             TX   75001
+  MASTER DEALER NUMBER P111111      
+  PLATE EXPIRES: 2016/01  PLATE STATUS: CURRENT            
+  CODE FW          220                    
+ 
+
+--------------------------------------------------------------------------------
+
+
+ SELECTION REQUEST: TEMPORARY TAG  23L7777 
+        
+ TEMPORARY TAG:    23L7777   VALID:2014/12/06 00:00:00--2015/02/04 00:00:00    
+ YR:2001 MAK:FORD                MODL:MUS                 STYL:CONVERTIBL       
+ VIN: 12345678901234567   COLOR: BLACK 
+        
+ BUYER TEMPORARY TAG              
+ NAME:     JESSE JAMES,1111 ROBBER ROAD,FORT WORTH,TX,75001     
+ LIEN:     AUTO SALES, INC.,14444 JACKYOUUP,FORT WORTH,TX,75001
+
+
+
+
+Line break in ZipCode 
+Line break in state
+Permit with 2nd addr line
+Line break in city
+Dealer with ,  in name
+NAME-OTHER, LTD   ---dash and comma in name field
+City has two names
+
+----------------------------------------------------------------------
+
+ 2016 08 DEALER            5F1234                          
+ ISSUED TO  HONDA CARS OF IRELAND         
+ 1550 E US ROUTE 130           
+ CORK            TX   75000 
+ MASTER DEALER NUMBER P122272       
+ PLATE EXPIRES: 2016/08  PLATE STATUS: CURRENT             
+ CODE DL          123                     
+
+----------------------------------------------------------  
+   
+ REG 00 BRS1234
+  RESPONSE-- NO RECORD IN RTS DATABASE  
+
+-------------------------------------------------------------  
+ 2008 TXIRP PLATE LIC OK1AHO
+ EXPIRES JUN/2008 EWT 16600 GWT  80000  APPORTIONED TRUCK PLT, REG CLASS 006
+ 2007 FRHT 1234VIN0123456789     TRACTOR 
+ ISSUED TO: SOME TRUCK LEASING LP,4444 DENTON DR.,ACITY,TX  75000
+            APPORTIONED ACCOUNT 012345 01,UNIT # 57297500, REMARKS                                        
+                                          
+-------------------------------------------------------------------------
+ 
+ LIC OKLAHO MAR/2015 OLD # OKLAHO MAR/2014 EWT  4300 GWT   4300
+ OKLAHOMA STATE UNIV C, STKR            REG CLASS  25   $ 62.75 DALLAS CNTY
+ TITLE 1234VIN1234567890 ISSUED 05/15/2012 ODOMETER 6     REG DT 02/21/2014
+ YR:2012 MAK:VOLV MODL:XC6 BDY STYL:LL VEH CLS:PASS       SALE PRC:   $43867.00
+ VIN: YYYYYY65432118889 BODY VIN: N/A COLOR: BLACK 
+ PREV OWN  PARK PLACE,BOARDWALK,TX             
+ OWNER     SOME BODY,,9999 PEACH TREE LN,,NEW YORK,ME,75000
+ RNWL RCP  SOME BODY,9999 PEACHTREE LANE,,NEW YORK,ME,75000
+ PLATE AGE:  4  LAST ACTIVITY 04/05/2014 IRENEW OFC: 999
+ REMARKS ACTUAL MILEAGE.DATE OF ASSIGNMENT:2012/04/14.SPECIAL PLATE.PAPER TITLE. 
+--------------------------------------------------------------------  
+ SELECTION REQUEST: TEMPORARY TAG 
+
+ 88K8888          TEMPORARY TAG:    88K8888   VALID:2014/02/03 00:00:00--2014/04/04 00:00:00    
+ YR:0000 MAK:  
+                                                                          
+ DEALER TEMPORARY TAG - AGENT     
+ NAME:     SAMANTHA BEWITCHED,1234 FORT WORTH AVE,FORT WORTH,TX,75000-0000 
+
+--------------canceled or cancelled , with or without whitespace------------
+
+ LIC ONEL SEP/2014 OLD # ABC1234 SEP/2013 EWT  4300 GWT   4300
+ PASSENGER-TRUCK PLT, STKR            REG CLASS  25   $ 62.75 COLLIN CNTY
+ TITLE 1234VIN1234567890 ISSUED 02/17/2006 ODOMETER 50223 REG DT 09/12/2013
+ YR:2003 MAK:FORD MODL:EPR BDY STYL:LL VEH CLS:PASS-TRK   SALE PRC:   $12135.37
+ VIN: 1234VIN1234567890 BODY VIN: N/A COLOR: SILVER 
+ PREV OWN  RICH MANN HYUNDAI,AMARILLO,KS         
+ OWNER     FRESH CORN,,3333 FIRST ST,,BLANK,TX,75000
+ RNWL RCP  FRESH CORN,4444 JUNCTION DR,,BLANK,TX,75000
+ LIEN      01/27/2006,SOME BANK,,PO BOX 123,,CITY,TX,75000
+ PLATE AGE:  3  LAST ACTIVITY 07/03/2014 TAPNCA OFC: 000
+ REMARKS PLATE PLATE99 CANCELED ON 2011/09/02.ACTUAL MILEAGE.PAPER TITLE. 
+------------------------------------------------------------------
+ LIC DBLL SEP/2014 OLD # ABC1234 SEP/2013 EWT  4300 GWT   4300
+ PASSENGER-TRUCK PLT, STKR            REG CLASS  25   $ 62.75 COLLIN CNTY
+ TITLE 1234VIN1234567890 ISSUED 02/17/2006 ODOMETER 50223 REG DT 09/12/2013
+ YR:2003 MAK:FORD MODL:EPR BDY STYL:LL VEH CLS:PASS-TRK   SALE PRC:   $12135.37
+ VIN: 1234VIN1234567890 BODY VIN: N/A COLOR: SILVER 
+ PREV OWN  RICH MANN HYUNDAI,AMARILLO,KS         
+ OWNER     FRESH CORN,,3333 FIRST ST,,BLANK,TX,75000
+ RNWL RCP  FRESH CORN,4444 JUNCTION DR,,BLANK,TX,75000
+ LIEN      01/27/2006,SOME BANK,,PO BOX 123,,CITY,TX,75000
+ PLATE AGE:  3  LAST ACTIVITY 07/03/2014 TAPNCA OFC: 000
+ REMARKS PLATE PLATE100CANCELLED ON 2011/09/02.ACTUAL MILEAGE.PAPER TITLE.
+
+   ----------standard with line breaks in owner line----------------------
+ LIC 1E12345 MAR/2015 OLD # 1E12345 MAR/2015 EWT 10400 GWT  29000
+ COMBINATION PLT, STKR            REG CLASS  10  $ 353.50 COLLIN CNTY
+ TITLE 1234VIN1234567890 ISSUED 01/29/2010 ODOMETER N/A REG DT 04/21/2014
+ YR:2001 MAK:FRHT MODL:FL7 BDY STYL:FB VEH CLS:TRK>1      SALE PRC:       $0.00
+ VIN: 1234VIN1234567890 BODY VIN: N/A COLOR: BLUE 
+ PREV OWN  YUMMY HOT DOGS,PLANO,TX         
+ OWNER     AAA LEASING,(LESSOR),C/O YUMMY HOT DOGS,4444 EA
+           ST 14TH STREET,MYTOWN,TX,75000
+ RNWL RCP  YUMMY HOT DOGS,4444 EAST 14TH STREET,,MYTOWN,TX,75074
+ PLATE AGE:  0  LAST ACTIVITY 04/22/2014 REPL   OFC: 000
+ REMARKS DIESEL.DATE OF ASSIGNMENT:2010/01/12.PAPER TITLE.
+
+
+
+   
+ ----------------one trip permit----------------------
+  
+ SELECTION REQUEST:  PERMIT 654321G      PERMIT ISSUANCE ID: 12345678901234567
+        
+ ONE TRIP PERMIT:    654321G  VALID:2014/02/21 13:33:40--2014/03/08 23:59:59   
+ APPLICANT NAME :    NIM TEL                        
+                     33 ASTREET LN                         
+                     SOMEWHERE TX 75001                                            
+ ORIGINATION POINT:   402 ASTREET ROAD SOMEWHERE TX                     
+ INTERMEDIATE POINTS: LEGACY                                           
+ INTERMEDIATE POINTS: 75                                               
+ DESTINATION POINT:   920 ASTREET BLVD #100 SOMEWHERE TX                    
+ 2004 BMW CV 
+ VIN: 111VIN12345678901                       
+ ISSUING OFFICE: COLLIN COUNTY 
+ 
+
+ 
+ -------------30 day permit------------------------------------------
+ 
+ SELECTION REQUEST:  PERMIT 334466G      PERMIT ISSUANCE ID: 12345678901234567
+        
+ 30 DAY PERMIT:      334466G  VALID:2014/01/07 15:33:46--2014/02/06 23:59:59   
+ APPLICANT NAME :    TOM TOM                    
+                     531 N ASTREET                          
+                     SOMEWHERE TX 75001
+ 2010 CHEVROLET 4D 
+ VIN: 111VIN12345678901                       
+ ISSUING OFFICE: DALLAS COUNTY 
+ 
+
+
+----------temporary tag -------------------------------------------
+ 
+ SELECTION REQUEST: TEMPORARY TAG  11S1111 
+        
+ TEMPORARY TAG:    11S1111   VALID:2014/09/02 00:00:00--2014/11/01 00:00:00    
+ YR:0000 MAK:                                                                   
+ 
+        
+ DEALER TEMPORARY TAG - AGENT     
+ NAME:     BADIDEAS,112 ASTREET RD,SOMEWHERE,TX,75001-1
+           411
+ 
+ REMARKS: ADDITIONAL TEMPORARY RECORDS AVAILABLE
+ 
+ --------------------------------------------------------------------
+  
+ SELECTION REQUEST: TEMPORARY TAG  11S2222   
+        
+ TEMPORARY TAG:    11S2222   VALID:2014/02/15 00:00:00--2014/04/16 00:00:00    
+ YR:0000 MAK:                                                                   
+ 
+        
+ DEALER TEMPORARY TAG - AGENT     
+ NAME:     DONALD TRUMP,599 FM 22 N,BLDG X,SOMEWHERE,TX,75001-3825
+
+
+
+-------------- \n in keyword 'TITLE.'  ---------------------------------
+  
+ LIC YELP FEB/2015 OLD # YELP FEB/2015 EWT  2800 GWT   2800
+ PER ANIMAL FRIENDLY PLT, STKR            REG CLASS  25   $ 64.25 COLLIN CNTY
+ TITLE 12345678901234567 ISSUED 02/08/2011 ODOMETER 25375 REG DT 02/19/2014
+ YR:2010 MAK:HOND MODL:UAX BDY STYL:CP VEH CLS:PASS       SALE PRC:       $0.00
+ VIN: 111VIN12345678901 BODY VIN: N/A COLOR: RED 
+ PREV OWN  SOMEONE ELSE/ANOTHER ELSE,DALLAS,TX      
+ OWNER     SOME PERSON,,410 ASTREET TR,,SOMEWHERE,TX,75001
+ PLATE AGE:  0  LAST ACTIVITY 03/08/2014 EXCH   OFC: 043
+ REMARKS ACTUAL MILEAGE.DATE OF ASSIGNMENT:2011/01/28.SPECIAL PLATE.PAPER TIT
+ LE.
+
+
+
+----------------trailer plates-------------------------------------
+
+  
+ LIC 123456H OCT/2015 OLD # 123456H OCT/2014 EWT  1100 GWT   3300
+ TRLR PLT, STKR            REG CLASS  37   $ 56.00 ROCKWALL CNTY
+ TITLE 12345678901234567 ISSUED            ODOMETER N/A REG DT 11/21/2014
+ YR:1998 MAK:SHOP MODL:    BDY STYL:UT VEH CLS:S-MISC     SALE PRC:     $800.00
+ VIN: 111VIN12345678901 BODY VIN: N/A COLOR: WHITE 
+ PREV OWN  SOMEONE ELSE,DR,,SOMEWHERE,TX         
+ OWNER     SOMEONE ELSE,,1731 ASTREET DR,,SOMEWHERE,TX,75001
+ PLATE AGE:  1  LAST ACTIVITY 11/24/2014 RENEW  OFC: 199
+ REMARKS DATE OF ASSIGNMENT:2013/11/20.NON-TITLED-VEHICLE.DUPLICATE REG - REC
+ ORD  1 OF    2.
+ 
+-----------------------------------------------------------------------------------
+
+  
+ LIC 654321H AUG/2015 OLD # 654321H MAY/2014 EWT   800 GWT   3500
+ TRLR PLT, STKR            REG CLASS  37   $ 56.00 DALLAS CNTY
+ TITLE 12345678901234567 ISSUED            ODOMETER N/A REG DT 09/11/2014
+ YR:2007 MAK:PERO MODL:    BDY STYL:UT VEH CLS:S-MISC     SALE PRC:     $500.00
+ VIN: 111VIN12345678901 BODY VIN: N/A COLOR: GRAY 
+ PREV OWN  SOMEONE ELSE,DR,,SOMEWHERE,TX                  
+ OWNER     SOMEONE ELSE,,374 ASTREET LN,,SOMEWHERE,TX,75001
+ PLATE AGE:  0  LAST ACTIVITY 09/20/2014 RENEW  OFC: 001
+ REMARKS NON-TITLED-VEHICLE.
+
+
+
+------------------------unknown issue--------------------------------------
+
+ LIC 1ABCD DEC/2014 OLD # 1ABCD DEC/2014 EWT  3300 GWT   3300
+ DISABLED PERSON PLT, STKR            REG CLASS  25   $ 62.75 COLLIN CNTY
+ TITLE 12345678901234567 ISSUED 02/10/2014 ODOMETER 28626 REG DT 02/07/2014
+ YR:2012 MAK:TOYT MODL:CBA BDY STYL:4D VEH CLS:PASS       SALE PRC:   $18600.00
+ VIN: 111VIN12345678901 BODY VIN: N/A COLOR: BLACK 
+ PREV OWN  LOANCOMPANY,ATLANTA,GA         
+ OWNER     DISABLED PERSON,,5699 WRANGLER DR,,SOMEWHERE,TX,75035
+ LIEN      10/07/2013,CREDIT UNION,,PO BOX 11224,,SOMEWHERE,CA,
+           90001
+ PLATE AGE:  0  LAST ACTIVITY 02/10/2014 EXCH   OFC: 001
+ REMARKS ACTUAL MILEAGE.DATE OF ASSIGNMENT:2013/10/14.E-TITLE.
+
+--------------no addr2------------------------------------
+
+SELECTION REQUEST: TEMPORARY TAG  55K0747 
+        
+ TEMPORARY TAG:    55K0747   VALID:2014/06/27 00:00:00--2014/08/26 00:00:00    
+ YR:0000 MAK:                                                                   
+ 
+        
+ DEALER TEMPORARY TAG - AGENT     
+ NAME:     MARIO NINTENDO, 1234 GAME LN # A,DALLAS,TX,75001-1111
+ 
+ REMARKS: ADDITIONAL TEMPORARY RECORDS AVAILABLE
+
+
+
+--------------special plate--with addr2 field------------------------
+
+ 2015 08 RTS SPECIAL PLATE 56K0748 
+  ISSUED TO
+  STEVEN JOBS               
+  410 I-27                     
+  SUITE  X                      
+  ATOWN            TX   75001
+                                    
+  CODE XYZ 08 2013 057 SLN24   000000   SP
+
+
+
+------------------no addr2--------------------------- 
+
+ SELECTION REQUEST: TEMPORARY TAG  20D2093 
+        
+ TEMPORARY TAG:    20D2093   VALID:2014/02/28 00:00:00--2014/04/29 00:00:00    
+ YR:0000 MAK:                                                                   
+ 
+        
+ DEALER TEMPORARY TAG - AGENT     
+ NAME:     JAMES STOVER,1008 W MAIN ST,ARLINGTON,TX,76013-1869
+ 
+ 
+ 
+ ----------------144hr business permit----------------------------
+ 
+ SELECTION REQUEST:  PERMIT 736030F      PERMIT ISSUANCE ID: 05746841342145927
+        
+ 144-HOUR PERMIT:    736030F  VALID:2013/03/11 14:59:03--2013/03/17 14:59:03   
+ BUSINESS  NAME :    F A M & SONS                                     
+                     5902 MIMOSA LN                            
+                     ROWLETT TX 75089                                           
+ 1996  VN 
+ VIN: 1DW1A5322WS136326                       
+ ISSUING OFFICE: DALLAS COUNTY 
+ 
+
+
+---------------------30day permit-----------------
+
+ SELECTION REQUEST:  PERMIT 562949G      PERMIT ISSUANCE ID: 04333141771123046
+        
+ 30 DAY PERMIT:      562949G  VALID:2014/05/14 12:30:39--2014/06/13 23:59:59   
+ APPLICANT NAME :    CHRISTOPHER L ANDERSON                          
+                     1906 JUPITER RD                           
+                     PLANO TX 75074                                             
+ 1995 CHEVROLET VN 
+ VIN: 1GCDG15H0SF161868                       
+ ISSUING OFFICE: COLLIN COUNTY 
+ 
+
+
+-----------city parse problem------------------------
+  
+ 2015 12 DEALER            8E4239                         
+  ISSUED TO
+  JDM ENTERPRISE                
+  7376 US HIGHWAY 69 S          
+  LONE OAK            TX   75453
+  MASTER DEALER NUMBER P123877      
+  PLATE EXPIRES: 2015/12  PLATE STATUS: CURRENT            
+  CODE DL          116    
+
+
+
+---------------------- embedded \n problem-------------               
+ 
+ LIC 356529H JAN/2015 OLD # 60093K JAN/2015 EWT  1490 GWT   3850
+ TRLR PLT, STKR            REG CLASS  37   $ 56.00 ROCKWALL CNTY
+ TITLE 19900041686120438 ISSUED            ODOMETER N/A REG DT 02/18/2014
+ YR:1998 MAK:CMT  MODL:M16 BDY STYL:VN VEH CLS:S-MISC     SALE PRC:     $100.00
+ VIN: 49TCB1011W1035210 BODY VIN: N/A COLOR: WHITE 
+ PREV OWN  BTA INC,ROCKWALL,TX                    
+ OWNER     ACTION COMMERCIAL SERVICES LLC,MICHAEL PRIMEAUX,4418 ST HWY 276,,RO
+           CKWALL,TX,75032
+ RNWL RCP  ,P.O. BOX 1689,,ROCKWALL,TX,75032
+ PLATE AGE:  0  LAST ACTIVITY 02/19/2014 REPL   OFC: 199
+ REMARKS PLATE 60093K CANCELLED ON 2014/02/18.DATE OF ASSIGNMENT:2014/02/14.N
+ ON-TITLED-VEHICLE.
+
+
+
+---------------------- embedded \n problem-------------               
+ 
+ LIC 123456T JAN/2015 OLD # 60093K JAN/2015 EWT  1490 GWT   3850
+ TRLR PLT, STKR            REG CLASS  37   $ 56.00 ROCKWALL CNTY
+ TITLE 19900041686120438 ISSUED            ODOMETER N/A REG DT 02/18/2014
+ YR:1998 MAK:CMT  MODL:M16 BDY STYL:VN VEH CLS:S-MISC     SALE PRC:     $100.00
+ VIN: 49TCB1011W1035210 BODY VIN: N/A COLOR: WHITE 
+ PREV OWN  BTA INC,ROCKWALL,TX                    
+ OWNER     ACTION COMMERCIAL SERVICES LLC,MICHAEL PRIMEAUX,4418 ST HWY 276,,RO
+           CKWALL,TX,75032
+ PLATE AGE:  0  LAST ACTIVITY 02/19/2014 REPL   OFC: 199
+ REMARKS PLATE 60093K CANCELLED ON 2014/02/18.DATE OF ASSIGNMENT:2014/02/14.N
+ ON-TITLED-VEHICLE.
+
+
+
+------------------broken Zip--------------------------- 
+
+ SELECTION REQUEST: TEMPORARY TAG  00A2093 
+        
+ TEMPORARY TAG:    00A2093   VALID:2014/02/28 00:00:00--2014/04/29 00:00:00    
+ YR:0000 MAK:                                                                   
+ 
+        
+ DEALER TEMPORARY TAG - AGENT     
+ NAME:     BROKEN ZIP,100 W MAIN ST,NOWHERE,TX,760
+ 13-1869
+ 
+
+
+----------standard with line breaks in owner line----------------------
+ LIC 1E44455 MAR/2015 OLD # 1E44455 MAR/2015 EWT 10400 GWT  29000
+ COMBINATION PLT, STKR            REG CLASS  10  $ 353.50 COLLIN CNTY
+ TITLE 1234VIN1234567890 ISSUED 01/29/2010 ODOMETER N/A REG DT 04/21/2014
+ YR:2001 MAK:FRHT MODL:FL7 BDY STYL:FB VEH CLS:TRK>1      SALE PRC:       $0.00
+ VIN: 1234VIN1234567890 BODY VIN: N/A COLOR: BLUE  PREV OWN  MOREORLESS,PLANO,TX         
+ OWNER     A REALLY LOOOOOONNNG NAME,C/O YUMMY HOT DOGS,4444 EA
+           ST 14TH STREET,,MYTOWN,TX,75000
+ PLATE AGE:  0  LAST ACTIVITY 04/22/2014 REPL   OFC: 000
+ REMARKS DIESEL.DATE OF ASSIGNMENT:2010/01/12.PAPER TITLE.
+
+
+
+
+------------------extra addr line and city has two words------------------------
+
+ SELECTION REQUEST:  PERMIT 654321F      PERMIT ISSUANCE ID: 11111141333335553
+        
+ 30 DAY PERMIT:      654321F  VALID:2013/02/07 13:55:02--2013/03/09 00:00:00   
+ APPLICANT NAME :    MYOWN  NAME                        
+                     43211 NORTH POLE PKWY                   
+                     #123                                      
+                     LITTLE ELM TX 75001                                            
+ 2005 LAND BOAT v8 
+ VIN: 12345678901234567                       
+ ISSUING OFFICE: ANOTHER COUNTY
+
+--------------------------------------------------------------------------------
+
+  
+ 2014 12 RTS SPECIAL PLATE 99999                          
+  ISSUED TO
+  JIMBO JO COFFCOFF                
+  30000 LBJ FREEWAY SOUTH       
+  SAN ANTONIO              TX   75001
+                                    
+  CODE XYZ 12 2013 057 BOB 99  000000   SP
+ 
+-------------------------------------------------------------------------------- 
+
+  
+ 2016 01 DEALER            1E1111                         
+  ISSUED TO
+  J LENO CARS, LLC            
+  6000 DENTON HWY               
+  DENTON             TX   75001
+  MASTER DEALER NUMBER P111111      
+  PLATE EXPIRES: 2016/01  PLATE STATUS: CURRENT            
+  CODE FW          220                    
+ 
+
+--------------------------------------------------------------------------------
+
+
+
+SELECTION REQUEST: PLACARD 123456      
+        
+ TEMPORARY DISABLED PLACARD PLACARD 123456:
+VALID:11/23/2009--05/2010
+
+ DISABLED PERSON NAME:   FIRSTNAME LASTNAME                      
+                         111 TALL TAIL TRL                   
+                         DALLAS, TX, 75001        
+ DALLAS COUNTY
+ TX DL OF DISABLED PERSON#: 12345678                    
+
+
+
+---new format , personalized ? or line break in keyword TITLE. ?---------------------------
+
+ 
+
+ LIC PERSON AUG/2015 OLD # PERSON AUG/2014 EWT  4500 GWT   5500
+ PERSONALIZED PLT, STKR            REG CLASS  35  $ 104.25 COLLIN CNTY
+ TITLE 01234567890123456 ISSUED 11/04/2013 ODOMETER 139303 REG DT 08/06/2014
+ YR:2009 MAK:CHEV MODL:SIL BDY STYL:PK VEH CLS:TRK<=1     SALE PRC:    $4960.00
+ VIN: 01234567890123456 BODY VIN: N/A COLOR: WHITE 
+ PREV OWN  MEHEREAGAIN,GLEN ELLYN,IL      
+ OWNER     PERSON CONSTRUCTION,,625 NORTH RD,,BOSTON,TX,75001
+ PLATE AGE:  0  LAST ACTIVITY 09/06/2014 RENEW  OFC: 043
+ REMARKS ACTUAL MILEAGE.DATE OF ASSIGNMENT:2013/10/14.SPECIAL PLATE.PAPER TIT
+ LE.
+
+ 
+------ apartment ? ----special issue plate?------------
+
+ 2014 11 RTS SPECIAL PLATE OINKY                          
+  ISSUED TO
+  IAM A PIG               
+  11 WOODYARD APT 111          
+  BARNYARD            TX   76001
+                                    
+  CODE XYZ 11 2010 126 OIFX4   000000   SP
+
+--------------------------------------------------------------------------------
+
+
+ SELECTION REQUEST: TEMPORARY TAG  23L7777 
+        
+ TEMPORARY TAG:    23L7777   VALID:2014/12/06 00:00:00--2015/02/04 00:00:00    
+ YR:2001 MAK:FORD                MODL:MUS                 STYL:CONVERTIBL       
+ VIN: 12345678901234567   COLOR: BLACK 
+        
+ BUYER TEMPORARY TAG              
+ NAME:     JESSE JAMES,1111 ROBBER ROAD,FORT WORTH,TX,75001     
+ LIEN:     AUTO SALES, INC.,14444 JACKYOUUP,FORT WORTH,TX,75001
+
+
+ 
+-------------------------------------------------------------------------------
+Line break in ZipCode 
+Line break in state
+Permit with 2nd addr line
+Line break in city
+Dealer with ,  in name
+NAME-OTHER, LTD   ---dash and comma in name field
+City has two names
+
+----------------------------------------------------------------------
+ 2016 08 DEALER            5F1234                          
+ ISSUED TO  HONDA CARS OF IRELAND         
+ 1550 E US ROUTE 130          
+ CORK            TX   75000 
+ MASTER DEALER NUMBER P122272       
+ PLATE EXPIRES: 2016/08 
+ PLATE STATUS: CURRENT              CODE DL          123                     
+
+----------------------------------------------------------     
+ REG 00 BRS1234
+  RESPONSE-- NO RECORD IN RTS DATABASE  
+-------------------------------------------------------------  
+ 2008 TXIRP PLATE LIC OK1AHO EXPIRES JUN/2008 EWT 16600 GWT  80000 
+ APPORTIONED TRUCK PLT, REG CLASS 006 2007 FRHT 1234VIN0123456789    
+ TRACTOR  ISSUED TO: SOME TRUCK LEASING LP,4444 DENTON DR.,ACITY,TX  75000           
+ APPORTIONED ACCOUNT 012345 01,UNIT # 57297500,
+ REMARKS                                                                            
+-------------------------------------------------------------------------  
+ LIC OKLAHO MAR/2015 OLD # OKLAHO MAR/2014 EWT  4300 GWT   4300
+ OKLAHOMA STATE UNIV C, STKR            REG CLASS  25   $ 62.75 DALLAS CNTY
+ TITLE 1234VIN1234567890 ISSUED 05/15/2012 ODOMETER 6     REG DT 02/21/2014
+ YR:2012 MAK:VOLV MODL:XC6 BDY STYL:LL VEH CLS:PASS       SALE PRC:   $43867.00
+ VIN: YYYYYY65432118889 BODY VIN: N/A COLOR: BLACK 
+ PREV OWN  PARK PLACE,BOARDWALK,TX             
+ OWNER     SOME BODY,,9999 PEACH TREE LN,,NEW YORK,ME,75000
+ RNWL RCP  SOME BODY,9999 PEACHTREE LANE,,NEW YORK,ME,75000
+ PLATE AGE:  4  LAST ACTIVITY 04/05/2014 IRENEW OFC: 999
+ REMARKS ACTUAL MILEAGE.DATE OF ASSIGNMENT:2012/04/14.SPECIAL PLATE.PAPER TITLE. 
+
+--------------------------------------------------------------------  
+ SELECTION REQUEST: TEMPORARY TAG  88K8888         
+ TEMPORARY TAG:    88K8888   VALID:2014/02/03 00:00:00--2014/04/04 00:00:00     YR:0000 MAK:    
+                                                        
+ DEALER TEMPORARY TAG - AGENT     
+ NAME:     SAMANTHA BEWITCHED,1234 FORT WORTH AVE,FORT WORTH,TX,75000-0000 
+
+--------------canceled or cancelled , with or without whitespace------------
+
+ LIC ONEL SEP/2014 OLD # ABC1234 SEP/2013 EWT  4300 GWT   4300 PASSENGER-TRUCK PLT, STKR           
+ REG CLASS  25   $ 62.75 COLLIN CNTY
+ TITLE 1234VIN1234567890 ISSUED 02/17/2006 ODOMETER 50223 REG DT 09/12/2013
+ YR:2003 MAK:FORD MODL:EPR BDY STYL:LL VEH CLS:PASS-TRK   SALE PRC:   $12135.37
+ VIN: 1234VIN1234567890 BODY VIN: N/A COLOR: SILVER 
+ PREV OWN  RICH MANN HYUNDAI,AMARILLO,KS         
+ OWNER     FRESH CORN,,3333 FIRST ST,,BLANK,TX,75000
+ RNWL RCP  FRESH CORN,4444 JUNCTION DR,,BLANK,TX,75000
+ LIEN      01/27/2006,SOME BANK,,PO BOX 123,,CITY,TX,75000
+ PLATE AGE:  3  LAST ACTIVITY 07/03/2014 TAPNCA OFC: 000
+ REMARKS PLATE PLATE99 CANCELED ON 2011/09/02.ACTUAL MILEAGE.PAPER TITLE. 
+------------------------------------------------------------------
+ LIC DBLL SEP/2014 OLD # ABC1234 SEP/2013 EWT  4300 GWT   4300 PASSENGER-TRUCK PLT, STKR           
+ REG CLASS  25   $ 62.75 COLLIN CNTY
+ TITLE 1234VIN1234567890 ISSUED 02/17/2006 ODOMETER 50223 REG DT 09/12/2013
+ YR:2003 MAK:FORD MODL:EPR BDY STYL:LL VEH CLS:PASS-TRK   SALE PRC:   $12135.37
+ VIN: 1234VIN1234567890 BODY VIN: N/A COLOR: SILVER 
+ PREV OWN  RICH MANN HYUNDAI,AMARILLO,KS         
+ OWNER     FRESH CORN,,3333 FIRST ST,,BLANK,TX,75000
+ RNWL RCP  FRESH CORN,4444 JUNCTION DR,,BLANK,TX,75000
+ LIEN      01/27/2006,SOME BANK,,PO BOX 123,,CITY,TX,750
+00
+ PLATE AGE:  3  LAST ACTIVITY 07/03/2014 TAPNCA OFC: 000
+ REMARKS PLATE PLATE100CANCELLED ON 2011/09/02.ACTUAL MILEAGE.PAPER TITLE.
+
+
+----------standard with line breaks in owner line----------------------
+
+ LIC 1E12345 MAR/2015 OLD # 1E12345 MAR/2015 EWT 10400 GWT  29000
+ COMBINATION PLT, STKR           
+ REG CLASS  10  $ 353.50 COLLIN CNTY
+ TITLE 1234VIN1234567890 ISSUED 01/29/2010 ODOMETER N/A REG DT 04/21/2014
+ YR:2001 MAK:FRHT MODL:FL7 BDY STYL:FB VEH CLS:TRK>1      SALE PRC:       $0.00
+ VIN: 1234VIN1234567890 BODY VIN: N/A COLOR: BLUE 
+ PREV OWN  YUMMY HOT DOGS,PLANO,TX         
+ OWNER     AAA LEASING,(LESSOR),C/O YUMMY HOT DOGS,4444 EA
+           ST 14TH STREET,MYTOWN,TX,75000
+ RNWL RCP  YUMMY HOT DOGS,4444 EAST 14TH STREET,,MYTOWN,TX,75074
+ PLATE AGE:  0  LAST ACTIVITY 04/22/2014 REPL
+   OFC: 000 REMARKS DIESEL.DATE OF ASSIGNMENT:2010/01/12.PAPER TITLE.
+
+
+
+   
+ ----------------one trip permit----------------------
+  
+ SELECTION REQUEST:  PERMIT 654321G      PERMIT ISSUANCE ID: 12345678901234567
+        
+ ONE TRIP PERMIT:    654321G  VALID:2014/02/21 13:33:40--2014/03/08 23:59:59   
+ APPLICANT NAME :    NIM TEL                        
+                     33 ASTREET LN                         
+                     SOMEWHERE TX 75001                                            
+ ORIGINATION POINT:   402 ASTREET ROAD SOMEWHERE TX                     
+ INTERMEDIATE POINTS: LEGACY                                           
+ INTERMEDIATE POINTS: 75                                               
+ DESTINATION POINT:   920 ASTREET BLVD #100 SOMEWHERE TX                    
+ 2004 BMW CV 
+ VIN: 111VIN12345678901                       
+ ISSUING OFFICE: COLLIN COUNTY 
+ 
+
+ 
+ -------------30 day permit------------------------------------------
+ 
+ SELECTION REQUEST:  PERMIT 334466G      PERMIT ISSUANCE ID: 12345678901234567
+        
+ 30 DAY PERMIT:      334466G  VALID:2014/01/07 15:33:46--2014/02/06 23:59:59   
+ APPLICANT NAME :    TOM TOM                    
+                     531 N ASTREET                          
+                     SOMEWHERE TX 75001
+ 2010 CHEVROLET 4D 
+ VIN: 111VIN12345678901                       
+ ISSUING OFFICE: DALLAS COUNTY 
+ 
+
+
+----------temporary tag -------------------------------------------
+ 
+ SELECTION REQUEST: TEMPORARY TAG  11S1111 
+        
+ TEMPORARY TAG:    11S1111   VALID:2014/09/02 00:00:00--2014/11/01 00:00:00    
+ YR:0000 MAK:                                                                   
+ 
+        
+ DEALER TEMPORARY TAG - AGENT     
+ NAME:     BADIDEAS,112 ASTREET RD,SOMEWHERE,TX,75001-1
+           411
+ 
+ REMARKS: ADDITIONAL TEMPORARY RECORDS AVAILABLE
+ 
+ --------------------------------------------------------------------
+  
+ SELECTION REQUEST: TEMPORARY TAG  11S2222   
+        
+ TEMPORARY TAG:    11S2222   VALID:2014/02/15 00:00:00--2014/04/16 00:00:00    
+ YR:0000 MAK:                                                                   
+ 
+        
+ DEALER TEMPORARY TAG - AGENT     
+ NAME:     DONALD TRUMP,599 FM 22 N,BLDG X,SOMEWHERE,TX,75001-3825
+
+
+
+-------------- \n in keyword 'TITLE.'  ---------------------------------
+  
+ LIC YELP FEB/2015 OLD # YELP FEB/2015 EWT  2800 GWT   2800
+ PER ANIMAL FRIENDLY PLT, STKR            REG CLASS  25   $ 64.25 COLLIN CNTY
+ TITLE 12345678901234567 ISSUED 02/08/2011 ODOMETER 25375 REG DT 02/19/2014
+ YR:2010 MAK:HOND MODL:UAX BDY STYL:CP VEH CLS:PASS       SALE PRC:       $0.00
+ VIN: 111VIN12345678901 BODY VIN: N/A COLOR: RED 
+ PREV OWN  SOMEONE ELSE/ANOTHER ELSE,DALLAS,TX      
+ OWNER     SOME PERSON,,410 ASTREET TR,,SOMEWHERE,TX,75001
+ PLATE AGE:  0  LAST ACTIVITY 03/08/2014 EXCH   OFC: 043
+ REMARKS ACTUAL MILEAGE.DATE OF ASSIGNMENT:2011/01/28.SPECIAL PLATE.PAPER TIT
+ LE.
+
+
+
+----------------trailer plates-------------------------------------
+
+  
+ LIC 123456H OCT/2015 OLD # 123456H OCT/2014 EWT  1100 GWT   3300
+ TRLR PLT, STKR            REG CLASS  37   $ 56.00 ROCKWALL CNTY
+ TITLE 12345678901234567 ISSUED            ODOMETER N/A REG DT 11/21/2014
+ YR:1998 MAK:SHOP MODL:    BDY STYL:UT VEH CLS:S-MISC     SALE PRC:     $800.00
+ VIN: 111VIN12345678901 BODY VIN: N/A COLOR: WHITE 
+ PREV OWN  SOMEONE ELSE,DR,,SOMEWHERE,TX         
+ OWNER     SOMEONE ELSE,,1731 ASTREET DR,,SOMEWHERE,TX,75001
+ PLATE AGE:  1  LAST ACTIVITY 11/24/2014 RENEW  OFC: 199
+ REMARKS DATE OF ASSIGNMENT:2013/11/20.NON-TITLED-VEHICLE.DUPLICATE REG - REC
+ ORD  1 OF    2.
+ 
+-----------------------------------------------------------------------------------
+
+  
+ LIC 654321H AUG/2015 OLD # 654321H MAY/2014 EWT   800 GWT   3500
+ TRLR PLT, STKR            REG CLASS  37   $ 56.00 DALLAS CNTY
+ TITLE 12345678901234567 ISSUED            ODOMETER N/A REG DT 09/11/2014
+ YR:2007 MAK:PERO MODL:    BDY STYL:UT VEH CLS:S-MISC     SALE PRC:     $500.00
+ VIN: 111VIN12345678901 BODY VIN: N/A COLOR: GRAY 
+ PREV OWN  SOMEONE ELSE,DR,,SOMEWHERE,TX                  
+ OWNER     SOMEONE ELSE,,374 ASTREET LN,,SOMEWHERE,TX,75001
+ PLATE AGE:  0  LAST ACTIVITY 09/20/2014 RENEW  OFC: 001
+ REMARKS NON-TITLED-VEHICLE.
+
+
+
+------------------------unknown issue--------------------------------------
+
+ LIC 1ABCD DEC/2014 OLD # 1ABCD DEC/2014 EWT  3300 GWT   3300
+ DISABLED PERSON PLT, STKR            REG CLASS  25   $ 62.75 COLLIN CNTY
+ TITLE 12345678901234567 ISSUED 02/10/2014 ODOMETER 28626 REG DT 02/07/2014
+ YR:2012 MAK:TOYT MODL:CBA BDY STYL:4D VEH CLS:PASS       SALE PRC:   $18600.00
+ VIN: 111VIN12345678901 BODY VIN: N/A COLOR: BLACK 
+ PREV OWN  LOANCOMPANY,ATLANTA,GA         
+ OWNER     DISABLED PERSON,,5699 WRANGLER DR,,SOMEWHERE,TX,75035
+ LIEN      10/07/2013,CREDIT UNION,,PO BOX 11224,,SOMEWHERE,CA,
+           90001
+ PLATE AGE:  0  LAST ACTIVITY 02/10/2014 EXCH   OFC: 001
+ REMARKS ACTUAL MILEAGE.DATE OF ASSIGNMENT:2013/10/14.E-TITLE.
+
+--------------no addr2------------------------------------
+
+SELECTION REQUEST: TEMPORARY TAG  55K0747 
+        
+ TEMPORARY TAG:    55K0747   VALID:2014/06/27 00:00:00--2014/08/26 00:00:00    
+ YR:0000 MAK:                                                                   
+ 
+        
+ DEALER TEMPORARY TAG - AGENT     
+ NAME:     MARIO NINTENDO, 1234 GAME LN # A,DALLAS,TX,75001-1111
+ 
+ REMARKS: ADDITIONAL TEMPORARY RECORDS AVAILABLE
+
+
+
+--------------special plate--with addr2 field------------------------
+
+ 2015 08 RTS SPECIAL PLATE 56K0748 
+  ISSUED TO
+  STEVEN JOBS               
+  410 I-27                     
+  SUITE  X                      
+  ATOWN            TX   75001
+                                    
+  CODE XYZ 08 2013 057 SLN24   000000   SP
+
+
+
+------------------no addr2--------------------------- 
+
+ SELECTION REQUEST: TEMPORARY TAG  20D2093 
+        
+ TEMPORARY TAG:    20D2093   VALID:2014/02/28 00:00:00--2014/04/29 00:00:00    
+ YR:0000 MAK:                                                                   
+ 
+        
+ DEALER TEMPORARY TAG - AGENT     
+ NAME:     JAMES STOVER,1008 W MAIN ST,ARLINGTON,TX,76013-1869
+ 
+ 
+ 
+ ----------------144hr business permit----------------------------
+ 
+ SELECTION REQUEST:  PERMIT 736030F      PERMIT ISSUANCE ID: 05746841342145927
+        
+ 144-HOUR PERMIT:    736030F  VALID:2013/03/11 14:59:03--2013/03/17 14:59:03   
+ BUSINESS  NAME :    F A M & SONS                                     
+                     5902 MIMOSA LN                            
+                     ROWLETT TX 75089                                           
+ 1996  VN 
+ VIN: 1DW1A5322WS136326                       
+ ISSUING OFFICE: DALLAS COUNTY 
+ 
+
+
+---------------------30day permit-----------------
+
+ SELECTION REQUEST:  PERMIT 562949G      PERMIT ISSUANCE ID: 04333141771123046
+        
+ 30 DAY PERMIT:      562949G  VALID:2014/05/14 12:30:39--2014/06/13 23:59:59   
+ APPLICANT NAME :    CHRISTOPHER L ANDERSON                          
+                     1906 JUPITER RD                           
+                     PLANO TX 75074                                             
+ 1995 CHEVROLET VN 
+ VIN: 1GCDG15H0SF161868                       
+ ISSUING OFFICE: COLLIN COUNTY 
+ 
+
+
+-----------city parse problem------------------------
+  
+ 2015 12 DEALER            8E4239                         
+  ISSUED TO
+  JDM ENTERPRISE                
+  7376 US HIGHWAY 69 S          
+  LONE OAK            TX   75453
+  MASTER DEALER NUMBER P123877      
+  PLATE EXPIRES: 2015/12  PLATE STATUS: CURRENT            
+  CODE DL          116    
+
+
+
+---------------------- embedded \n problem-------------               
+ 
+ LIC 356529H JAN/2015 OLD # 60093K JAN/2015 EWT  1490 GWT   3850
+ TRLR PLT, STKR            REG CLASS  37   $ 56.00 ROCKWALL CNTY
+ TITLE 19900041686120438 ISSUED            ODOMETER N/A REG DT 02/18/2014
+ YR:1998 MAK:CMT  MODL:M16 BDY STYL:VN VEH CLS:S-MISC     SALE PRC:     $100.00
+ VIN: 49TCB1011W1035210 BODY VIN: N/A COLOR: WHITE 
+ PREV OWN  BTA INC,ROCKWALL,TX                    
+ OWNER     ACTION COMMERCIAL SERVICES LLC,MICHAEL PRIMEAUX,4418 ST HWY 276,,RO
+           CKWALL,TX,75032
+ RNWL RCP  ,P.O. BOX 1689,,ROCKWALL,TX,75032
+ PLATE AGE:  0  LAST ACTIVITY 02/19/2014 REPL   OFC: 199
+ REMARKS PLATE 60093K CANCELLED ON 2014/02/18.DATE OF ASSIGNMENT:2014/02/14.N
+ ON-TITLED-VEHICLE.
+
+
+
+---------------------- embedded \n problem-------------               
+ 
+ LIC 123456T JAN/2015 OLD # 60093K JAN/2015 EWT  1490 GWT   3850
+ TRLR PLT, STKR            REG CLASS  37   $ 56.00 ROCKWALL CNTY
+ TITLE 19900041686120438 ISSUED            ODOMETER N/A REG DT 02/18/2014
+ YR:1998 MAK:CMT  MODL:M16 BDY STYL:VN VEH CLS:S-MISC     SALE PRC:     $100.00
+ VIN: 49TCB1011W1035210 BODY VIN: N/A COLOR: WHITE 
+ PREV OWN  BTA INC,ROCKWALL,TX                    
+ OWNER     ACTION COMMERCIAL SERVICES LLC,MICHAEL PRIMEAUX,4418 ST HWY 276,,RO
+           CKWALL,TX,75032
+ PLATE AGE:  0  LAST ACTIVITY 02/19/2014 REPL   OFC: 199
+ REMARKS PLATE 60093K CANCELLED ON 2014/02/18.DATE OF ASSIGNMENT:2014/02/14.N
+ ON-TITLED-VEHICLE.
+
+
+
+------------------broken Zip--------------------------- 
+
+ SELECTION REQUEST: TEMPORARY TAG  00A2093 
+        
+ TEMPORARY TAG:    00A2093   VALID:2014/02/28 00:00:00--2014/04/29 00:00:00    
+ YR:0000 MAK:                                                                   
+ 
+        
+ DEALER TEMPORARY TAG - AGENT     
+ NAME:     BROKEN ZIP,100 W MAIN ST,NOWHERE,TX,760
+ 13-1869
+ 
+
+
+----------standard with line breaks in owner line----------------------
+ LIC 1E44455 MAR/2015 OLD # 1E44455 MAR/2015 EWT 10400 GWT  29000
+ COMBINATION PLT, STKR            REG CLASS  10  $ 353.50 COLLIN CNTY
+ TITLE 1234VIN1234567890 ISSUED 01/29/2010 ODOMETER N/A REG DT 04/21/2014
+ YR:2001 MAK:FRHT MODL:FL7 BDY STYL:FB VEH CLS:TRK>1      SALE PRC:       $0.00
+ VIN: 1234VIN1234567890 BODY VIN: N/A COLOR: BLUE  PREV OWN  MOREORLESS,PLANO,TX         
+ OWNER     A REALLY LOOOOOONNNG NAME,C/O YUMMY HOT DOGS,4444 EA
+           ST 14TH STREET,,MYTOWN,TX,75000 PLATE AGE:  0  LAST ACTIVITY 04/22/2014 REPL   OFC: 000
+ REMARKS DIESEL.DATE OF ASSIGNMENT:2010/01/12.PAPER TITLE.
+
+
+------------------extra addr line and city has two words------------------------
+
+ SELECTION REQUEST:  PERMIT 654321F      PERMIT ISSUANCE ID: 11111141333335553
+        
+ 30 DAY PERMIT:      654321F  VALID:2013/02/07 13:55:02--2013/03/09 00:00:00   
+ APPLICANT NAME :    MYOWN  NAME                        
+                     43211 NORTH POLE PKWY                   
+                     #123                                      
+                     LITTLE ELM TX 75001                                            
+ 2005 LAND BOAT v8 
+ VIN: 12345678901234567                       
+ ISSUING OFFICE: ANOTHER COUNTY
+
+--------------------------------------------------------------------------------
+
+  
+ 2014 12 RTS SPECIAL PLATE 99999                          
+  ISSUED TO
+  JIMBO JO COFFCOFF                
+  30000 LBJ FREEWAY SOUTH       
+  SAN ANTONIO              TX   75001
+                                    
+  CODE XYZ 12 2013 057 99999  000000   SP
+ 
+-------------------------------------------------------------------------------- 
+
+  
+ 2016 01 DEALER            1E1111                         
+  ISSUED TO
+  J LENO CARS, LLC            
+  6000 DENTON HWY               
+  DENTON             TX   75001
+  MASTER DEALER NUMBER P111111      
+  PLATE EXPIRES: 2016/01  PLATE STATUS: CURRENT            
+  CODE FW          220                    
+ 
+
+--------------------------------------------------------------------------------
+
+
+
+SELECTION REQUEST: PLACARD 123456      
+        
+ TEMPORARY DISABLED PLACARD PLACARD 123456:
+VALID:11/23/2009--05/2010
+
+ DISABLED PERSON NAME:   FIRSTNAME LASTNAME                      
+                         111 TALL TAIL TRL                   
+                         DALLAS, TX, 75001        
+ DALLAS COUNTY
+ TX DL OF DISABLED PERSON#: 12345678                    
+
+
+
+---new format , personalized ? or line break in keyword TITLE. ?---------------------------
+
+ 
+
+ LIC PERSON AUG/2015 OLD # PERSON AUG/2014 EWT  4500 GWT   5500
+ PERSONALIZED PLT, STKR            REG CLASS  35  $ 104.25 COLLIN CNTY
+ TITLE 01234567890123456 ISSUED 11/04/2013 ODOMETER 139303 REG DT 08/06/2014
+ YR:2009 MAK:CHEV MODL:SIL BDY STYL:PK VEH CLS:TRK<=1     SALE PRC:    $4960.00
+ VIN: 01234567890123456 BODY VIN: N/A COLOR: WHITE 
+ PREV OWN  MEHEREAGAIN,GLEN ELLYN,IL      
+ OWNER     PERSON CONSTRUCTION,,625 NORTH RD,,BOSTON,TX,75001
+ PLATE AGE:  0  LAST ACTIVITY 09/06/2014 RENEW  OFC: 043
+ REMARKS ACTUAL MILEAGE.DATE OF ASSIGNMENT:2013/10/14.SPECIAL PLATE.PAPER TIT
+ LE.
+
+ 
+------ apartment ? ----special issue plate?------------
+
+ 2014 11 RTS SPECIAL PLATE OINKY                          
+  ISSUED TO
+  IAM A PIG               
+  11 WOODYARD APT 111          
+  BARNYARD            TX   76001
+                                    
+  CODE XYZ 11 2010 126 OIFX4   000000   SP
+
+--------------------------------------------------------------------------------
+
+
+ SELECTION REQUEST: TEMPORARY TAG  23L7777 
+        
+ TEMPORARY TAG:    23L7777   VALID:2014/12/06 00:00:00--2015/02/04 00:00:00    
+ YR:2001 MAK:FORD                MODL:MUS                 STYL:CONVERTIBL       
+ VIN: 12345678901234567   COLOR: BLACK 
+        
+ BUYER TEMPORARY TAG              
+ NAME:     JESSE JAMES,1111 ROBBER ROAD,FORT WORTH,TX,75001     
+ LIEN:     AUTO SALES, INC.,14444 JACKYOUUP,FORT WORTH,TX,75001
+
+
+ 
+-------------------------------------------------------------------------------
