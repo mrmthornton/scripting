@@ -5,7 +5,7 @@
 # close the page
 
 # works on win7, ie10
-import os
+import io
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 
@@ -29,5 +29,7 @@ passwordField.clear()
 passwordField.send_keys("randomaccess")
 passwordField.submit()
 
-selectMenuItem = driver.find_element_by_partial_link_text()
-##driver.quit()
+selectMenuItem = driver.find_element_by_xpath('//li[@class="mailbox"]/a[contains(@href, "Junk")]')
+selectMenuItem.click()
+#driver.quit()
+
