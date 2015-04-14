@@ -29,12 +29,12 @@ driver.get(url)
 
 #userNameField = driver.find_element_by_name('j_username')
 #userNameField.clear()
-#userNameField.send_keys("Y1WW0N1")
+#userNameField.send_keys("xxxxx")
 #userNameField.submit()
 
 passwordField = driver.find_element_by_name('j_password')
 passwordField.clear()
-passwordField.send_keys("2b0at33s")
+passwordField.send_keys("xxxxx")
 passwordField.submit()
 
 menuItem = driver.find_element_by_xpath("//td[@id='Bar1']")
