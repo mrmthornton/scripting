@@ -9,6 +9,7 @@ import io
 import unittest
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.common.keys import Keys
@@ -33,13 +34,17 @@ assert 'search yielded no results' not in driver.page_source
 #elem = driver.find_element_by_link_text("Diversity");
 #elem.click();
 
+#element = driver.find_element_by_xpath('//a[@href="http://www.hntb.com/careers/diversity"]')
+#element.click()
+
 try:
-    element = WebDriverWait(driver, 10).until(EC.element_to_be_clickable(driver.find_element_by_link_text("Diversity")))
+    EC.element_to_be_clickable(driver.find_element_by_xpath('//a[@href="http://www.hntb.com/careers/diversity"]'))
+    WebDriverWait(driver, 60).until(EC.element_to_be_clickable(driver.find_element_by_xpath('//a[@href="http://www.hntb.com/careers/diversity"]')))
+    element = driver.find_element_by_xpath('//a[@href="http://www.hntb.com/careers/diversity"]')
+    element.click()
 finally:
-    driver.quit()
+    driver.close()
 
-
-selectMenuItem.click()
 
 driver.close()
 
