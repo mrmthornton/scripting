@@ -32,3 +32,4 @@ passwordField.submit()
 selectMenuItem = driver.find_element_by_xpath('//li[@class="mailbox"]/a[contains(@href, "Junk")]')
 selectMenuItem.click()
 #driver.quit()
+

@@ -9,6 +9,7 @@ import io
 import unittest
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.common.keys import Keys
@@ -27,17 +28,23 @@ elem.send_keys(Keys.RETURN)
 #assert 'No results found.' not in driver.page_source
 assert 'search yielded no results' not in driver.page_source
 
-
 # absolute tag forllowed by relative tag
 #selectMenuItem = driver.find_element_by_xpath('//li[@class="mailbox"]/a[contains(@href, "Junk")]')
 
+#elem = driver.find_element_by_link_text("Diversity");
+#elem.click();
+
+#element = driver.find_element_by_xpath('//a[@href="http://www.hntb.com/careers/diversity"]')
+#element.click()
+
 try:
-    element = WebDriverWait(driver, 10).until(EC.presence_of_element_located(By.ID, "VPS"))
+    EC.element_to_be_clickable(driver.find_element_by_xpath('//a[@href="http://www.hntb.com/careers/diversity"]'))
+    WebDriverWait(driver, 60).until(EC.element_to_be_clickable(driver.find_element_by_xpath('//a[@href="http://www.hntb.com/careers/diversity"]')))
+    element = driver.find_element_by_xpath('//a[@href="http://www.hntb.com/careers/diversity"]')
+    element.click()
 finally:
-    driver.quit()
+    driver.close()
 
-
-selectMenuItem.click()
 
 driver.close()
 
