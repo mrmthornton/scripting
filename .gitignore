@@ -4,6 +4,8 @@
 
 *.xlsx
 
+*.xlsm
+
 *.html
 
 *.txt
