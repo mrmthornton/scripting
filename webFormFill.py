@@ -33,7 +33,7 @@ element.submit()
 print "! Success !"
 
 #try:
-#    locator = (By.XPATH, "//a[@href='/careers']")
+#    locator = (By.XPATH, "//[@href='/careers']")
 #    element = WebDriverWait(driver, delay).until(EC.presence_of_element_located(locator))
 #except TimeoutException:
 #    print "Took too much time!"
