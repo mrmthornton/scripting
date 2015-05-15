@@ -16,7 +16,6 @@ driver = webdriver.Ie()
 driver.maximize_window()
 delay = 5 # seconds
 
-#url = 'https://duckduckgo.com/html'       # target URL
 url = 'http://www.hntb.com'       # target URL
 driver.get(url)
 
@@ -27,20 +26,22 @@ except TimeoutException:
     print "Took too much time!"
     quit()
 
-searchKey = "python"
+searchKey = "career"
 element.send_keys(searchKey)
 element.submit()
 
 print "! Success !"
 
-#try:
-#    locator = (By.XPATH, "//a[@href='/careers']")
-#    element = WebDriverWait(driver, delay).until(EC.presence_of_element_located(locator))
-#except TimeoutException:
-#    print "Took too much time!"
-#    quit()
+try:
+    locator = (By.XPATH, '//p[@class="search-snippet"]')
 
-#element.click()
+    results = WebDriverWait(driver, delay).until(EC.presence_of_all_elements_located(locator))
+except TimeoutException:
+    print "Took too much time!"
+    quit()
+
+for e in results:
+    print e.text
 
 #try:
 #    locator = (By.XPATH, "//a[@href='/careers/diversity']")
