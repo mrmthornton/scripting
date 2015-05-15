@@ -1,51 +1,62 @@
-# testing selenium
-# open a page
-# fill the search field and submit
-# scrape the results
-# close the page
+# generic
+# get url,
+# wait for element
+# fill element
+# do next element
+# display for inspection and wait for confirmation
 
-# works on win7, ie10
-import io
-import unittest
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import Select
-from selenium.webdriver.common.keys import Keys
+from selenium.common.exceptions import TimeoutException
+import selenium.webdriver.support.expected_conditions as EC
+#from selenium.webdriver.support.select import Select
 
-#create an instance of IE and set some options
 driver = webdriver.Ie()
-driver.implicitly_wait(10)
 driver.maximize_window()
+delay = 5 # seconds
 
-url = 'http://www.hntb.com'
+#url = 'https://duckduckgo.com/html'       # target URL
+url = 'http://www.hntb.com'       # target URL
 driver.get(url)
-assert "HNTB" in driver.title
-elem = driver.find_element_by_name('search_block_form')
-elem.send_keys('careers')
-elem.send_keys(Keys.RETURN)
-#assert 'No results found.' not in driver.page_source
-assert 'search yielded no results' not in driver.page_source
-
-# absolute tag forllowed by relative tag
-#selectMenuItem = driver.find_element_by_xpath('//li[@class="mailbox"]/a[contains(@href, "Junk")]')
-
-#elem = driver.find_element_by_link_text("Diversity");
-#elem.click();
-
-#element = driver.find_element_by_xpath('//a[@href="http://www.hntb.com/careers/diversity"]')
-#element.click()
 
 try:
-    EC.element_to_be_clickable(driver.find_element_by_xpath('//a[@href="http://www.hntb.com/careers/diversity"]'))
-    WebDriverWait(driver, 60).until(EC.element_to_be_clickable(driver.find_element_by_xpath('//a[@href="http://www.hntb.com/careers/diversity"]')))
-    element = driver.find_element_by_xpath('//a[@href="http://www.hntb.com/careers/diversity"]')
-    element.click()
-finally:
-    driver.close()
+    locator = (By.NAME, "search_block_form")
+    element = WebDriverWait(driver, delay).until(EC.presence_of_element_located(locator))
+except TimeoutException:
+    print "Took too much time!"
+    quit()
+
+searchKey = "python"
+element.send_keys(searchKey)
+element.submit()
+
+print "! Success !"
+
+#try:
+#    locator = (By.XPATH, "//a[@href='/careers']")
+#    element = WebDriverWait(driver, delay).until(EC.presence_of_element_located(locator))
+#except TimeoutException:
+#    print "Took too much time!"
+#    quit()
+
+#element.click()
+
+#try:
+#    locator = (By.XPATH, "//a[@href='/careers/diversity']")
+#    element = WebDriverWait(driver, delay).until(EC.presence_of_element_located(locator))
+#except TimeoutException:
+#    print "Took too much time!"
+#    quit()
+
+#element.click()
+
+#html = driver.page_source
+
+#with open('page.html', 'w') as pageFile:  # open the file to store html
+#    pageFile.write(html)        # write to file
+
+#webbrowser.open('page.html')              # view the html
 
 
-driver.close()
-
-driver.quit()
+# see stackoverflow 'using python to sign into website,
