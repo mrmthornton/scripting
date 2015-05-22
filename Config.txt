@@ -1,0 +1,23 @@
+[core]
+	repositoryformatversion = 0
+	filemode = false
+	bare = false
+	logallrefupdates = true
+	symlinks = false
+	ignorecase = true
+	hideDotFiles = dotGitOnly
+[remote "github"]
+	url = git@github.com:mrmthornton/scripting.git
+	fetch = +refs/heads/*:refs/remotes/origin/*
+[remote "bitbucket"]
+	url = git@bitbucket.org:mrmthornton/scripting.git
+	fetch = +refs/heads/*:refs/remotes/origin/*
+[branch "master"]
+	remote = github
+	merge = refs/heads/master
+[remote "origin"]
+	url = git@github.com:mrmthornton/scripting.git
+	url = git@bitbucket.org:mrmthornton/scripting.git
+[user]
+	name = mrmthornton
+	email = mrmthornton@gmail.com
