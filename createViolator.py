@@ -1,43 +1,67 @@
-# testing selenium
-# open a page
-# fill the search field and submit
-# scrape the results
-# close the page
+# create a violator
+# open ntta portal
+# navigate to violator screen
+# fill the fields and submit
+# navigate to address screen
+# fill the fields and submit
+# query the new violator for review
+# wait until operator accepts
+# move on to next
 
 # works on win7, ie10
-import os
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support.ui import Select
-from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
+
+def timeout():
+    print "Took too much time!"
+    quit()
+
+delay = 120
 
 #create an instance of IE and set some options
 driver = webdriver.Ie()
-driver.implicitly_wait(10)
-driver.set_script_timeout(10)
 driver.maximize_window()
-wait = WebDriverWait(driver,10)
-
 url = 'https://lprod.scip.ntta.org/scip/jsp/SignIn.jsp'
 driver.get(url)
 
 userNameField = driver.find_element_by_name('j_username')
 userNameField.clear()
-userNameField.send_keys("mthornton")
-#userNameField.submit()
-
 passwordField = driver.find_element_by_name('j_password')
 passwordField.clear()
-passwordField.send_keys("NTTA2jan01")
+
+userNameField.send_keys("mthornton")
+passwordField.send_keys("NTTA2apr04")
 passwordField.submit()
 
-menuItem = driver.find_element_by_xpath("//td[@id='Bar1']")
-menuItem.click()
+#try:
+#    url='/scip/scipaction?command=LaunchApplication&applicationName=VPS' type='ExternalAppWindow'
+#    driver.get(url)
+#except TimeoutException:
+#    timeout()
+
+try:
+    locator = (By.ID,"P_LIC_PLATE_NBR")
+    results = WebDriverWait(driver, delay).until(EC.presence_of_all_elements_located(locator))
+    #document.forms[1].P_LIC_PLATE_NBR.focus();
+except TimeoutException:
+    timeout()
+
+try:
+    locator = (By.ID,"P_LIC_PLATE_NBR")
+    results = WebDriverWait(driver, delay).until(EC.presence_of_all_elements_located(locator))
+    #document.forms[1].P_LIC_PLATE_NBR.focus();
+except TimeoutException:
+    timeout()
 
 
-menuItem = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[@id='menuItem3']")))
-menuItem.click()
-#driver.find_element_by_xpath("//div[@id='menuItem3']")
+for e in results:
+    s = filter(lambda x: x in string.printable, e.text)
+    print s
+
+with open('results.txt', 'w') as pageFile:  # open the file to store html
+    for e in results:
+        pageFile.write(filter(lambda x: x in string.printable, e.text))        # write to file
 
 #driver.quit()

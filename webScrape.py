@@ -1,4 +1,4 @@
-6F3201# complete code that performs the scraping
+# complete code that performs the scraping
 # and prints a simple report to the standard output is:
 """
 Scrape packpub article network

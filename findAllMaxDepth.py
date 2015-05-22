@@ -120,7 +120,7 @@ def crawl_web(seed,max_depth):
 #for e in anIndex:
 #    print e
 
-anIndex = crawl_web("http://www.ntta.org",0)
+anIndex = crawl_web("http://nttaintranet1/default.aspx",0)
 for e in anIndex:
     print e
 

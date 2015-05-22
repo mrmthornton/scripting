@@ -1,63 +1,56 @@
-# code that requests does a violation search,
+# code that requests violation search,
 # corrects the plate and state information,
 # saves the changes and moves to the next image
 
-from BeautifulSoup import BeautifulSoup
-from windmill.authoring import WindmillTestClient
-import windmill.browser
-import re
-import urlparse
-from copy import copy
+
+# works on win7, ie10
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+import selenium.webdriver.support.expected_conditions as EC
+from selenium.common.exceptions import TimeoutException
+
+delay=10
+
+def timeout():
+    print "Took too much time!"
+    quit()
+
+#create an instance of IE and set some options
+driver = webdriver.Ie()
+driver.maximize_window()
+
+url = 'https://lprod.scip.ntta.org/scip'
+driver.get(url)
+
+#WebDriverWait(driver,10).until()
+
+userNameField = driver.find_element_by_name('j_username')
+userNameField.clear()
+passwordField = driver.find_element_by_name('j_password')
+passwordField.clear()
+
+userNameField.send_keys("mthornton")
+passwordField.send_keys("NTTA2apr04")
+passwordField.submit()
+
+menuItem = driver.find_element_by_xpath("//td[@id='Bar1']")
+menuItem.click()
+try:
+    locator =(By.XPATH,"//div[@id='menuItem3']")
+    nextPage = WebDriverWait(driver, delay).until(EC.element_to_be_clickable(locator))
+    nextPage.click()
+    driver.maximize_window()
+except TimeoutException:
+    timeout()
+
+try:
+    locator =(By.LINK_TEXT,"Violation Search")
+    menuItem = WebDriverWait(driver, delay).until(EC.element_to_be_clickable(locator))
+    menuItem.click()
+    driver.maximize_window()
+except TimeoutException:
+    timeout()
 
 
-def get_massage():
-    """
-    Provide extra data massage to solve HTML problems in BeautifulSoup
-    """
-    # Javascript code in ths page generates HTML markup
-    # that isn't parsed correctly by BeautifulSoup.
-    # To avoid this problem, all document.write fragments are removed
-    my_massage = copy(BeautifulSoup.MARKUP_MASSAGE)
-    my_massage.append((re.compile(u"document.write(.+);"), lambda match: ""))
-    my_massage.append((re.compile(u'alt=".+">'), lambda match: ">"))
-    return my_massage
-
-def main():
-    """
-    Scrape NASA Image of the Day Gallery
-    """
-    # Extra data massage for BeautifulSoup
-    my_massage = get_massage()
-    # Open main gallery page
-
-    br = windmill.browser
-    url = 'https://lprod.scip.ntta.org/portal/login'
-    br.windmill.get_test_url(url)
-
-    client = WindmillTestClient()
-    print __name__
-    client.open(url='https://lprod.scip.ntta.org/portal/login')
-    # Page isn't completely loaded until image gallery data
-    # has been updated by javascript code
-    client.waits.forElement(xpath=u"//div[@id='gallery_image_area']/img", timeout=30000)
-    # Scrape all images information
-    images_info = {}
-    while True:
-        image_info = get_image_info(client, my_massage)
-        # Break if image has been already scrapped
-        # (that means that all images have been parsed
-        # since they are ordered in a circular ring)
-        if image_info['link'] in images_info:
-            break
-        images_info[image_info['link']] = image_info
-        # Click to get the information for the next image
-        client.click(xpath=u"//div[@class='btn_image_next']")
-        # Print results to stdout ordered by image name
-        for image_info in sorted(images_info.values(),
-                       key=lambda image_info: image_info['name']):
-            print ("Name: %(name)sn" "Link: %(link)sn" % image_info)
-
-
-if __name__ == '__main__':
-    main()
-
+driver.quit()

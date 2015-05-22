@@ -1,4 +1,3 @@
-# testing selenium
 # open a page
 # fill the search field and submit
 # scrape the results
@@ -7,48 +6,33 @@
 # works on win7, ie10
 import os
 from selenium import webdriver
+from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support.ui import Select
-
+import selenium.webdriver.support.expected_conditions as EC
+from selenium.common.exceptions import TimeoutException
 
 #create an instance of IE and set some options
 driver = webdriver.Ie()
-driver.implicitly_wait(10)
-driver.set_script_timeout(10)
 driver.maximize_window()
 
-url = 'https://prod1.dot.state.tx.us/'
+delay=30
+
+def timeout():
+    print "Took too much time!"
+    quit()
+
+# Go to the main web page and wait while the user enters credentials
+##url = 'https://mvdinet.txdmv.gov/'
+url = 'https://mvdinet.txdmv.gov'
 driver.get(url)
 
-#WebDriverWait(driver,10).until()
-##continueToSite = driver.find_element_by_id('overridelink')
-##continueToSite = driver.find_element_by_id('overridelink')
-continueToSite = driver.find_element_by_id('continueToSite')
-##continueToSite = driver.find_element_by_id('continueToSiteAlign')
-continueToSite.click()
-
-userNameField = driver.find_element_by_name('j_username')
-userNameField.clear()
-userNameField.send_keys("Y1WW0N1")
-#userNameField.submit()
-
-passwordField = driver.find_element_by_name('j_password')
-passwordField.clear()
-passwordField.send_keys("2b0tt1es")
-passwordField.submit()
-
-menuItem = driver.find_element_by_xpath("//td[@id='Bar1']")
-menuItem.click()
-
-##WebDriverWait(driver,5,5)
-nextPage = driver.find_element_by_xpath("//div[@id='menuItem3']")
-nextPage.click()
-driver.maximize_window()
+try:
+    locator =(By.NAME,'plate_1')
+    plateField = WebDriverWait(driver, delay).until(EC.presence_of_element_located(locator))
+    plateField.clear()
+    plateField.send_keys("22g2222")
+    plateField.submit()
+except TimeoutException:
+    timeout()
 
 
-##print "Found " + str(len(clickOnSent)) + ' products:'
-
-##or product in clickOnSent:
-##    clickOnSent.click
-
-#driver.quit()

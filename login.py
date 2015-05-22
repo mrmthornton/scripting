@@ -7,37 +7,52 @@
 # works on win7, ie10
 import os
 from selenium import webdriver
+from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support.ui import Select
+import selenium.webdriver.support.expected_conditions as EC
+from selenium.common.exceptions import TimeoutException
+
+delay=10
+
+def timeout():
+    print "Took too much time!"
+    quit()
 
 #create an instance of IE and set some options
 driver = webdriver.Ie()
-driver.implicitly_wait(30)
 driver.maximize_window()
 
-url = 'https://lprod.scip.ntta.org/portal/login'
+url = 'https://lprod.scip.ntta.org/scip'
 driver.get(url)
 
 #WebDriverWait(driver,10).until()
 
 userNameField = driver.find_element_by_name('j_username')
 userNameField.clear()
-userNameField.send_keys("mthornton")
-#userNameField.submit()
-
 passwordField = driver.find_element_by_name('j_password')
 passwordField.clear()
-passwordField.send_keys("NTTA2jan01")
+
+userNameField.send_keys("mthornton")
+passwordField.send_keys("NTTA2apr04")
 passwordField.submit()
 
 menuItem = driver.find_element_by_xpath("//td[@id='Bar1']")
 menuItem.click()
-nextPage = driver.find_element_by_xpath("//div[@id='menuItem3']").click()
+try:
+    locator =(By.XPATH,"//div[@id='menuItem3']")
+    nextPage = WebDriverWait(driver, delay).until(EC.element_to_be_clickable(locator))
+    nextPage.click()
+    driver.maximize_window()
+except TimeoutException:
+    timeout()
 
+try:
+    locator =(By.XPATH,"//A[@HREF='javascript:toggle( 58,59,60,61,62,63,64)']")
+    menuItem = WebDriverWait(driver, delay).until(EC.element_to_be_clickable(locator))
+    menuItem.click()
+    driver.maximize_window()
+except TimeoutException:
+    timeout()
 
-##print "Found " + str(len(clickOnSent)) + ' products:'
-
-##or product in clickOnSent:
-##    clickOnSent.click
 
 driver.quit()
