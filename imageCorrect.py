@@ -31,8 +31,8 @@ passwordField = driver.find_element_by_name('j_password')
 passwordField.clear()
 
 #change to wait for operator ##########################################
-userNameField.send_keys("mthornton")
-passwordField.send_keys("NTTA2apr04")
+userNameField.send_keys("")
+passwordField.send_keys("")
 passwordField.submit()
 
 menuItem = driver.find_element_by_xpath("//td[@id='Bar1']")
