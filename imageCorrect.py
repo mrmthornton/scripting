@@ -44,9 +44,9 @@ try:
     driver.maximize_window()
 except TimeoutException:
     timeout()
-
+# assert title = "Violation Processing System"
 try:
-    locator =(By.LINK_TEXT,"Violation Search")
+    locator =(By.LINK_TEXT,"Violations")
     menuItem = WebDriverWait(driver, delay).until(EC.element_to_be_clickable(locator))
     menuItem.click()
     driver.maximize_window()
