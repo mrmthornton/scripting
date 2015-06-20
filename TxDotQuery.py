@@ -22,16 +22,17 @@ def timeout():
     quit()
 
 # Go to the main web page and wait while the user enters credentials
-##url = 'https://mvdinet.txdmv.gov/'
 url = 'https://mvdinet.txdmv.gov'
 driver.get(url)
 #https://mvdinet.txdmv.gov/cics/mvinq/regs.html
 #<title>TxDMV: VTR Vehicle Titles and Registration: Inquiry by Registration (Single Plate Number)</title>
 #NoSuchWindowException: Message: Unable to find element on closed window
-url = 'https://mvdinet.txdmv.gov/cics/mvinq/regs.html'
-driver.get(url)
+#url = 'https://mvdinet.txdmv.gov/cics/mvinq/regs.html'
+#driver.get(url)
 
 try:
+    url ='https://mvdinet.txdmv.gov/cics/mvinq/menu.html'
+    #ebDriverWait(driver, delay).until.(EC.alert_is_present())
     locator =(By.NAME,'plate_1')
     plateField = WebDriverWait(driver, delay).until(EC.presence_of_element_located(locator))
     plateField.clear()
