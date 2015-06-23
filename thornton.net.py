@@ -27,7 +27,7 @@ driver.get(url)
 try:
     locator = (By.NAME, "_user")
     element = WebDriverWait(driver, delay).until(EC.presence_of_element_located(locator))
-    element.send_keys("mike@thornton.net")
+    #element.send_keys("mike@thornton.net")
     #element.submit()
 except TimeoutException:
     timeout()
@@ -35,8 +35,8 @@ except TimeoutException:
 try:
     locator = (By.NAME, "_pass")
     element = WebDriverWait(driver, delay).until(EC.presence_of_element_located(locator))
-    element.send_keys("randomaccess")
-    element.submit()
+    #element.send_keys("randomaccess")
+    #element.submit()
 except TimeoutException:
     timeout()
 
@@ -48,7 +48,7 @@ except TimeoutException:
 try:
     #locator = (By.ID, "rcmbtn112")
     locator = (By.CLASS_NAME, "button-addressbook")
-    element = WebDriverWait(driver, delay).until(EC.presence_of_element_located(locator))
+    element = WebDriverWait(driver, delay, 20).until(EC.presence_of_element_located(locator))
     element = driver.find_elements_by_class_name("button-addressbook")
     element.click()
 except TimeoutException:
