@@ -33,6 +33,7 @@ delay = 5 # seconds
 url = 'http://www.hntb.com'       # target URL
 driver.get(url)
 
+WebDriverWait(driver,60)
 try:
     locator = (By.NAME, "search_block_form")
     element = WebDriverWait(driver, delay).until(EC.presence_of_element_located(locator))

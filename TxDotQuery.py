@@ -15,24 +15,36 @@ from selenium.common.exceptions import TimeoutException
 driver = webdriver.Ie()
 driver.maximize_window()
 
-delay=30
+delay=60
 
 def timeout():
     print "Took too much time!"
     quit()
 
 # Go to the main web page and wait while the user enters credentials
-##url = 'https://mvdinet.txdmv.gov/'
 url = 'https://mvdinet.txdmv.gov'
 driver.get(url)
+#https://mvdinet.txdmv.gov/cics/mvinq/regs.html
+#<title>TxDMV: VTR Vehicle Titles and Registration: Inquiry by Registration (Single Plate Number)</title>
+#NoSuchWindowException: Message: Unable to find element on closed window
+#url = 'https://mvdinet.txdmv.gov/cics/mvinq/regs.html'
+
 
 try:
     locator =(By.NAME,'plate_1')
-    plateField = WebDriverWait(driver, delay).until(EC.presence_of_element_located(locator))
+    plateField = WebDriverWait(driver, delay,20).until(EC.presence_of_element_located(locator))
     plateField.clear()
-    plateField.send_keys("22g2222")
+    plateField.send_keys("12345TX")
     plateField.submit()
 except TimeoutException:
     timeout()
 
+try:
+    locator = (By.XPATH, '//pre')
+    results = WebDriverWait(driver, delay).until(EC.presence_of_all_elements_located(locator))
+except TimeoutException:
+    timeout()
 
+for e in results:
+    s = filter(lambda x: x in string.printable, e.text)
+    print s
