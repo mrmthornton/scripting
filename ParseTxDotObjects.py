@@ -31,6 +31,7 @@ dateYearFirstPattern = re.compile(r'\d{4,4}/\d{2,2}/\d{2,2}') # year/mo/day
 # renewal -> name, owner2 name?, address, address2, city, state, zip
 # dates   -> issued, registered, assignment
 # string  -> contents of the txdot response
+# remarks -> parsed remarks, Cancelled on ...,  etc
 
 class TxDotPlateInfo:
     def __init__(self, licencePlate, txdotString):

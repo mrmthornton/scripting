@@ -14,7 +14,7 @@ from selenium.common.exceptions import TimeoutException
 #create an instance of IE and set some options
 driver = webdriver.Ie()
 driver.maximize_window()
-delay=10
+delay=30
 
 def timeout():
     print "TxDotQuery: timeout!"
@@ -25,10 +25,17 @@ def credentials():
     url = 'https://mvdinet.txdmv.govX'
     driver.get(url)
 
-def query(plate):
+def connect():
     try:
         locator =(By.NAME,'plate_1')
         plateField = WebDriverWait(driver, delay,20).until(EC.presence_of_element_located(locator))
+    except TimeoutException:
+        timeout()
+
+def query(plate):
+    try:
+        locator =(By.NAME,'plate_1')
+        plateField = WebDriverWait(driver, delay,2).until(EC.presence_of_element_located(locator))
         plateField.clear()
         plateField.send_keys(plate)
         plateField.submit()
@@ -46,4 +53,5 @@ def query(plate):
 
 if __name__ == '__main__':
     credentials()
+    connect()
     print query("12345TX")

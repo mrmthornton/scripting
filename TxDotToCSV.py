@@ -1,27 +1,17 @@
-# open a page
-# fill the search field and submit
-# scrape the results
-# close the page
-
-# works on win7, ie10
-import os
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-import selenium.webdriver.support.expected_conditions as EC
-from selenium.common.exceptions import TimeoutException
-
-from TxDotQuery import credentials
-from TxDotQuery import query
-
-def timeout():
-    print "TxDotToCSV: timeout!"
-    quit()
+#-------------------------------------------------------------------------------
+# Name:        parseTxDot
+# Purpose:     read text output from the TxDot DMV database lookup
+#
+# Author:      mthornton
+#
+# Created:     24/11/2014
+# Copyright:   (c) mthornton 2014
 #-------------------------------------------------------------------------------
 
 import re
 import io
 import csv
+import string
 
 linePattern = re.compile('^.+')
 wordPattern = re.compile('\w+')
@@ -565,49 +555,71 @@ def csvStringFromList(listData):
     csvString += '\n'
     return csvString
 
-##############################################################################
-
 def main():
 
-    # read the list of license plates
-    with open('plates-test.csv', 'r') as plateFile:
+    #workbook = xlrd.open_workbook('plates.xlsx')
+    #sheet = workbook.sheet_by_index(0)
+    #print sheet
+    #data = [[sheet.cell_value(r, c) for c in range(sheet.ncols)] for r in range(sheet.nrows)]
+
+    with open('dealerPlates.csv', 'r') as plateFile:
         csvInput = csv.reader(plateFile)
         plates = [row[0] for row in csvInput]
     #print plates
 
-    # query each plate
-    # parse the result
-    # write a record to the file
-    with open('data.csv', 'a') as outfile:
-        outfile.truncate()
-        for plate in plates:
-            fileString = query(plate)
-            fileString =  repairLineBreaks(fileString)
-            foundCurrentPlate = False
-            while True:
-                try:
-                    responseType, startNum, endNum = findResponseType(plate, fileString)
-                except:
-                    responseType = None
-                    if foundCurrentPlate == False:
-                        print "\n", plate, ' Plate/Pattern not found'
-                        outfile.write(',' + plate + ' Plate/Pattern not found\n')
-                    break
-                if responseType != None:
-                    foundCurrentPlate = True
-                    #print 'main:', responseType, startNum, endNum
-                    typeString = fileString[startNum:endNum + 1]
-                    #print typeString
-                    fileString = fileString[:startNum] + fileString[endNum + 1:]
-                    listData = parseRecord(responseType, typeString)
-                    csvString = csvStringFromList(listData)
-                    outfile.write(csvString)
-        outfile.write('----------------\n')
-        outfile.flush()
+    with open('txdotText.txt','r') as infile:
+        with open('data.csv', 'a') as outfile:
+            outfile.truncate()
+            for plate in plates:
+                # #results = query(plate)
+                # #for e in results:
+                    # #fileString = filter(lambda x: x in string.printable, e.text)
+                    # #print fileString
+                fileString = """ re----------------------
+
+2016 08 DEALER            5F1234
+  ISSUED TO
+  HONDA CARS OF IRELAND
+  1550 E US ROUTE 130
+  CORK            TX   75000
+  MASTER DEALER NUMBER P122272
+  PLATE EXPIRES: 2016/08  PLATE STATUS: CURRENT
+  CODE DL          123
+
+----------------------------"""
+                fileString = repairLineBreaks(fileString)
+                foundCurrentPlate = False
+                while True:
+                    try:
+                        responseType, startNum, endNum = findResponseType(plate, fileString)
+                    except:
+                        responseType = None
+                        if foundCurrentPlate == False:
+                            print "\n", plate, ' Plate/Pattern not found'
+                            outfile.write(',' + plate + ' Plate/Pattern not found\n')
+                        break
+                    if responseType != None:
+                        foundCurrentPlate = True
+                        #print 'main:', responseType, startNum, endNum
+                        typeString = fileString[startNum:endNum + 1]
+                        #print typeString
+                        fileString = fileString[:startNum] + fileString[endNum + 1:]
+                        listData = parseRecord(responseType, typeString)
+                        csvString = csvStringFromList(listData)
+                        outfile.write(csvString)
+            outfile.write('----------------\n')
+            outfile.flush()
     print "main: Finished parsing TxDot file."
 
-if __name__ == '__main__':
-    #credentials()
-    #query("12345TX")
-    main()
 
+# #from TxDotQuery import credentials
+# #from TxDotQuery import connect
+# #from TxDotQuery import query
+
+# input - 'txdotText.txt'
+# input - 'dealerPlates.csv'
+# output - 'data.csv'
+if __name__ == '__main__':
+    # #credentials()
+    # #connect()
+    main()

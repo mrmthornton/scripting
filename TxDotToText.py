@@ -50,7 +50,6 @@ if __name__ == '__main__':
     with open('dealerPlates.csv', 'r') as plateFile:
         csvInput = csv.reader(plateFile)
         plates = [row[0] for row in csvInput]
-    #print plates
 
     with open('txdotText.txt', 'a') as outfile:
         outfile.truncate()
