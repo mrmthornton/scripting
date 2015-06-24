@@ -1,0 +1,9 @@
+*.lnk
+*.csv
+*.xlsx
+*.xlsm
+*.html
+*.txt
+*.log
+*.exe
+*.pyc
