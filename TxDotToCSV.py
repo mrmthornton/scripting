@@ -5,7 +5,7 @@
 # Author:      mthornton
 #
 # Created:     24/11/2014
-# Copyright:   (c) mthornton 2014
+# Copyright:   (c) mthornton 2014, 2015
 #-------------------------------------------------------------------------------
 
 import re
