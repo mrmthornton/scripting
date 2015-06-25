@@ -7,3 +7,7 @@
 *.log
 *.exe
 *.pyc
+.metadata/
+How To Read a TXDOT.pdf
+RemoteSystemsTempFiles/
+templist
