@@ -1,12 +1,11 @@
 #-------------------------------------------------------------------------------
-# Name:        parseTxDot
-# Purpose:     read text output from the TxDot DMV database lookup
+# Name:        TxDotQuery
+# Purpose:     establish connection to TXDMV RTS database
 #
 # Author:      mthornton
 #
 # Created:     24/11/2014
 # Copyright:   (c) mthornton 2014, 2015
-# Licence:     <your licence>
 #------------------------------------------------------------------------------
 # open a page
 # fill the search field and submit

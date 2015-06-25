@@ -1,18 +1,17 @@
 #-------------------------------------------------------------------------------
-# Name:        TxDotToCSV
-# Purpose:     gather output from TXDMV RTS database, parse the raw text,
-#              and save to CSV text file
+# Name:        TxDotParse
+# Purpose:     parse the multi-formated results from the TXDMV RTS database
+#
 # Author:      mthornton
 #
 # Created:     24/11/2014
-# Updates:     24/06/2015
+# Update:      25/06/2015
 # Copyright:   (c) mthornton 2014, 2015
 #-------------------------------------------------------------------------------
 
 import re
 import io
 import csv
-import string
 
 linePattern = re.compile('^.+')
 wordPattern = re.compile('\w+')
@@ -568,46 +567,37 @@ def main():
         plates = [row[0] for row in csvInput]
     #print plates
 
-    with open('dataCSV.txt', 'a') as outfile:
-        outfile.truncate()
-        for plate in plates:
-            results = query(plate)
-            for e in results:
-                fileString = filter(lambda x: x in string.printable, e.text)
-                print fileString
-
-            fileString = repairLineBreaks(fileString)
-            foundCurrentPlate = False
-            while True:
-                try:
-                    responseType, startNum, endNum = findResponseType(plate, fileString)
-                except:
-                    responseType = None
-                    if foundCurrentPlate == False:
-                        print "\n", plate, ' Plate/Pattern not found'
-                        outfile.write(',' + plate + ' Plate/Pattern not found\n')
-                    break
-                if responseType != None:
-                    foundCurrentPlate = True
-                    #print 'main:', responseType, startNum, endNum
-                    typeString = fileString[startNum:endNum + 1]
-                    #print typeString
-                    fileString = fileString[:startNum] + fileString[endNum + 1:]
-                    listData = parseRecord(responseType, typeString)
-                    csvString = csvStringFromList(listData)
-                    outfile.write(csvString)
-        outfile.write('----------------\n')
-        outfile.flush()
+    with open('txdotText.txt','r') as infile:
+        with open('data.csv', 'a') as outfile:
+            outfile.truncate()
+            fileString = infile.read()
+            fileString =  repairLineBreaks(fileString)
+            for plate in plates:
+                foundCurrentPlate = False
+                while True:
+                    try:
+                        responseType, startNum, endNum = findResponseType(plate, fileString)
+                    except:
+                        responseType = None
+                        if foundCurrentPlate == False:
+                            print "\n", plate, ' Plate/Pattern not found'
+                            outfile.write(',' + plate + ' Plate/Pattern not found\n')
+                        break
+                    if responseType != None:
+                        foundCurrentPlate = True
+                        #print 'main:', responseType, startNum, endNum
+                        typeString = fileString[startNum:endNum + 1]
+                        #print typeString
+                        fileString = fileString[:startNum] + fileString[endNum + 1:]
+                        listData = parseRecord(responseType, typeString)
+                        csvString = csvStringFromList(listData)
+                        outfile.write(csvString)
+            outfile.write('----------------\n')
+            outfile.flush()
     print "main: Finished parsing TxDot file."
 
-
-from TxDotQuery import credentials
-from TxDotQuery import connect
-from TxDotQuery import query
-
+# input - 'txdotText.txt'
 # input - 'dealerPlates.csv'
-# output - 'dataCSV.txt'
+# output - 'data.csv'
 if __name__ == '__main__':
-    credentials()
-    connect()
     main()

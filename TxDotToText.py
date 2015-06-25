@@ -1,3 +1,12 @@
+#-------------------------------------------------------------------------------
+# Name:        TxDotToText
+# Purpose:     gather output from TXDMV RTS database, save to CSV text file
+#
+# Author:      mthornton
+#
+# Created:     24/11/2014
+# Copyright:   (c) mthornton 2014, 2015
+#------------------------------------------------------------------------------
 # open a page
 # fill the search field and submit
 # scrape the results
