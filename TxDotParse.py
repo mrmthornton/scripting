@@ -15,8 +15,8 @@ import csv
 
 linePattern = re.compile('^.+')
 wordPattern = re.compile('\w+')
-csvPattern = re.compile('[A-Z0-9 .#]*,')
-commaToEOLpattern = re.compile(',[A-Z0-9 .#]+$')
+csvPattern = re.compile('[A-Z0-9 .#&]*,')
+commaToEOLpattern = re.compile(',[A-Z0-9 .#&]+$')
 LICpattern = re.compile('^LIC ')
 issuedPattern = re.compile('ISSUED ')
 reg_dtPattern = re.compile('REG DT ')
