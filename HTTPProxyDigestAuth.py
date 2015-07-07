@@ -54,9 +54,11 @@ proxies = {
 auth = HTTPProxyDigestAuth("username", "password")
 
 # HTTP
-r = requests.get("http://www.python.org/", proxies=proxies, auth=auth)
-r.status_code # 200 OK
+r = requests.get("http://www.python.org/")
+#r = requests.get("http://www.python.org/", proxies=proxies, auth=auth)
+print "HTTP result" ,r.status_code # 200 OK
 
 # HTTPS
-r = requests.get("https://www.python.org/", proxies=proxies, auth=auth)
-r.status_code # 200 OK
+r = requests.get("https://www.python.org/")
+#r = requests.get("https://www.python.org/", proxies=proxies, auth=auth)
+print "HTTPS result" ,r.status_code # 200 OK
