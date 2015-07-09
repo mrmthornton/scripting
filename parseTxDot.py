@@ -5,7 +5,7 @@
 # Author:      mthornton
 #
 # Created:     24/11/2014
-# Copyright:   (c) mthornton 2014
+# Copyright:   (c) mthornton 2014, 2015
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 
@@ -37,7 +37,7 @@ def repairLineBreaks(fileString):
     while True:
         broken = wordBreakPattern.search(fileString)
         if broken != None:
-            print 'repairLineBreaks:' + broken.group()
+            ##print 'repairLineBreaks:' + broken.group()
             fileStringBegin = fileString[:broken.start()]
             fileStringMiddle = broken.group()
             fileStringMiddle = fileStringMiddle.replace('\n ', '')
@@ -51,7 +51,7 @@ def repairLineBreaks(fileString):
     while True:
         broken = numberBreakPattern.search(fileString)
         if broken != None:
-            print 'repairLineBreaks:' + broken.group()
+            ##print 'repairLineBreaks:' + broken.group()
             fileStringBegin = fileString[:broken.start()]
             fileStringMiddle = broken.group()
             fileStringMiddle = fileStringMiddle.replace('\n', '')
@@ -59,11 +59,24 @@ def repairLineBreaks(fileString):
             fileStringEnd = fileString[broken.end():]
             if re.search(zipPlusPattern, fileStringMiddle) != None:
                 fileString = fileStringBegin + fileStringMiddle + fileStringEnd
-                #print 'repairLineBreaks:' + fileStringMiddle
+                ##print 'repairLineBreaks:' + fileStringMiddle
         else:
             break
     #print 'repairLineBreaks:' + fileString
     return fileString
+
+def fixLine(lineString):
+    # repair lines broken with \n and/or \r and following spaces
+#    # get owner line and remove
+    ownerStartPattern = re.compile(r'OWNER')
+    ownerEndPattern = re.compile(r' RNWL RCP| PLATE AGE:| LIEN')
+    ownerStartFound = ownerStartPattern.search(typeString)
+    ownerStart = ownerStartFound.start()
+    ownerEndFound = ownerEndPattern.search(typeString)
+    ownerEnd = ownerEndFound.start()
+    ownerLine = typeString[ownerStartFound.start():ownerEndFound.start()]
+    print 'parseStandard: ' + ownerLine
+    return lineString
 
 def findStartEnd(fileString,startPattern, endPattern):
     # the iterator is used to search for all possible endLoc instances,
@@ -120,7 +133,7 @@ def findResponseType(plate, fileString):
 
     # PERMIT
     targetType = 'PERMIT'
-    permitStartPattern = re.compile('SELECTION REQUEST:' + '[\s]+' + 'PERMIT' + '[\s]+' + plate)
+    permitStartPattern = re.compile(r'SELECTION REQUEST:\s+PERMIT\s+' + plate)
     permitEndPattern = re.compile('ISSUING OFFICE: ')
     startNum, endNum = findStartEnd(fileString,permitStartPattern, permitEndPattern)
     if startNum != None:
@@ -129,8 +142,8 @@ def findResponseType(plate, fileString):
 
     # TEMPORARY
     targetType = 'TEMPORARY'
-    startPattern = re.compile('SELECTION REQUEST:' + '[\s]+' + 'TEMPORARY TAG' + '[\s]+' + plate)
-    endPattern = re.compile('[0-9]{5,5}' + '-' + '[0-9]{4,4}')  #ZipPlus
+    startPattern = re.compile(r'SELECTION REQUEST:\s+TEMPORARY TAG\s+' + plate)
+    endPattern = re.compile(r',\w{2,2},\d{5,5}')  #ZipPlus
     startNum, endNum = findStartEnd(fileString,startPattern, endPattern)
     if startNum != None:
         print  'findResponseType:', targetType, plate
@@ -283,12 +296,6 @@ def parseStandard(responseType, typeString):
         typeString = typeString[nextRemove.end():]
         nextDate = datePattern.search(typeString)
         ownedStartDate = nextDate.group()
-#    # get owner line and remove
-#    ownerLinePattern = re.compile(r'OWNER.*,.*,.*,.*,.*,.*,\d{5,5}', re.DOTALL)
-#   ownerLineFound = ownerLinePattern.search(typeString)
-#    ownerLine = ownerLineFound.group()
-#    ownerLine = ownerLine.replace("\n" , '')
-#    print 'parseStandard: ' + ownerLine
     # get owner and remove
     ownerPattern = re.compile('OWNER\s+')
     nextRemove = ownerPattern.search(typeString)
@@ -555,15 +562,12 @@ def main():
     #print sheet
     #data = [[sheet.cell_value(r, c) for c in range(sheet.ncols)] for r in range(sheet.nrows)]
 
-    with open('plates.csv', 'r') as plateFile:
-    #with open('plates-needreview.csv', 'r') as plateFile:
-    #with open('plates-norecord.csv', 'r') as plateFile:
+    with open('dealerPlates.csv', 'r') as plateFile:
         csvInput = csv.reader(plateFile)
         plates = [row[0] for row in csvInput]
     #print plates
 
-    #with open('TxDot.needreview.txt','r') as infile:
-    with open('TxDot.txt','r') as infile:
+    with open('txdotText.txt','r') as infile:
         with open('data.csv', 'a') as outfile:
             outfile.truncate()
             fileString = infile.read()
@@ -592,5 +596,8 @@ def main():
             outfile.flush()
     print "main: Finished parsing TxDot file."
 
+# input - 'txdotText.txt'
+# input - 'dealerPlates.csv'
+# output - 'data.csv'
 if __name__ == '__main__':
     main()
