@@ -1,4 +1,15 @@
 #-------------------------------------------------------------------------------
+# Name:        MultiColToSingle.py
+# Purpose:     get a name from column 1 and multiple plates from column 2,
+#              create a new spreadsheet with a single column,
+#              where each name is followed by the associated  plates.
+#              save to text file, in CSV format.
+# Author:      mthornton
+#
+# Created:     2015jul27
+# Updates:     2015jul28
+# Copyright:   (c) michael thornton 2015
+#-------------------------------------------------------------------------------
 
 import re
 import io
@@ -9,7 +20,7 @@ import string
 
 def main():
 
-    with open('siftCSV.csv', 'r') as infile, open('siftDATA.txt', 'a') as outfile:
+    with open('scrubONE.csv', 'r') as infile, open('scrubDATAcsv.txt', 'a') as outfile:
         outfile.truncate()
         csvInput = csv.reader(infile)
         for row in csvInput:
