@@ -17,10 +17,16 @@ def timeout():
 
 driver = webdriver.Ie()
 driver.maximize_window()
-delay = 5 # seconds
+delay = 30 # seconds
 
 url = 'http://www.hntb.com'       # target URL
 driver.get(url)
+
+#About HNTB | HNTB.com#
+try:
+    element = WebDriverWait(driver, delay).until(EC.title_contains("About HNTB | HNTB.com"))
+except TimeoutException:
+    timeout()
 
 try:
     locator = (By.NAME, "search_block_form")
