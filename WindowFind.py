@@ -1,7 +1,4 @@
-# use HNTB site search, putting the search results in 'results.txt'
-# get url,
-# test for no results
-# write results to file
+
 
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
