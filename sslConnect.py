@@ -9,14 +9,20 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 import requests
-from requests
+from requests import request
 import httplib
 
-conn = httplib.HTTPConnection("www.python.org")
-conn.request("GET", "/index.html")
-#conn = httplib.HTTPSConnection("www.python.org")
-#conn.request("CONNECT", "/index.html")
-
+conn = httplib.HTTPConnection("python.org")
+conn.request("GET", "python.org/index.html")
 r1 = conn.getresponse()
 print r1.status, r1.reason
 
+conn = httplib.HTTPSConnection("www.python.org")
+conn.request("CONNECT", "/index.html")
+r1 = conn.getresponse()
+print r1.status, r1.reason
+
+conn = httplib.HTTPSConnection("python.org")
+conn.request("CONNECT", "/about/")
+r1 = conn.getresponse()
+print r1.status, r1.reason

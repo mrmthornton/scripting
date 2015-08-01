@@ -25,8 +25,8 @@ print ssock.send('GET /ssltest/viewMyClient.html HTTP/1.1\r\nHost: www.ssllabs.c
 #66
 print ssock.recv(16384)
 # HTTP -> chunked
-print ssock.recv(16384)
-print ssock.recv(16384)
+##print ssock.recv(16384)
+##print ssock.recv(16384)
 #'2000\r\n'
 d = ssock.recv(16384)
 print d
