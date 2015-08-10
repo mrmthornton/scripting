@@ -33,7 +33,7 @@ while True:
             if element:
                 try:
                     locator = (By.NAME, "search_block_form")
-                    form = WebDriverWait(driver, delay).until(EC.presence_of_element_located(locator))
+                    form = WebDriverWait(driver, 5).until(EC.presence_of_element_located(locator))
                     break
                 except TimeoutException:
                     timeout("no search block found")

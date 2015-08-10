@@ -15,8 +15,9 @@ driver = webdriver.Ie()
 driver.maximize_window()
 delay = 30 # seconds
 
-url = 'http://www.hntb.com'       # target URL
-title = 'About Us | HNTB.com'     # target page
+url = 'https://docs.python.org/2/'       # target URL
+title = 'Search'     # target page
+frame = 'Python 2.7.10 documentation' # target frame
 driver.get(url)
 
 while True:
@@ -26,11 +27,13 @@ while True:
         print window
         try:
             driver.switch_to.window(window)
-            element = WebDriverWait(driver, 5).until(EC.title_contains(title))
+            #element = WebDriverWait(driver, 5).until(EC.title_contains(title))
+            locator = (By.XPATH, '//h1[@id="search-documentation"]')
+            element = WebDriverWait(driver, 5).until(EC.presence_of_element_located(locator))
             if element:
                 try:
-                    locator = (By.NAME, "search_block_form")
-                    form = WebDriverWait(driver, delay).until(EC.presence_of_element_located(locator))
+                    locator = (By.NAME, "q")
+                    form = WebDriverWait(driver, 5).until(EC.presence_of_element_located(locator))
                     break
                 except TimeoutException:
                     timeout("no search block found")
