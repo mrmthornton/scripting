@@ -13,7 +13,7 @@ def timeout(msg="Took too much time!"):
 
 driver = webdriver.Ie()
 driver.maximize_window()
-delay = 30 # seconds
+delay = 5 # seconds
 
 url = 'https://docs.python.org/2/'       # target URL
 title = 'Search'     # target page
@@ -25,15 +25,15 @@ while True:
     windows = driver.window_handles
     for window in windows:
         print window
-        try:
+        try:            # find the window with he the given header or title.
             driver.switch_to.window(window)
-            #element = WebDriverWait(driver, 5).until(EC.title_contains(title))
+            #element = WebDriverWait(driver, delay).until(EC.title_contains(title))
             locator = (By.XPATH, '//h1[@id="search-documentation"]')
-            element = WebDriverWait(driver, 5).until(EC.presence_of_element_located(locator))
+            element = WebDriverWait(driver, delay).until(EC.presence_of_element_located(locator))
             if element:
-                try:
+                try:    # find the data entry form and exit the search
                     locator = (By.NAME, "q")
-                    form = WebDriverWait(driver, 5).until(EC.presence_of_element_located(locator))
+                    form = WebDriverWait(driver, delay).until(EC.presence_of_element_located(locator))
                     break
                 except TimeoutException:
                     timeout("no search block found")
@@ -47,20 +47,26 @@ searchKey = "career"
 form.send_keys(searchKey)
 form.submit()
 
+try:   # delay to ignore presence of initial message
+    WebDriverWait(driver,delay).until(EC.alert_is_present())
+except:
+    pass
+
 try:
-    locator = (By.XPATH, '//p[@class="search-snippet"]')
+    #locator = (By.XPATH, '//p[@class="search-snippet"]')  # hntb style search results
+    locator = (By.XPATH, '//div[@id="search-results"]')   # python.org style search results
     results = WebDriverWait(driver, delay).until(EC.presence_of_all_elements_located(locator))
-except TimeoutException:
-    timeout()
 
-for e in results:
-    s = filter(lambda x: x in string.printable, e.text)
-    print s
-
-with open('results.txt', 'w') as pageFile:  # open the file to store html
     for e in results:
-        pageFile.write(filter(lambda x: x in string.printable, e.text))        # write to file
+        s = filter(lambda x: x in string.printable, e.text)
+        print s
 
+    with open('results.txt', 'w') as pageFile:  # open the file to store html
+        for e in results:
+            pageFile.write(filter(lambda x: x in string.printable, e.text))        # write to file
+
+except TimeoutException:
+    timeout("Search results not found.")
 #try:
 #    driver.get("file://results.txt") # the get does not display anything
 #webbrowser.open('page.html')              # view the html
