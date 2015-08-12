@@ -28,8 +28,15 @@ while True:
         try:            # find the window with he the given header or title.
             driver.switch_to.window(window)
             #element = WebDriverWait(driver, delay).until(EC.title_contains(title))
-            locator = (By.XPATH, '//h1[@id="search-documentation"]')
+            #locator = (By.XPATH, '//h1[@id="search-documentation"]')
+            #locator = (By.NAME, 'unique_element_name')
+            #element = WebDriverWait(driver, delay).until(EC.presence_of_element_located(locator))
+            locator = (By.CSS_SELECTOR, "span[class='linkdescr']")
             element = WebDriverWait(driver, delay).until(EC.presence_of_element_located(locator))
+            #if element.text == 'or all "What\'s new" documents since 2.0':
+            if element.text == 'or ':
+                print  element.text
+
             if element:
                 try:    # find the data entry form and exit the search
                     locator = (By.NAME, "q")
