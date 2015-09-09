@@ -16,7 +16,7 @@ def timeout(msg="Took too much time!"):
 
 driver = webdriver.Ie()
 driver.maximize_window()
-delay = 30 # seconds
+delay = 5 # seconds
 
 url = 'http://www.hntb.com'       # target URL
 title = 'About Us | HNTB.com'     # target page
@@ -29,15 +29,20 @@ while True:
         print window
         try:
             driver.switch_to.window(window)
-            element = WebDriverWait(driver, 5).until(EC.title_contains(title))
-            if element:
-                try:
-                    locator = (By.NAME, "search_block_form")
-                    form = WebDriverWait(driver, 5).until(EC.presence_of_element_located(locator))
-                    break
-                except TimeoutException:
-                    timeout("no search block found")
-                    continue
+            #element = WebDriverWait(driver, 5).until(EC.title_contains(title))
+            locator = (By.XPATH, '//h1')
+            #locator = (By.CSS_SELECTOR, 'h1')
+            elems = WebDriverWait(driver, delay).until(EC.presence_of_all_elements_located(locator))
+            for element in elems:
+                if element.text == 'HNTB SOLUTIONS':     # why all upper case?
+                    print element.text
+                    try:
+                        locator = (By.NAME, "search_block_form")
+                        form = WebDriverWait(driver, delay).until(EC.presence_of_element_located(locator))
+                        break
+                    except TimeoutException:
+                        timeout("no search block found")
+                        continue
         except TimeoutException:
             timeout('"' + title + '" window not found')
             continue
