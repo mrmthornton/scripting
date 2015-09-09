@@ -2,10 +2,10 @@
 # Name:        ViolatorFind.py
 # Purpose:     Query "Violation Search" for a name, with broad search latitude.
 #              For each violator found, match street address.
-#              Allow operator to decide on close matches. (what constitutes close?)
+#              Allow operator to decide on close matches. (what is close?)
 #              Add licence plate to licence plate list.
 #              Add comment, with specific information for this group.
-#              Add annotation to each violator in the licence plate list for this group.
+#              Add annotation to each violator in the LP list for this group.
 # Author:      mthornton
 #
 # Created:     2015JUL27
