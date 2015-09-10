@@ -15,7 +15,7 @@ def timeout(msg="Took too much time!"):
     print msg
 
 driver = webdriver.Ie()
-driver.maximize_window()
+#driver.maximize_window()
 delay = 5 # seconds
 
 url = 'http://www.hntb.com'       # target URL
