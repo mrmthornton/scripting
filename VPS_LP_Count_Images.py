@@ -22,42 +22,30 @@ def timeout(msg="Took too much time!"):
     print msg
 
 
-def openBrowser():
+def openBrowser(url):
     driver = webdriver.Ie()
     #driver.maximize_window()
-    url = 'http://www.hntb.com'       # target URL
-    #url = 'https://lprod.scip.ntta.org/scip/jsp/SignIn.jsp'  # start URL
     driver.get(url)
     return driver
 
 
-def waitForSelectedPage(driver):
+def waitForSelectedPage(driver, targetText, locator):
     # wait for page to load
-    targetText = 'HNTB SOLUTIONS'      # target text
-    #targetText = 'Violation Search'     # target text
-    #targetText = 'VIOLATION SEARCH'     # target text
     delay = 5 # seconds
     while True:
-        test = False
         for window in driver.window_handles:
             driver.switch_to_window(window)
             print window
             try:
                 #element = WebDriverWait(driver, 5).until(EC.title_contains(title))
-                locator = (By.XPATH, '//h1')
-                #locator = (By.XPATH, '//title')
-                #locator = (By.CSS_SELECTOR, 'h1')
                 elems = WebDriverWait(driver, delay).until(EC.presence_of_all_elements_located(locator))
                 for element in elems:
                     if element.text == targetText:     # why all upper case?
-                        test = True
                         print element.text
-                        break
+                        return window
             except TimeoutException:
                 timeout('"' + targetText + '" window not found')
                 continue
-        if test:
-            break
 
 
 def getCount(driver, plateString):
@@ -72,12 +60,8 @@ import csv
 import sys
 import string
 
-# stringValue = stringValue.replace(',' , '') # remove any commas
-
-def dataIO(driver):
-
-    #with open('LP_Repeats_Count.csv', 'r') as infile, open('LP_Repeats_Count_Out.txt', 'a') as outfile:
-    with open('plates.csv', 'r') as infile, open('platesOut.txt', 'a') as outfile:
+def dataIO(driver, dataInFileName, dataOutFileName, window):
+    with open(dataInFileName, 'r') as infile, open(dataOutFileName, 'a') as outfile:
         outfile.truncate()
         csvInput = csv.reader(infile)
         for row in csvInput:
@@ -101,8 +85,30 @@ def dataIO(driver):
     print "main: Finished parsing plate file."
 
 
-
 if __name__ == '__main__':
-    driver = openBrowser()
-    waitForSelectedPage(driver)
-    dataIO(driver)
+
+    ## testing with google site
+    #url = 'http://www.google.com'       # target URL
+    #targetText = 'HNTB SOLUTIONS'      # target text
+    #dataInFileName = 'plates.csv'
+    #dataOutFileName = 'platesOut.txt'
+    #locator = (By.XPATH, '//div')
+
+    ## testing with hntb site
+    url = 'http://www.hntb.com'       # target URL
+    targetText = 'HNTB SOLUTIONS'      # target text
+    dataInFileName = 'plates.csv'
+    dataOutFileName = 'platesOut.txt'
+    locator = (By.XPATH, '//h1')
+
+    ## production values
+    #targetText = 'Violation Search'     # target text
+    #targetText = 'VIOLATION SEARCH'     # target text
+    #url = 'https://lprod.scip.ntta.org/scip/jsp/SignIn.jsp'  # start URL
+    #dataInFileName = 'LP_Repeats_Count.csv'
+    #dataOutFileName = 'LP_Repeats_Count_Out.txt'
+    #locator = (By.XPATH, '//title')
+
+    driver = openBrowser(url)
+    foundWindow = waitForSelectedPage(driver, targetText, locator)
+    dataIO(driver, dataInFileName, dataOutFileName, foundWindow)
