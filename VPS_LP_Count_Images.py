@@ -25,43 +25,39 @@ def timeout(msg="Took too much time!"):
 def openBrowser():
     driver = webdriver.Ie()
     #driver.maximize_window()
-    #url = 'http://www.hntb.com'       # target URL
-    url = 'https://lprod.scip.ntta.org/scip/jsp/SignIn.jsp'  # start URL
+    url = 'http://www.hntb.com'       # target URL
+    #url = 'https://lprod.scip.ntta.org/scip/jsp/SignIn.jsp'  # start URL
     driver.get(url)
     return driver
 
 
 def waitForSelectedPage(driver):
     # wait for page to load
-    #header = 'HNTB SOLUTIONS'      # target header
-    #header = 'Violation Search'     # target header
-    header = 'VIOLATION SEARCH'     # target header
-    delay = 60 # seconds
+    targetText = 'HNTB SOLUTIONS'      # target text
+    #targetText = 'Violation Search'     # target text
+    #targetText = 'VIOLATION SEARCH'     # target text
+    delay = 5 # seconds
     while True:
-        form = False
-        windows = driver.window_handles
-        for window in windows:
+        test = False
+        for window in driver.window_handles:
+            driver.switch_to_window(window)
             print window
             try:
                 #element = WebDriverWait(driver, 5).until(EC.title_contains(title))
                 locator = (By.XPATH, '//h1')
+                #locator = (By.XPATH, '//title')
                 #locator = (By.CSS_SELECTOR, 'h1')
                 elems = WebDriverWait(driver, delay).until(EC.presence_of_all_elements_located(locator))
                 for element in elems:
-                    if element.text == header:     # why all upper case?
+                    if element.text == targetText:     # why all upper case?
+                        test = True
                         print element.text
-                        try:
-                            locator = (By.NAME, "search_block_form")
-                            form = WebDriverWait(driver, delay).until(EC.presence_of_element_located(locator))
-                            break
-                        except TimeoutException:
-                            timeout("no search block found")
-                            continue
+                        break
             except TimeoutException:
-                timeout('"' + header + '" window not found')
+                timeout('"' + targetText + '" window not found')
                 continue
-                if form:
-                    break
+        if test:
+            break
 
 
 def getCount(driver, plateString):
@@ -80,7 +76,8 @@ import string
 
 def dataIO(driver):
 
-    with open('LP_Repeats_Count.csv', 'r') as infile, open('LP_Repeats_Count_Out.txt', 'a') as outfile:
+    #with open('LP_Repeats_Count.csv', 'r') as infile, open('LP_Repeats_Count_Out.txt', 'a') as outfile:
+    with open('plates.csv', 'r') as infile, open('platesOut.txt', 'a') as outfile:
         outfile.truncate()
         csvInput = csv.reader(infile)
         for row in csvInput:
@@ -108,5 +105,4 @@ def dataIO(driver):
 if __name__ == '__main__':
     driver = openBrowser()
     waitForSelectedPage(driver)
-    #driver = webdriver.Ie()
     dataIO(driver)
