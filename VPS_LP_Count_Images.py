@@ -89,25 +89,26 @@ if __name__ == '__main__':
 
     ## testing with google site
     #url = 'http://www.google.com'       # target URL
-    #targetText = 'HNTB SOLUTIONS'      # target text
+    #locator = (By.XPATH, '//div')
+    #targetText = 'about ...'      # target text
     #dataInFileName = 'plates.csv'
     #dataOutFileName = 'platesOut.txt'
-    #locator = (By.XPATH, '//div')
 
     ## testing with hntb site
     url = 'http://www.hntb.com'       # target URL
-    targetText = 'HNTB SOLUTIONS'      # target text
+    locator = (By.XPATH, '//h1')
+    targetText = 'HNTB Solutions'      # target text
     dataInFileName = 'plates.csv'
     dataOutFileName = 'platesOut.txt'
-    locator = (By.XPATH, '//h1')
 
     ## production values
     #targetText = 'Violation Search'     # target text
     #targetText = 'VIOLATION SEARCH'     # target text
+    #locator = (By.XPATH, '//title')
     #url = 'https://lprod.scip.ntta.org/scip/jsp/SignIn.jsp'  # start URL
     #dataInFileName = 'LP_Repeats_Count.csv'
     #dataOutFileName = 'LP_Repeats_Count_Out.txt'
-    #locator = (By.XPATH, '//title')
+
 
     driver = openBrowser(url)
     foundWindow = waitForSelectedPage(driver, targetText, locator)
