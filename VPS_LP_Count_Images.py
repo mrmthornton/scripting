@@ -33,18 +33,17 @@ def waitForSelectedPage(driver, targetText, locator):
     # wait for page to load
     delay = 5 # seconds
     while True:
-        for window in driver.window_handles:
+        for window in driver.window_handles:  # test each window for locator element
             driver.switch_to_window(window)
             print window
             try:
-                #element = WebDriverWait(driver, 5).until(EC.title_contains(title))
                 elems = WebDriverWait(driver, delay).until(EC.presence_of_all_elements_located(locator))
-                for element in elems:
-                    if element.text == targetText:     # why all upper case?
+                for element in elems:       # test each element for target
+                    if element.text == targetText:   #all upper case
                         print element.text
                         return window
             except TimeoutException:
-                timeout('"' + targetText + '" window not found')
+                timeout('locator element not found')
                 continue
 
 
@@ -97,14 +96,14 @@ if __name__ == '__main__':
     ## testing with hntb site
     url = 'http://www.hntb.com'       # target URL
     locator = (By.XPATH, '//h1')
-    targetText = 'HNTB Solutions'      # target text
+    targetText = 'HNTB SOLUTIONS'      # target text
     dataInFileName = 'plates.csv'
     dataOutFileName = 'platesOut.txt'
 
     ## production values
     #targetText = 'Violation Search'     # target text
     #targetText = 'VIOLATION SEARCH'     # target text
-    #locator = (By.XPATH, '//title')
+    #locator = (By.XPATH, '//h1')
     #url = 'https://lprod.scip.ntta.org/scip/jsp/SignIn.jsp'  # start URL
     #dataInFileName = 'LP_Repeats_Count.csv'
     #dataOutFileName = 'LP_Repeats_Count_Out.txt'
