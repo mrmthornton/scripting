@@ -1,13 +1,14 @@
 #-------------------------------------------------------------------------------
-# Name:        MultiColToSingle.py
-# Purpose:     get a name from column 1 and multiple plates from column 2,
-#              create a new spreadsheet with a single column,
-#              where each name is followed by the associated  plates.
-#              save to text file, in CSV format.
+# Name:        VPS_LP_Count_Images.py
+# Purpose:     Examine web pages until the VPS Violation Search page is found.
+#              enter a licence plate in the search box
+#              find the text number of images
+#              write the licence plate and number of images to the output file.
+#
 # Author:      mthornton
 #
-# Created:     2015jul27
-# Updates:     2015jul28
+# Created:     2015aug01
+# Updates:     2015jul14
 # Copyright:   (c) michael thornton 2015
 #-------------------------------------------------------------------------------
 
