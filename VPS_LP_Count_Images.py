@@ -95,19 +95,22 @@ if __name__ == '__main__':
     #dataOutFileName = 'platesOut.txt'
 
     ## testing with hntb site
-    url = 'http://www.hntb.com'       # target URL
-    locator = (By.XPATH, '//h1')
-    targetText = 'HNTB SOLUTIONS'      # target text
-    dataInFileName = 'plates.csv'
-    dataOutFileName = 'platesOut.txt'
+    #url = 'http://www.hntb.com'       # target URL
+    #locator = (By.XPATH, '//h1')
+    #targetText = 'HNTB SOLUTIONS'      # target text
+    #dataInFileName = 'plates.csv'
+    #dataOutFileName = 'platesOut.txt'
 
     ## production values
+    id = "P_LIC_PLATE_NBR"
+    targetText = ""
+    locator = (By.ID, id)
     #targetText = 'Violation Search'     # target text
     #targetText = 'VIOLATION SEARCH'     # target text
-    #locator = (By.XPATH, '//h1')
-    #url = 'https://lprod.scip.ntta.org/scip/jsp/SignIn.jsp'  # start URL
-    #dataInFileName = 'LP_Repeats_Count.csv'
-    #dataOutFileName = 'LP_Repeats_Count_Out.txt'
+    #locator = (By.XPATH, '//td/h1')
+    url = 'https://lprod.scip.ntta.org/scip/jsp/SignIn.jsp'  # start URL
+    dataInFileName = 'LP_Repeats_Count.csv'
+    dataOutFileName = 'LP_Repeats_Count_Out.txt'
 
 
     driver = openBrowser(url)
