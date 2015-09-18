@@ -40,11 +40,9 @@ def waitForSelectedPage(driver, targetText, locator):
             try:
                 elems = WebDriverWait(driver, delay).until(EC.presence_of_all_elements_located(locator))
                 for element in elems:       # test each element for target
-                    element.clear()
-                    element.submit("testItNow")
-                    if element.id == targetText:   #all upper case
+                    if element.text == targetText:   #all upper case
                         print element.text
-                        return window
+                        return window, element
             except TimeoutException:
                 timeout('locator element not found')
                 continue
@@ -89,14 +87,6 @@ def dataIO(driver, dataInFileName, dataOutFileName, window):
 
 if __name__ == '__main__':
 
-    ## testing with startpage site
-    url = 'http://startpage.com'       # target URL
-    locator = (By.XPATH, '//span/input[@name="query"]')
-    #locator = (By.XPATH, '//span/input')
-    targetText = 'query'      # target text
-    dataInFileName = 'plates.csv'
-    dataOutFileName = 'platesOut.txt'
-
     ## testing with google site
     #url = 'http://www.google.com'       # target URL
     #locator = (By.XPATH, '//div')
@@ -112,17 +102,22 @@ if __name__ == '__main__':
     #dataOutFileName = 'platesOut.txt'
 
     ## production values
-    #id = "P_LIC_PLATE_NBR"
+    id = "P_LIC_PLATE_NBR"
     #targetText = ""
-    #locator = (By.ID, id)
-    #targetText = 'Violation Search'     # target text
+    #works#locator = (By.ID, id)
+    locator = (By.XPATH, '//TD/H1')
+    targetText = 'Violation Search'     # target text
     #targetText = 'VIOLATION SEARCH'     # target text
-    #locator = (By.XPATH, '//td/h1')
-    #url = 'https://lprod.scip.ntta.org/scip/jsp/SignIn.jsp'  # start URL
-    #dataInFileName = 'LP_Repeats_Count.csv'
-    #dataOutFileName = 'LP_Repeats_Count_Out.txt'
+    url = 'https://lprod.scip.ntta.org/scip/jsp/SignIn.jsp'  # start URL
+    dataInFileName = 'LP_Repeats_Count.csv'
+    dataOutFileName = 'LP_Repeats_Count_Out.txt'
 
 
     driver = openBrowser(url)
-    foundWindow = waitForSelectedPage(driver, targetText, locator)
+    window, element = waitForSelectedPage(driver, targetText, locator)
+
+    driver.switch_to_window(window)
+    element.send_keys("test")
+    element.submit()
+
     dataIO(driver, dataInFileName, dataOutFileName, foundWindow)
