@@ -47,11 +47,36 @@ def waitForSelectedPage(driver, targetText, locator):
                 timeout('locator element not found')
                 continue
 
-
-def getCount(driver, plateString):
-    loginDelay = 30 # seconds
+def findElementOnPage(window):
     delay = 5 # seconds
-    title = 'About Us | HNTB.com'     # target page
+    while True:
+        for window in driver.window_handles:  # test each window for locator element
+            driver.switch_to_window(window)
+            print window
+            try:
+                elems = WebDriverWait(driver, delay).until(EC.presence_of_all_elements_located(locator))
+                for element in elems:       # test each element for target
+                    if element.text == targetText:   #all upper case
+                        print element.text
+                        return window, element
+            except TimeoutException:
+                timeout('locator element not found')
+                continue
+    driver.switch_to_window(window)
+    element.send_keys("test")
+    id = "Submit"
+    targetText = None
+    locator = (By.ID, id)
+    window, element = waitForSelectedPage(driver, targetText, locator)
+    driver.switch_to_window(window)
+    element.click()
+
+def getCount(driver, window, element, plateString):
+    delay = 5 # seconds
+    driver.switch_to_window(window)
+    print window
+    element.send_keys("test")
+    element.submit()
 
 
 import re
@@ -60,7 +85,7 @@ import csv
 import sys
 import string
 
-def dataIO(driver, dataInFileName, dataOutFileName, window):
+def dataIO(driver, dataInFileName, dataOutFileName, window, element):
     with open(dataInFileName, 'r') as infile, open(dataOutFileName, 'a') as outfile:
         outfile.truncate()
         csvInput = csv.reader(infile)
@@ -76,7 +101,7 @@ def dataIO(driver, dataInFileName, dataOutFileName, window):
                 plateString = plateString.replace('\n\n' , '\n') # replace \n\n, with \n
 
             count = 0
-            #count = getCount(driver, plateString)
+            count = getCount(driver, window, element, plateString)
 
             sys.stdout.write(plateString + ", " + str(count) + '\n')
             outfile.write(plateString + ", " + str(count) + '\n')
@@ -112,12 +137,6 @@ if __name__ == '__main__':
     dataInFileName = 'LP_Repeats_Count.csv'
     dataOutFileName = 'LP_Repeats_Count_Out.txt'
 
-
     driver = openBrowser(url)
     window, element = waitForSelectedPage(driver, targetText, locator)
-
-    driver.switch_to_window(window)
-    element.send_keys("test")
-    element.submit()
-
-    dataIO(driver, dataInFileName, dataOutFileName, foundWindow)
+    dataIO(driver, dataInFileName, dataOutFileName, window, element)
