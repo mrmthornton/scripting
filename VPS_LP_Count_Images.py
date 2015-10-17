@@ -47,21 +47,20 @@ def waitForSelectedPage(driver, targetText, locator):
                 timeout('locator element not found')
                 continue
 
-def findElementOnPage(window):
+def findElementOnPage(window, element):
     delay = 5 # seconds
     while True:
-        for window in driver.window_handles:  # test each window for locator element
-            driver.switch_to_window(window)
-            print window
-            try:
-                elems = WebDriverWait(driver, delay).until(EC.presence_of_all_elements_located(locator))
-                for element in elems:       # test each element for target
-                    if element.text == targetText:   #all upper case
-                        print element.text
-                        return window, element
-            except TimeoutException:
-                timeout('locator element not found')
-                continue
+        driver.switch_to_window(window)
+        print window
+        try:
+            elems = WebDriverWait(driver, delay).until(EC.presence_of_all_elements_located(locator))
+            for element in elems:       # test each element for target
+                if element.text == targetText:   #all upper case
+                    print element.text
+                    return window, element
+        except TimeoutException:
+            timeout('locator element not found')
+            continue
     driver.switch_to_window(window)
     element.send_keys("test")
     id = "Submit"
@@ -137,23 +136,26 @@ if __name__ == '__main__':
     #dataOutFileName = 'platesOut.txt'
 
     ## testing with hntb site
-    #url = 'http://www.hntb.com'       # target URL
-    #locator = (By.XPATH, '//h1')
-    #targetText = 'HNTB SOLUTIONS'      # target text
-    #dataInFileName = 'plates.csv'
-    #dataOutFileName = 'platesOut.txt'
 
-    ## production values
-    id = "P_LIC_PLATE_NBR"
-    #targetText = ""
-    #works#locator = (By.ID, id)
-    locator = (By.XPATH, '//TD/H1')
-    targetText = 'Violation Search'     # target text
-    #targetText = 'VIOLATION SEARCH'     # target text
-    url = 'https://lprod.scip.ntta.org/scip/jsp/SignIn.jsp'  # start URL
-    dataInFileName = 'LP_Repeats_Count.csv'
-    dataOutFileName = 'LP_Repeats_Count_Out.txt'
+    locator = (By.XPATH, '//h1')
+    targetText = 'HNTB SOLUTIONS'      # target text
+    url = 'http://www.hntb.com'       # target URL
+    dataInFileName = 'plates.csv'
+    dataOutFileName = 'platesOut.txt'
+    id = ""
+
+    # production values
+    ## locator = (By.XPATH, '//TD/H1')
+    ## targetText = 'Violation Search'     # target text
+    ## url = 'https://lprod.scip.ntta.org/scip/jsp/SignIn.jsp'  # start URL
+    ## dataInFileName = 'LP_Repeats_Count.csv'
+    ## dataOutFileName = 'LP_Repeats_Count_Out.txt'
+    ## id = "P_LIC_PLATE_NBR"
 
     driver = openBrowser(url)
     window, element = waitForSelectedPage(driver, targetText, locator)
+
+    locator = (By.ID, id)
+    window, element = findElementOnPage(window, locator)
+
     dataIO(driver, dataInFileName, dataOutFileName, window, element)
