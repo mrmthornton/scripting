@@ -22,6 +22,13 @@ import selenium.webdriver.support.expected_conditions as EC
 def timeout(msg="Took too much time!"):
     print msg
 
+from selenium.webdriver.common.keys import Keys
+
+def returnOrClick(element, switch):
+    if switch =='R':
+        element.send_keys(Keys.RETURN)
+    if switch == 'C':
+        element.click()
 
 def openBrowser(url):
     driver = webdriver.Ie()
@@ -58,8 +65,6 @@ def findElementOnPage(window, locator):
         except TimeoutException:
             timeout('locator element not found')
             continue
-
-
 
 def getCount(driver, window, element, plateString):
     delay = 5 # seconds
@@ -127,14 +132,13 @@ if __name__ == '__main__':
     #dataOutFileName = 'platesOut.txt'
 
     ## testing with hntb site
-
     pageLocator = (By.XPATH, '//h2')
     targetText = 'About HNTB'      # target text
     url = 'http://www.hntb.com'       # target URL
     dataInFileName = 'plates.csv'
     dataOutFileName = 'platesOut.txt'
-
     elemLocator = (By.XPATH,'//input[@name = "s"]')
+    RoC = 'R' # use Return or Click to submit form
 
     # production values
     ## locator = (By.XPATH, '//TD/H1')
@@ -144,16 +148,12 @@ if __name__ == '__main__':
     ## dataOutFileName = 'LP_Repeats_Count_Out.txt'
     ## id = "P_LIC_PLATE_NBR"
 
-    from selenium.webdriver.common.keys import Keys
-
     driver = openBrowser(url)
     window, element = waitForSelectedPage(driver, targetText, pageLocator)
 
     window, element = findElementOnPage(window, elemLocator)
 
-    #driver.switch_to_window(window)
     element.send_keys("test")
-    element.send_keys(Keys.RETURN)
-    #element.click()
+    returnOrClick(element, RoC)
 
     dataIO(driver, dataInFileName, dataOutFileName, window, element)
