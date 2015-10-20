@@ -47,7 +47,7 @@ def waitForSelectedPage(driver, targetText, locator):
                 timeout('locator element not found')
                 continue
 
-def findElementOnPage(window, element):
+def findElementOnPage(window, locator):
     delay = 5 # seconds
     while True:
         driver.switch_to_window(window)
@@ -77,7 +77,7 @@ def getCount(driver, window, element, plateString):
     element.send_keys("test")
     try:
         locator = (By.XPATH, "//input[@value='Search']")
-        elems = WebDriverWait(driver, delay).until(EC.presence_of_all_elements_located(locator))
+        element = WebDriverWait(driver, delay).until(EC.presence_of_element_located(locator))
         element.click()
 
     except TimeoutException:
@@ -137,12 +137,13 @@ if __name__ == '__main__':
 
     ## testing with hntb site
 
-    locator = (By.XPATH, '//h1')
-    targetText = 'HNTB SOLUTIONS'      # target text
+    pageLocator = (By.XPATH, '//h2')
+    targetText = 'About HNTB'      # target text
     url = 'http://www.hntb.com'       # target URL
     dataInFileName = 'plates.csv'
     dataOutFileName = 'platesOut.txt'
-    id = ""
+    name = "s"
+    elemLocator = (By.NAME, name)
 
     # production values
     ## locator = (By.XPATH, '//TD/H1')
@@ -153,9 +154,8 @@ if __name__ == '__main__':
     ## id = "P_LIC_PLATE_NBR"
 
     driver = openBrowser(url)
-    window, element = waitForSelectedPage(driver, targetText, locator)
+    window, element = waitForSelectedPage(driver, targetText, pageLocator)
 
-    locator = (By.ID, id)
-    window, element = findElementOnPage(window, locator)
+    window, element = findElementOnPage(window, elemLocator)
 
     dataIO(driver, dataInFileName, dataOutFileName, window, element)
