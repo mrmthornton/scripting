@@ -51,24 +51,15 @@ def findElementOnPage(window, locator):
     delay = 5 # seconds
     while True:
         driver.switch_to_window(window)
-        print window
+        print "switched to target window"
         try:
-            elems = WebDriverWait(driver, delay).until(EC.presence_of_all_elements_located(locator))
-            for element in elems:       # test each element for target
-                if element.text == targetText:   #all upper case
-                    print element.text
-                    return window, element
+            element = WebDriverWait(driver, delay).until(EC.presence_of_element_located(locator))
+            return window, element
         except TimeoutException:
             timeout('locator element not found')
             continue
-    driver.switch_to_window(window)
-    element.send_keys("test")
-    id = "Submit"
-    targetText = None
-    locator = (By.ID, id)
-    window, element = waitForSelectedPage(driver, targetText, locator)
-    driver.switch_to_window(window)
-    element.click()
+
+
 
 def getCount(driver, window, element, plateString):
     delay = 5 # seconds
@@ -142,8 +133,8 @@ if __name__ == '__main__':
     url = 'http://www.hntb.com'       # target URL
     dataInFileName = 'plates.csv'
     dataOutFileName = 'platesOut.txt'
-    name = "s"
-    elemLocator = (By.NAME, name)
+
+    elemLocator = (By.XPATH,'//input[@name = "s"]')
 
     # production values
     ## locator = (By.XPATH, '//TD/H1')
@@ -153,9 +144,16 @@ if __name__ == '__main__':
     ## dataOutFileName = 'LP_Repeats_Count_Out.txt'
     ## id = "P_LIC_PLATE_NBR"
 
+    from selenium.webdriver.common.keys import Keys
+
     driver = openBrowser(url)
     window, element = waitForSelectedPage(driver, targetText, pageLocator)
 
     window, element = findElementOnPage(window, elemLocator)
+
+    #driver.switch_to_window(window)
+    element.send_keys("test")
+    element.send_keys(Keys.RETURN)
+    #element.click()
 
     dataIO(driver, dataInFileName, dataOutFileName, window, element)
