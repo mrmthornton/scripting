@@ -47,6 +47,7 @@ def dataIO(driver, dataInFileName, dataOutFileName, window, element, txtLocator=
                 plateString = plateString.replace('\n\n' , '\n') # replace \n\n, with \n
 
             text = getText(driver, window, element, plateString, txtLocator)
+
             sys.stdout.write(plateString + ", " + str(text) + '\n')
             outfile.write(plateString + ", " + str(text) + '\n')
 
@@ -57,24 +58,28 @@ def dataIO(driver, dataInFileName, dataOutFileName, window, element, txtLocator=
 if __name__ == '__main__':
 
     ## testing with google site
-    pageLocator = (By.XPATH,'//input[@value = "Google Search"]')
-    targetText = ''      # target text
-    url = 'http://www.google.com'       # target URL
-    dataInFileName = 'plates.csv'
-    dataOutFileName = 'platesOut.txt'
-    elemLocator = (By.XPATH,'//input[@name = "q"]')
-    RoC = 'R' # use Return or Click to submit form
-    textLocator = (By.ID, "resultStats")
-
-    ## testing with hntb site
-    #pageLocator = (By.XPATH, '//h2')
-    #targetText = 'About HNTB'      # target text
-    #url = 'http://www.hntb.com'       # target URL
+    #print "Google test: no operator actions needed."
+    #pageLocator = (By.XPATH,'//input[@value = "Google Search"]')
+    #targetText = ''      # target text
+    #url = 'http://www.google.com'       # target URL
     #dataInFileName = 'plates.csv'
     #dataOutFileName = 'platesOut.txt'
-    #elemLocator = (By.XPATH,'//input[@name = "s"]')
+    #lemLocator = (By.XPATH,'//input[@name = "q"]')
     #RoC = 'R' # use Return or Click to submit form
     #textLocator = (By.ID, "resultStats")
+
+    ## testing with hntb site
+    print "HNTB test run: use debug mode?, open new window with About link."
+    print "click on search icon, continue run. "
+    print "results are displayed in a different window. "
+    pageLocator = (By.XPATH, '//h2')
+    targetText = 'About HNTB'      # target text
+    url = 'http://www.hntb.com'       # target URL
+    dataInFileName = 'plates.csv'
+    dataOutFileName = 'platesOut.txt'
+    elemLocator = (By.XPATH,'//input[@name = "s"]')
+    RoC = 'R' # use Return or Click to submit form
+    textLocator = (By.ID, "resultStats")
 
     ## production values
     #pageLocator = (By.XPATH, '//TD/H1')
