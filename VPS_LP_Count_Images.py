@@ -18,66 +18,12 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
 import selenium.webdriver.support.expected_conditions as EC
 
-
-def timeout(msg="Took too much time!"):
-    print msg
-
-from selenium.webdriver.common.keys import Keys
-
-def returnOrClick(element, switch):
-    if switch =='R':
-        element.send_keys(Keys.RETURN)
-    if switch == 'C':
-        element.click()
-
-def openBrowser(url):
-    driver = webdriver.Ie()
-    #driver.maximize_window()
-    driver.get(url)
-    return driver
-
-
-def waitForSelectedPage(driver, targetText, locator):
-    # wait for page to load
-    delay = 5 # seconds
-    while True:
-        for window in driver.window_handles:  # test each window for locator element
-            driver.switch_to_window(window)
-            print "Searching for '" , targetText, "' in window ", window
-            try:
-                elems = WebDriverWait(driver, delay).until(EC.presence_of_all_elements_located(locator))
-                for element in elems:       # test each element for target
-                    if (element.text == targetText) or (targetText == ""):   #all upper case
-                        print "found '", element.text, "'"
-                        return window, element
-            except TimeoutException:
-                timeout('locator element not found')
-                continue
-
-def findElementOnPage(window, locator):
-    delay = 5 # seconds
-    while True:
-        driver.switch_to_window(window)
-        print "switched to target window"
-        try:
-            element = WebDriverWait(driver, delay).until(EC.presence_of_element_located(locator))
-            return window, element
-        except TimeoutException:
-            timeout('locator element not found')
-            continue
-
-def getText(driver, window, element, plateString, txtLoc=("","")):
-    delay = 5 # seconds
-    driver.switch_to_window(window)
-    #print window
-    element.clear()
-    element.send_keys(plateString)
-    element.send_keys("\n")
-    try:
-        element = WebDriverWait(driver, delay).until(EC.presence_of_element_located(txtLoc))
-        return element.text
-    except TimeoutException:
-        timeout('text not found')
+from VPS_LIB import timeout
+from VPS_LIB import returnOrClick
+from VPS_LIB import openBrowser
+from VPS_LIB import waitForSelectedPage
+from VPS_LIB import findElementOnPage
+from VPS_LIB import getText
 
 import re
 import io
@@ -85,7 +31,7 @@ import csv
 import sys
 import string
 
-def dataIO(driver, dataInFileName, dataOutFileName, window, element, txtLoc=("","")):
+def dataIO(driver, dataInFileName, dataOutFileName, window, element, txtLocator=("","")):
     with open(dataInFileName, 'r') as infile, open(dataOutFileName, 'a') as outfile:
         outfile.truncate()
         csvInput = csv.reader(infile)
@@ -100,7 +46,7 @@ def dataIO(driver, dataInFileName, dataOutFileName, window, element, txtLoc=("",
             for n in range(10):
                 plateString = plateString.replace('\n\n' , '\n') # replace \n\n, with \n
 
-            text = getText(driver, window, element, plateString, txtLoc)
+            text = getText(driver, window, element, plateString, txtLocator)
             sys.stdout.write(plateString + ", " + str(text) + '\n')
             outfile.write(plateString + ", " + str(text) + '\n')
 
@@ -143,6 +89,6 @@ if __name__ == '__main__':
     driver = openBrowser(url)
     window, element = waitForSelectedPage(driver, targetText, pageLocator)
 
-    window, element = findElementOnPage(window, elemLocator)
+    window, element = findElementOnPage(driver, window, elemLocator)
 
     dataIO(driver, dataInFileName, dataOutFileName, window, element, textLocator)
