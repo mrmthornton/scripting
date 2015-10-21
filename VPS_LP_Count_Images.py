@@ -82,6 +82,8 @@ if __name__ == '__main__':
     textLocator = (By.ID, "resultStats")
 
     ## production values
+    #print "Use debug mode, open VPS, new violator search window, "
+    #print "and run to completion"
     #pageLocator = (By.XPATH, '//TD/H1')
     #targetText = 'Violation Search'     # target text
     #url = 'https://lprod.scip.ntta.org/scip/jsp/SignIn.jsp'  # start URL
