@@ -18,82 +18,12 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
 import selenium.webdriver.support.expected_conditions as EC
 
-
-def timeout(msg="Took too much time!"):
-    print msg
-
-
-def openBrowser(url):
-    driver = webdriver.Ie()
-    #driver.maximize_window()
-    driver.get(url)
-    return driver
-
-
-def waitForSelectedPage(driver, targetText, locator):
-    # wait for page to load
-    delay = 5 # seconds
-    while True:
-        for window in driver.window_handles:  # test each window for locator element
-            driver.switch_to_window(window)
-            print "Searching for '" , targetText, "' in window ", window
-            try:
-                elems = WebDriverWait(driver, delay).until(EC.presence_of_all_elements_located(locator))
-                for element in elems:       # test each element for target
-                    if element.text == targetText:   #all upper case
-                        print "found '", element.text, "'"
-                        return window, element
-            except TimeoutException:
-                timeout('locator element not found')
-                continue
-
-def findElementOnPage(window, locator):
-    delay = 5 # seconds
-    while True:
-        driver.switch_to_window(window)
-        print window
-        try:
-            elems = WebDriverWait(driver, delay).until(EC.presence_of_all_elements_located(locator))
-            for element in elems:       # test each element for target
-                if element.text == targetText:   #all upper case
-                    print element.text
-                    return window, element
-        except TimeoutException:
-            timeout('locator element not found')
-            continue
-    driver.switch_to_window(window)
-    element.send_keys("test")
-    id = "Submit"
-    targetText = None
-    locator = (By.ID, id)
-    window, element = waitForSelectedPage(driver, targetText, locator)
-    driver.switch_to_window(window)
-    element.click()
-
-def getCount(driver, window, element, plateString):
-    delay = 5 # seconds
-    driver.switch_to_window(window)
-    print window
-    element.send_keys("test")
-    try:
-        locator = (By.XPATH, "//input[@value='Search']")
-        element = WebDriverWait(driver, delay).until(EC.presence_of_element_located(locator))
-        element.click()
-
-    except TimeoutException:
-        timeout('clickable element not found')
-    try:
-        locator = (By.XPATH, "//p")
-        targetText = "Records..."
-        elems = WebDriverWait(driver, delay).until(EC.presence_of_all_elements_located(locator))
-        for element in elems:       # test each element for target
-           if element.text == targetText:   #all upper case
-              #parse and return count
-              return count
-
-    except TimeoutException:
-        timeout('count not found')
-
+from VPS_LIB import timeout
+from VPS_LIB import returnOrClick
+from VPS_LIB import openBrowser
+from VPS_LIB import waitForSelectedPage
+from VPS_LIB import findElementOnPage
+from VPS_LIB import getText
 
 import re
 import io
@@ -101,7 +31,7 @@ import csv
 import sys
 import string
 
-def dataIO(driver, dataInFileName, dataOutFileName, window, element):
+def dataIO(driver, dataInFileName, dataOutFileName, window, element, txtLocator=("",""), targetText=""):
     with open(dataInFileName, 'r') as infile, open(dataOutFileName, 'a') as outfile:
         outfile.truncate()
         csvInput = csv.reader(infile)
@@ -116,11 +46,10 @@ def dataIO(driver, dataInFileName, dataOutFileName, window, element):
             for n in range(10):
                 plateString = plateString.replace('\n\n' , '\n') # replace \n\n, with \n
 
-            count = 0
-            count = getCount(driver, window, element, plateString)
+            text = getText(driver, window, element, plateString, txtLocator, targetText)
 
-            sys.stdout.write(plateString + ", " + str(count) + '\n')
-            outfile.write(plateString + ", " + str(count) + '\n')
+            sys.stdout.write(plateString + ", " + str(text) + '\n')
+            outfile.write(plateString + ", " + str(text) + '\n')
 
             outfile.flush()
     print "main: Finished parsing plate file."
@@ -129,33 +58,45 @@ def dataIO(driver, dataInFileName, dataOutFileName, window, element):
 if __name__ == '__main__':
 
     ## testing with google site
+    #print "Google test: no operator actions needed."
+    #pageLocator = (By.XPATH,'//input[@value = "Google Search"]')
+    #targetText = ''      # target text
     #url = 'http://www.google.com'       # target URL
-    #locator = (By.XPATH, '//div')
-    #targetText = 'about ...'      # target text
     #dataInFileName = 'plates.csv'
     #dataOutFileName = 'platesOut.txt'
+    #lemLocator = (By.XPATH,'//input[@name = "q"]')
+    #RoC = 'R' # use Return or Click to submit form
+    #textLocator = (By.ID, "resultStats")
 
     ## testing with hntb site
+    #print "HNTB test run: use debug mode?, open new window with About link."
+    #print "click on search icon, continue run. "
+    #print "results are displayed in a different window. "
+    #pageLocator = (By.XPATH, '//h2')
+    #targetText = 'About HNTB'      # target text
+    #url = 'http://www.hntb.com'       # target URL
+    #dataInFileName = 'plates.csv'
+    #dataOutFileName = 'platesOut.txt'
+    #elemLocator = (By.XPATH,'//input[@name = "s"]')
+    #RoC = 'R' # use Return or Click to submit form
+    #textLocator = (By.ID, "resultStats")
 
-    pageLocator = (By.XPATH, '//h2')
-    targetText = 'About HNTB'      # target text
-    url = 'http://www.hntb.com'       # target URL
-    dataInFileName = 'plates.csv'
-    dataOutFileName = 'platesOut.txt'
-    name = "s"
-    elemLocator = (By.NAME, name)
-
-    # production values
-    ## locator = (By.XPATH, '//TD/H1')
-    ## targetText = 'Violation Search'     # target text
-    ## url = 'https://lprod.scip.ntta.org/scip/jsp/SignIn.jsp'  # start URL
-    ## dataInFileName = 'LP_Repeats_Count.csv'
-    ## dataOutFileName = 'LP_Repeats_Count_Out.txt'
-    ## id = "P_LIC_PLATE_NBR"
+    ## production values
+    print "Use debug mode, open VPS, new violator search window, "
+    print "and run to completion"
+    pageLocator = (By.XPATH, '//TD/H1')
+    targetText = 'Violation Search'     # target text
+    url = 'https://lprod.scip.ntta.org/scip/jsp/SignIn.jsp'  # start URL
+    dataInFileName = 'LP_Repeats_Count.csv'
+    dataOutFileName = 'LP_Repeats_Count_Out.txt'
+    elemLocator = (By.XPATH,'//input[@id = "P_LIC_PLATE_NBR"]')
+    RoC = 'R' # use Return or Click to submit form
+    textLocator = (By.ID, "resultStats")
+    resultTargetText = "Records "
 
     driver = openBrowser(url)
     window, element = waitForSelectedPage(driver, targetText, pageLocator)
 
-    window, element = findElementOnPage(window, elemLocator)
+    window, element = findElementOnPage(driver, window, elemLocator)
 
-    dataIO(driver, dataInFileName, dataOutFileName, window, element)
+    dataIO(driver, dataInFileName, dataOutFileName, window, element, textLocator, resultTargetText)
