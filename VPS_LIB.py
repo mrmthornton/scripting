@@ -9,15 +9,12 @@
 # Copyright:   (c) michael thornton 2015
 #-------------------------------------------------------------------------------
 
+import re
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
 import selenium.webdriver.support.expected_conditions as EC
-
-
-def timeout(msg="Took too much time!"):
-    print msg
 
 from selenium.webdriver.common.keys import Keys
 
@@ -26,6 +23,20 @@ def returnOrClick(element, switch):
         element.send_keys(Keys.RETURN)
     if switch == 'C':
         element.click()
+
+def loadRegExPatterns():
+    linePattern = re.compile('^.+')
+    wordPattern = re.compile('\w+')
+    csvPattern = re.compile('[A-Z0-9 .#&]*,')
+    commaToEOLpattern = re.compile(',[A-Z0-9 .#&]+$')
+    LICpattern = re.compile('^LIC ')
+    issuedPattern = re.compile('ISSUED ')
+    reg_dtPattern = re.compile('REG DT ')
+    datePattern = re.compile('[0-9]{2,2}/[0-9]{2,2}/[0-9]{4,4}') # mo/day/year
+    dateYearFirstPattern = re.compile(r'\d{4,4}/\d{2,2}/\d{2,2}') # year/mo/day
+
+def timeout(msg="Took too much time!"):
+    print msg
 
 def openBrowser(url):
     driver = webdriver.Ie()
@@ -71,9 +82,11 @@ def getText(driver, window, element, plateString, txtLocator=("",""), targetText
     element.send_keys(plateString)
     element.send_keys("\n")
     try:
+        pattern = re.compile('^' + targetText)
         elem = WebDriverWait(driver, delay).until(EC.presence_of_all_elements_located(txtLocator))
-        for element in elems:       # test each element for target
-            if (element.text == targetText) or (targetText == ""):   #all upper case
+        for element in elem:       # test each element for target
+            found = pattern.search(element.text)
+            if (found) or (targetText == ""):
                 print "found '", element.text, "'"
                 return element.text
     except TimeoutException:
