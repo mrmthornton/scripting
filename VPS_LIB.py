@@ -87,7 +87,7 @@ def getText(driver, window, element, plateString, txtLocator=("",""), targetText
         for element in elem:       # test each element for target
             found = pattern.search(element.text)
             if (found) or (targetText == ""):
-                print "found '", element.text, "'"
+                print "TEXT: '", element.text, "'"
                 return element.text
     except TimeoutException:
         timeout('text not found')
