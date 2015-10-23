@@ -73,8 +73,9 @@ def dataIO(driver, dataInFileName, dataOutFileName, window, element, txtLocator=
             outfile.write(plateString + ", " + str(stringSegment) + '\n')
 
             outfile.flush()
+            driver.back()
 
-            # return to query window
+            # return to query window and test for correct location
             # using waitForSelectedPage ? and stored url? or return vector ?
 
     print "main: Finished parsing plate file."
@@ -108,18 +109,18 @@ if __name__ == '__main__':
     #resultIndexText = 'HNTB'
 
     ## testing with hntb site
-    print "The Colony library."
-    print "No operator actions needed."
-    print "Fails after one successful pass."
-    pageLocator = (By.XPATH, '//h1')
-    targetText = 'The Colony Public Library'      # target text
-    url = 'http://thecolony.ploud.net/'       # target URL
-    dataInFileName = 'plates.csv'
-    dataOutFileName = 'platesOut.txt'
-    elemLocator = (By.XPATH,'//input[@name = "SearchableText"]')
-    RoC = 'R' # use Return or Click to submit form
-    textLocator = (By.XPATH, '//*[contains(text(), "results ")]')
-    resultIndexText = 'No results'
+    #print "The Colony library."
+    #print "No operator actions needed."
+    #print "Fails after one successful pass."
+    #pageLocator = (By.XPATH, '//h1')
+    #targetText = 'The Colony Public Library'      # target text
+    #url = 'http://thecolony.ploud.net/'       # target URL
+    #dataInFileName = 'plates.csv'
+    #dataOutFileName = 'platesOut.txt'
+    #elemLocator = (By.XPATH,'//input[@name = "SearchableText"]')
+    #RoC = 'R' # use Return or Click to submit form
+    #textLocator = (By.XPATH, '//*[contains(text(), "results ")]')
+    #resultIndexText = 'No results'
 
     ## production values
     #print "Use debug mode, open VPS, new violator search window, "
@@ -138,6 +139,6 @@ if __name__ == '__main__':
     driver = openBrowser(url)
     window, element = waitForSelectedPage(driver, targetText, pageLocator)
 
-    window, element = findElementOnPage(driver, window, elemLocator)
+    window, element, urlVector = findElementOnPage(driver, window, elemLocator)
 
     dataIO(driver, dataInFileName, dataOutFileName, window, element, textLocator, resultIndexText)

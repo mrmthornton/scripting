@@ -71,7 +71,8 @@ def findElementOnPage(driver, window, locator):
         print "switched to target window"
         try:
             element = WebDriverWait(driver, delay).until(EC.presence_of_element_located(locator))
-            return window, element
+            page_url = driver.current_url
+            return window, element, page_url
         except TimeoutException:
             timeout('locator element not found')
             continue
