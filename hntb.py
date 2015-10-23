@@ -1,14 +1,3 @@
-#-------------------------------------------------------------------------------
-# Name:        module1
-# Purpose:
-#
-# Author:      mthornton
-#
-# Created:     18/05/2015
-# Copyright:   (c) mthornton 2015
-# Licence:     <your licence>
-#-------------------------------------------------------------------------------
-
 # use HNTB site search, putting the search results in 'results.txt'
 # get url,
 # test for no results
@@ -22,27 +11,41 @@ import selenium.webdriver.support.expected_conditions as EC
 
 import string
 
-def timeout():
-    print "Took too much time!"
-    quit()
+def timeout(msg="Took too much time!"):
+    print msg
 
 driver = webdriver.Ie()
 driver.maximize_window()
 delay = 5 # seconds
 
 url = 'http://www.hntb.com'       # target URL
+title = 'About Us | HNTB.com'     # target page
 driver.get(url)
 
-WebDriverWait(driver,60)
-try:
-    locator = (By.NAME, "search_block_form")
-    element = WebDriverWait(driver, delay).until(EC.presence_of_element_located(locator))
-except TimeoutException:
-    timeout()
-
+while True:
+    form = False
+    windows = driver.window_handles
+    for window in windows:
+        print window
+        try:
+            driver.switch_to.window(window)
+            element = WebDriverWait(driver, 5).until(EC.title_contains(title))
+            if element:
+                try:
+                    locator = (By.NAME, "search_block_form")
+                    form = WebDriverWait(driver, delay).until(EC.presence_of_element_located(locator))
+                    break
+                except TimeoutException:
+                    timeout("no search block found")
+                    continue
+        except TimeoutException:
+            timeout('"' + title + '" window not found')
+            continue
+    if form:
+        break
 searchKey = "career"
-element.send_keys(searchKey)
-element.submit()
+form.send_keys(searchKey)
+form.submit()
 
 try:
     locator = (By.XPATH, '//p[@class="search-snippet"]')
