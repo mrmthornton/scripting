@@ -109,8 +109,8 @@ if __name__ == '__main__':
 
     ## testing with hntb site
     print "The Colony library."
-    print ""
-    print ""
+    print "No operator actions needed."
+    print "Fails after one successful pass."
     pageLocator = (By.XPATH, '//h1')
     targetText = 'The Colony Public Library'      # target text
     url = 'http://thecolony.ploud.net/'       # target URL
