@@ -65,27 +65,33 @@ def dataIO(driver, dataInFileName, dataOutFileName, window, element, txtLocator=
 
             text = getText(driver, window, element, plateString, txtLocator, targetText)
             beginPattern = re.compile(targetText)
-            numCommaPattern = re.compile('[0-9,]+')
-            stringSegment = parseString(text, beginPattern, numCommaPattern, "all")
+            numberCommaPattern = re.compile('[0-9,]+')
+            linePattern = re.compile('^.+')
+            eolPattern = re.compile('$')
+            stringSegment = parseString(text, beginPattern, eolPattern, "all")
             sys.stdout.write(plateString + ", " + str(stringSegment) + '\n')
             outfile.write(plateString + ", " + str(stringSegment) + '\n')
 
             outfile.flush()
+
+            # return to query window
+            # using waitForSelectedPage ? and stored url? or return vector ?
+
     print "main: Finished parsing plate file."
 
 if __name__ == '__main__':
 
     ## testing with google site
-    print "Google test: no operator actions needed."
-    pageLocator = (By.XPATH,'//input[@value = "Google Search"]')
-    targetText = ''      # target text
-    url = 'http://www.google.com'       # target URL
-    dataInFileName = 'plates.csv'
-    dataOutFileName = 'platesOut.txt'
-    elemLocator = (By.XPATH,'//input[@name = "q"]')
-    RoC = 'R' # use Return or Click to submit form
-    textLocator = (By.ID, "resultStats")
-    resultIndexText = "About "
+    #print "Google test: no operator actions needed."
+    #pageLocator = (By.XPATH,'//input[@value = "Google Search"]')
+    #targetText = ''      # target text
+    #url = 'http://www.google.com'       # target URL
+    #dataInFileName = 'plates.csv'
+    #dataOutFileName = 'platesOut.txt'
+    #elemLocator = (By.XPATH,'//input[@name = "q"]')
+    #RoC = 'R' # use Return or Click to submit form
+    #textLocator = (By.ID, "resultStats")
+    #resultIndexText = "About "
 
     ## testing with hntb site
     #print "HNTB test run: use debug mode?, open new window with About link."
@@ -98,8 +104,22 @@ if __name__ == '__main__':
     #dataOutFileName = 'platesOut.txt'
     #elemLocator = (By.XPATH,'//input[@name = "s"]')
     #RoC = 'R' # use Return or Click to submit form
-    #textLocator = (By.ID, "resultStats")
-    #resultIndexText =
+    #textLocator = (By.CSS_SELECTOR, 'p:contains("HNTB")')
+    #resultIndexText = 'HNTB'
+
+    ## testing with hntb site
+    print "The Colony library."
+    print ""
+    print ""
+    pageLocator = (By.XPATH, '//h1')
+    targetText = 'The Colony Public Library'      # target text
+    url = 'http://thecolony.ploud.net/'       # target URL
+    dataInFileName = 'plates.csv'
+    dataOutFileName = 'platesOut.txt'
+    elemLocator = (By.XPATH,'//input[@name = "SearchableText"]')
+    RoC = 'R' # use Return or Click to submit form
+    textLocator = (By.XPATH, '//*[contains(text(), "results ")]')
+    resultIndexText = 'No results'
 
     ## production values
     #print "Use debug mode, open VPS, new violator search window, "

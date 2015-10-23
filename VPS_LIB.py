@@ -25,10 +25,12 @@ def returnOrClick(element, switch):
         element.click()
 
 def loadRegExPatterns():
+    global linePattern
     linePattern = re.compile('^.+')
     wordPattern = re.compile('\w+')
     csvPattern = re.compile('[A-Z0-9 .#&]*,')
     commaToEOLpattern = re.compile(',[A-Z0-9 .#&]+$')
+    numberCommaPattern = re.compile('[0-9,]+')
     LICpattern = re.compile('^LIC ')
     issuedPattern = re.compile('ISSUED ')
     reg_dtPattern = re.compile('REG DT ')
