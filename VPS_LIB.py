@@ -5,7 +5,7 @@
 # Author:      mthornton
 #
 # Created:     2015aug01
-# Updates:     2015oct21
+# Updates:     2015oct28
 # Copyright:   (c) michael thornton 2015
 #-------------------------------------------------------------------------------
 
@@ -25,12 +25,10 @@ def returnOrClick(element, switch):
         element.click()
 
 def loadRegExPatterns():
-    global linePattern
     linePattern = re.compile('^.+')
     wordPattern = re.compile('\w+')
     csvPattern = re.compile('[A-Z0-9 .#&]*,')
     commaToEOLpattern = re.compile(',[A-Z0-9 .#&]+$')
-    numberCommaPattern = re.compile('[0-9,]+')
     LICpattern = re.compile('^LIC ')
     issuedPattern = re.compile('ISSUED ')
     reg_dtPattern = re.compile('REG DT ')
@@ -71,13 +69,12 @@ def findElementOnPage(driver, window, locator):
         print "switched to target window"
         try:
             element = WebDriverWait(driver, delay).until(EC.presence_of_element_located(locator))
-            page_url = driver.current_url
-            return window, element, page_url
+            return window, element
         except TimeoutException:
             timeout('locator element not found')
             continue
 
-def getText(driver, window, element, plateString, txtLocator=("",""), targetText=""):
+def getText(driver, window, element, plateString, txtLocator=("",""), targetText="", resultTargetText=""):
     delay = 5 # seconds
     driver.switch_to_window(window)
     #print window
