@@ -8,7 +8,7 @@
 # Author:      mthornton
 #
 # Created:     2015aug01
-# Updates:     2015oct28
+# Updates:     2015oct29
 # Copyright:   (c) michael thornton 2015
 #-------------------------------------------------------------------------------
 
@@ -48,7 +48,7 @@ def parseString(inputString,indexPattern, targetPattern, segment="all"): # segme
                 return inputString[indexEnd:targetEnd:]
     return None
 
-def dataIO(driver, dataInFileName, dataOutFileName, window, element, txtLocator=("",""), targetText="", resultTargetText=""):
+def dataIO(driver, dataInFileName, dataOutFileName, window, element, txtLocator=("",""), targetPageText="", resultTargetText=""):
     with open(dataInFileName, 'r') as infile, open(dataOutFileName, 'a') as outfile:
         outfile.truncate()
         csvInput = csv.reader(infile)
@@ -63,7 +63,7 @@ def dataIO(driver, dataInFileName, dataOutFileName, window, element, txtLocator=
             for n in range(10):
                 plateString = plateString.replace('\n\n' , '\n') # replace \n\n, with \n
 
-            text = getText(driver, window, element, plateString, txtLocator, resultTargetText, targetText)
+            text = getText(driver, window, element, plateString, txtLocator, targetPageText, resultTargetText)
             beginPattern = re.compile(targetText)
             numCommaPattern = re.compile('[0-9,]+')
             if text!= None:
