@@ -5,7 +5,7 @@
 # Author:      mthornton
 #
 # Created:     2015aug01
-# Updates:     2015oct28
+# Updates:     2015oct29
 # Copyright:   (c) michael thornton 2015
 #-------------------------------------------------------------------------------
 
@@ -74,7 +74,7 @@ def findElementOnPage(driver, window, locator):
             timeout('locator element not found')
             continue
 
-def getText(driver, window, element, plateString, txtLocator=("",""), targetText="", resultTargetText=""):
+def getText(driver, window, element, plateString, txtLocator=("",""), targetPageText="", resultTargetText=""):
     delay = 5 # seconds
     driver.switch_to_window(window)
     #print window
