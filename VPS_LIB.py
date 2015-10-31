@@ -18,13 +18,25 @@ import selenium.webdriver.support.expected_conditions as EC
 
 from selenium.webdriver.common.keys import Keys
 
-def returnOrClick(element, switch):
-    if switch =='R':
+def returnOrClick(element, select):
+    if select =='return':
         element.send_keys(Keys.RETURN)
-    if switch == 'C':
+    elif select == 'click':
         element.click()
+    else:
+        print "ERROR: returnOrClick - assert failed"
 
 def loadRegExPatterns():
+    global linePattern
+    global wordPattern
+    global csvPattern
+    global commaToEOLpattern
+    global LICpattern
+    global issuedPattern
+    global reg_dtPattern
+    global datePattern
+    global dateYearFirstPattern
+
     linePattern = re.compile('^.+')
     wordPattern = re.compile('\w+')
     csvPattern = re.compile('[A-Z0-9 .#&]*,')
@@ -51,12 +63,12 @@ def waitForSelectedPage(driver, targetText, locator):
     while True:
         for window in driver.window_handles:  # test each window for locator element
             driver.switch_to_window(window)
-            print "Searching for '" , targetText, "' in window ", window
+            #print "Searching for '" , targetText, "' in window ", window #debug
             try:
                 elems = WebDriverWait(driver, delay).until(EC.presence_of_all_elements_located(locator))
                 for element in elems:       # test each element for target
                     if (element.text == targetText) or (targetText == ""):   #all upper case
-                        print "found '", element.text, "'"
+                        #print "found '", element.text, "'" #debug
                         return window, element
             except TimeoutException:
                 timeout('locator element not found')
@@ -66,7 +78,7 @@ def findElementOnPage(driver, window, locator):
     delay = 5 # seconds
     while True:
         driver.switch_to_window(window)
-        print "switched to target window"
+        #print "switched to target window" #debug
         try:
             element = WebDriverWait(driver, delay).until(EC.presence_of_element_located(locator))
             return window, element
@@ -74,7 +86,7 @@ def findElementOnPage(driver, window, locator):
             timeout('locator element not found')
             continue
 
-def getText(driver, window, element, plateString, txtLocator=("",""), targetPageText="", resultTargetText=""):
+def getTextResults(driver, window, element, plateString, parameters):
     delay = 5 # seconds
     driver.switch_to_window(window)
     #print window
@@ -82,12 +94,13 @@ def getText(driver, window, element, plateString, txtLocator=("",""), targetPage
     element.send_keys(plateString)
     element.send_keys("\n")
     try:
-        pattern = re.compile('^' + targetText)
-        elem = WebDriverWait(driver, delay).until(EC.presence_of_all_elements_located(txtLocator))
+        pattern = re.compile('^' + parameters['resultIndexLocator'])
+        elem = WebDriverWait(driver, delay).until(EC.presence_of_all_elements_located(parameters['outputLocator']))
         for element in elem:       # test each element for target
             found = pattern.search(element.text)
-            if (found) or (targetText == ""):
-                print "TEXT: '", element.text, "'"
+            #if (found) or (targetText == ""):
+            if found :
+                #print "TEXT: '", element.text, "'" #debug
                 return element.text
     except TimeoutException:
         timeout('text not found')
