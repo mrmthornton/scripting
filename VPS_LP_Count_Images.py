@@ -66,7 +66,7 @@ def dataIO(driver, parameters):
             window, element = waitForSelectedPage(driver, parameters['startPageVerifyText'], parameters['startPageTextLocator'])
             window, element = findElementOnPage(driver, window, parameters['inputLocator'])
             text = getTextResults(driver, window, element, plateString, parameters)
-            beginPattern = re.compile(parameters['resultIndexLocator'])
+            beginPattern = re.compile(parameters['resultIndexParameters']['index'])
             numCommaPattern = re.compile('[0-9,]+')
             if text!= None:
                 stringSegment = parseString(text, beginPattern, numCommaPattern, "all")
@@ -90,8 +90,7 @@ if __name__ == '__main__':
     'resultPageTextLocator' : (By.XPATH, '//TD/H1'),
     'resultPageVerifyText' : '',
     'outputLocator' : (By.ID, "resultStats"),
-    'resultIndexLocator' : "About ",
-    #'resultIndexLocator' : ("of ", 'tail'),  # head, tail, or all
+    'resultIndexParameters' : {'index' : "About ", 'selector' : 'tail'},  # head, tail, or all
     'dataInFileName' : 'plates.csv',
     'dataOutFileName' : 'platesOut.txt',
 

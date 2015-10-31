@@ -63,12 +63,12 @@ def waitForSelectedPage(driver, targetText, locator):
     while True:
         for window in driver.window_handles:  # test each window for locator element
             driver.switch_to_window(window)
-            #print "Searching for '" , targetText, "' in window ", window #debug
+            print "Searching for '" , targetText, "' in window ", window #debug
             try:
                 elems = WebDriverWait(driver, delay).until(EC.presence_of_all_elements_located(locator))
                 for element in elems:       # test each element for target
                     if (element.text == targetText) or (targetText == ""):   #all upper case
-                        #print "found '", element.text, "'" #debug
+                        #print "found '", element.text, "'" # for debug purposes
                         return window, element
             except TimeoutException:
                 timeout('locator element not found')
@@ -78,7 +78,7 @@ def findElementOnPage(driver, window, locator):
     delay = 5 # seconds
     while True:
         driver.switch_to_window(window)
-        #print "switched to target window" #debug
+        print "switched to target window" # for debug purposes
         try:
             element = WebDriverWait(driver, delay).until(EC.presence_of_element_located(locator))
             return window, element
@@ -94,14 +94,13 @@ def getTextResults(driver, window, element, plateString, parameters):
     element.send_keys(plateString)
     element.send_keys("\n")
     try:
-        pattern = re.compile('^' + parameters['resultIndexLocator'])
-        elem = WebDriverWait(driver, delay).until(EC.presence_of_all_elements_located(parameters['outputLocator']))
-        for element in elem:       # test each element for target
-            found = pattern.search(element.text)
-            #if (found) or (targetText == ""):
-            if found :
-                #print "TEXT: '", element.text, "'" #debug
-                return element.text
+        pattern = re.compile('^' + parameters['resultIndexParameters']['index'])
+        elems = WebDriverWait(driver, delay).until(EC.presence_of_all_elements_located(parameters['outputLocator']))
+        for resultElement in elems:       # test each element for target
+            found = pattern.search(resultElement.text)
+            if (found) or (targetText == ""): # ###########is the empty string needed???
+                print "TEXT: '", resultElement.text, "'" # for debug purposes
+                return resultElement.text
     except TimeoutException:
         timeout('text not found')
 
