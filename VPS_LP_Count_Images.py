@@ -7,8 +7,8 @@
 #
 # Author:      mthornton
 #
-# Created:     2015aug01
-# Updates:     2015oct29
+# Created:     2015 AUG 01
+# Updates:     2015 OCT 31
 # Copyright:   (c) michael thornton 2015
 #-------------------------------------------------------------------------------
 
@@ -21,7 +21,7 @@ import selenium.webdriver.support.expected_conditions as EC
 from VPS_LIB import timeout
 from VPS_LIB import returnOrClick
 from VPS_LIB import openBrowser
-from VPS_LIB import waitForSelectedPage
+from VPS_LIB import findSelectedPage
 from VPS_LIB import findElementOnPage
 from VPS_LIB import getTextResults
 from VPS_LIB import loadRegExPatterns
@@ -31,6 +31,15 @@ import io
 import csv
 import sys
 import string
+
+def cleanUpLicensePlateString(plateString):
+    plateString = plateString.replace(' ' , '') # remove any spaces
+    plateString = plateString.replace('"' , '') # remove any quotes
+    plateString = plateString.replace('\t' , '') # remove any tabs
+    plateString = plateString.replace(',' , '\n') # replace comma with \n
+    for n in range(10):
+        plateString = plateString.replace('\n\n' , '\n') # replace \n\n, with \n
+    return plateString
 
 def parseString(inputString,indexPattern, targetPattern, segment="all"): # segment may be start, end, or all
     # the iterator is used to search for all possible target pattern instances
@@ -53,17 +62,11 @@ def dataIO(driver, parameters):
         outfile.truncate()
         csvInput = csv.reader(infile)
         for row in csvInput:
-            plateString = row[0]
-            if plateString == "" or plateString == 0:  #end when LP does not exist
+            rawString = row[0]
+            if rawString == "" or rawString == 0:  #end when LP does not exist
                 break
-            plateString = plateString.replace(' ' , '') # remove any spaces
-            plateString = plateString.replace('"' , '') # remove any quotes
-            plateString = plateString.replace('\t' , '') # remove any tabs
-            plateString = plateString.replace(',' , '\n') # replace comma with \n
-            for n in range(10):
-                plateString = plateString.replace('\n\n' , '\n') # replace \n\n, with \n
-
-            window, element = waitForSelectedPage(driver, parameters['startPageVerifyText'], parameters['startPageTextLocator'])
+            plateString = cleanUpLicensePlateString(rawString)
+            window, element = findSelectedPage(driver, parameters['startPageVerifyText'], parameters['startPageTextLocator'])
             window, element = findElementOnPage(driver, window, parameters['inputLocator'])
             text = getTextResults(driver, window, element, plateString, parameters)
             beginPattern = re.compile(parameters['resultIndexParameters']['index'])
@@ -76,77 +79,67 @@ def dataIO(driver, parameters):
             driver.back() # go back to 'startPage'
     print "main: Finished parsing plate file."
 
-if __name__ == '__main__':
 
+def googleValues():
     parameters = {
     'url' : 'http://www.google.com', # initial URL
-
     'operatorMessage' : "Google test: no operator actions needed.",
-
     'startPageTextLocator' : (By.XPATH,'//input[@value = "Google Search"]'),
     'startPageVerifyText' : '',
     'inputLocator' : (By.XPATH,'//input[@name = "q"]'),
-
     'resultPageTextLocator' : (By.XPATH, '//TD/H1'),
     'resultPageVerifyText' : '',
     'outputLocator' : (By.ID, "resultStats"),
     'resultIndexParameters' : {'index' : "About ", 'selector' : 'tail'},  # head, tail, or all
     'dataInFileName' : 'plates.csv',
     'dataOutFileName' : 'platesOut.txt',
-
-    'RoC' : 'return', # use Return or Click to submit form
+    'returnOrClick' : 'return', # use Return or Click to submit form
     }
+    return parameters
 
-    ## testing with hntb site
-    #print "HNTB test run: use debug mode?, open new window with About link."
-    #print "click on search icon, continue run. "
-    #print "results are displayed in a different window. "
-    #pageLocator = (By.XPATH, '//h2')
-    #targetText = 'About HNTB'      # target text
-    #url = 'http://www.hntb.com'       # target URL
-    #dataInFileName = 'plates.csv'
-    #dataOutFileName = 'platesOut.txt'
-    #elemLocator = (By.XPATH,'//input[@name = "s"]')
-    #RoC = 'R' # use Return or Click to submit form
-    #textLocator = (By.ID, "resultStats")
-    #resultIndexText =
+    #textLocator =
 
-    ## production values
-    #print "Use debug mode, open VPS, new violator search window, "
-    #print "and run to completion"
-    #pageLocator = (By.XPATH, '//TD/H1')
-    #targetText = 'Violation Search'     # target text
-    #resultTargetText = 'Violation Search'     # target text
-    #url = 'https://lprod.scip.ntta.org/scip/jsp/SignIn.jsp'  # start URL
-    #dataInFileName = 'LP_Repeats_Count.csv'
-    #dataOutFileName = 'LP_Repeats_Count_Out.txt'
-    #elemLocator = (By.XPATH,'//input[@id = "P_LIC_PLATE_NBR"]')
-    #RoC = 'R' # use Return or Click to submit form
-    #textLocator = (By.XPATH,'//*[contains(text(),"Record")]')
-    #resultIndexText = "of "
-
-    """
+     # testing with hntb site
+def hntbValues():
     parameters = {
-    url, 'https://lprod.scip.ntta.org/scip/jsp/SignIn.jsp', # initial URL
-
-    operatorMessage, "Use debug mode, open VPS, new violator search window, and run to completion",
-
-    startPageTextLocator, (By.XPATH, '//TD/H1'),
-    startPageVerifyText, 'Violation Search',
-    inputLocator, (By.XPATH, '//input[@id = "P_LIC_PLATE_NBR"]'),
-
-    resultPageTextLocator, (By.XPATH, '//TD/H1'),
-    resultPageVerifyText, 'Violation Search Results',
-    outputLocator, (By.XPATH,'//*[contains(text(),"Record")]'),
-    resultIndexLocator, "of ",
-    #resultIndexLocator, ("of ", 'tail'),  # head, tail, or all
-    dataInFileName, 'LP_Repeats_Count.csv',
-    dataOutFileName, 'LP_Repeats_Count_Out.txt',
-
-    RoC, 'return', # use Return or Click to submit form
+    'url' : 'http://www.hntb.com/about', # initial URL
+    'operatorMessage' : "HNTB test run: use debug mode, open new window with 'About'link. \
+    Click on search icon, continue run. ",
+    'startPageTextLocator' : (By.XPATH, '//h2'),
+    'startPageVerifyText' : 'About HNTB',
+    'inputLocator' : (By.XPATH,'//input[@name = "s"]'),
+    'resultPageTextLocator' : (By.XPATH, '//TD/H1'),
+    'resultPageVerifyText' : '',
+    'outputLocator' : (By.ID, "resultStats"),
+    'resultIndexParameters' : {'index' : " Results", 'selector' : 'tail'},  # head, tail, or all
+    'dataInFileName' : 'plates.csv',
+    'dataOutFileName' : 'platesOut.txt',
+    'returnOrClick' : 'return', # use Return or Click to submit form
     }
-    """
+    return parameters
 
+def productionValues():
+    parameters = {
+    'url' : 'https://lprod.scip.ntta.org/scip/jsp/SignIn.jsp', # initial URL
+    'operatorMessage' : "Use debug mode, open VPS, new violator search window, and run to completion",
+    'startPageTextLocator' : (By.XPATH, '//TD/H1'),
+    'startPageVerifyText' : 'Violation Search',
+    'inputLocator' : (By.XPATH, '//input[@id = "P_LIC_PLATE_NBR"]'),
+    'resultPageTextLocator' : (By.XPATH, '//TD/H1'),
+    'resultPageVerifyText' : 'Violation Search Results',
+    'outputLocator' : (By.XPATH,'//*[contains(text(),"Record")]'),
+    'resultIndexParameters' : {'index' : "of ", 'selector' : 'tail'},  # head, tail, or all
+    'dataInFileName' : 'LP_Repeats_Count.csv',
+    'dataOutFileName' : 'LP_Repeats_Count_Out.txt',
+    'returnOrClick' : 'return', # use Return or Click to submit form
+    }
+    return parameters
+
+if __name__ == '__main__':
+
+    parameters = hntbValues()
+    #parameters = googleValues()
+    #parameters = productionValues()
     print parameters['operatorMessage']
     loadRegExPatterns()
     driver = openBrowser(parameters['url'])
