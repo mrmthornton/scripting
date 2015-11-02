@@ -8,7 +8,7 @@
 # Author:      mthornton
 #
 # Created:     2015 AUG 01
-# Updates:     2015 OCT 31
+# Updates:     2015 NOV 02
 # Copyright:   (c) michael thornton 2015
 #-------------------------------------------------------------------------------
 
@@ -137,9 +137,10 @@ def productionValues():
 
 if __name__ == '__main__':
 
-    parameters = hntbValues()
+    #parameters = hntbValues()
     #parameters = googleValues()
-    #parameters = productionValues()
+    parameters = productionValues()
+
     print parameters['operatorMessage']
     loadRegExPatterns()
     driver = openBrowser(parameters['url'])
