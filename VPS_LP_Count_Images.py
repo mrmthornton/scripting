@@ -145,7 +145,7 @@ if __name__ == '__main__':
 
     #parameters = googleValues()
     #parameters = hntbValues()
-    parameters = ciscoValues()
+    parameters = ciscoValues() # should work on production systems
     #parameters = productionValues()
 
     print parameters['operatorMessage']
