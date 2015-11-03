@@ -8,7 +8,7 @@
 # Author:      mthornton
 #
 # Created:     2015 AUG 01
-# Updates:     2015 NOV 02
+# Updates:     2015 NOV 03
 # Copyright:   (c) michael thornton 2015
 #-------------------------------------------------------------------------------
 
@@ -21,10 +21,11 @@ import selenium.webdriver.support.expected_conditions as EC
 from VPS_LIB import timeout
 from VPS_LIB import returnOrClick
 from VPS_LIB import openBrowser
-from VPS_LIB import findSelectedPage
+from VPS_LIB import findTargetPage
 from VPS_LIB import findElementOnPage
 from VPS_LIB import getTextResults
 from VPS_LIB import loadRegExPatterns
+from VPS_LIB import cleanUpLicensePlateString
 
 import re
 import io
@@ -32,28 +33,19 @@ import csv
 import sys
 import string
 
-def cleanUpLicensePlateString(plateString):
-    plateString = plateString.replace(' ' , '') # remove any spaces
-    plateString = plateString.replace('"' , '') # remove any quotes
-    plateString = plateString.replace('\t' , '') # remove any tabs
-    plateString = plateString.replace(',' , '\n') # replace comma with \n
-    for n in range(10):
-        plateString = plateString.replace('\n\n' , '\n') # replace \n\n, with \n
-    return plateString
-
 def parseString(inputString,indexPattern, targetPattern, segment="all"): # segment may be start, end, or all
     # the iterator is used to search for all possible target pattern instances
     found = indexPattern.search(inputString)
     if found != None:
         indexStart = found.start()
         indexEnd = found.end()
-        #print "parseString: found start", indexStart #debug statement
+        print "parseString: found start", indexStart #debug statement
         iterator = targetPattern.finditer(inputString)
         for found in iterator:
             if found.start() > indexStart and found != None:
                 targetStart = found.start()
                 targetEnd = found.end()
-                #print "findStartEnd: found end", targetStart #debug statement
+                print "findStartEnd: found end", targetStart #debug statement
                 return inputString[indexEnd:targetEnd:]
     return None
 
@@ -66,7 +58,7 @@ def dataIO(driver, parameters):
             if rawString == "" or rawString == 0:  #end when LP does not exist
                 break
             plateString = cleanUpLicensePlateString(rawString)
-            window, element = findSelectedPage(driver, parameters['startPageVerifyText'], parameters['startPageTextLocator'])
+            window, element = findTargetPage(driver, parameters['startPageVerifyText'], parameters['startPageTextLocator'])
             window, element = findElementOnPage(driver, window, parameters['inputLocator'])
             text = getTextResults(driver, window, element, plateString, parameters)
             beginPattern = re.compile(parameters['resultIndexParameters']['index'])
@@ -97,21 +89,35 @@ def googleValues():
     }
     return parameters
 
-    #textLocator =
-
-     # testing with hntb site
 def hntbValues():
     parameters = {
     'url' : 'http://www.hntb.com/about', # initial URL
-    'operatorMessage' : "HNTB test run: use debug mode, open new window with 'About'link. \
-    Click on search icon, continue run. ",
+    'operatorMessage' : "HNTB test run:  no operator actions needed.",
     'startPageTextLocator' : (By.XPATH, '//h2'),
     'startPageVerifyText' : 'About HNTB',
     'inputLocator' : (By.XPATH,'//input[@name = "s"]'),
-    'resultPageTextLocator' : (By.XPATH, '//TD/H1'),
-    'resultPageVerifyText' : '',
+    #'resultPageTextLocator' : (By.XPATH, '//TD/H1'),
+    'resultPageTextLocator' : (By.XPATH, '//TITLE'),
+    'resultPageVerifyText' : 'Search Result',
     'outputLocator' : (By.ID, "resultStats"),
     'resultIndexParameters' : {'index' : " Results", 'selector' : 'tail'},  # head, tail, or all
+    'dataInFileName' : 'plates.csv',
+    'dataOutFileName' : 'platesOut.txt',
+    'returnOrClick' : 'return', # use Return or Click to submit form
+    }
+    return parameters
+
+def ciscoValues():
+    parameters = {
+    'url' : 'http://www.cisco.com/univercd/cc/td/doc/product/voice/c_ipphone/index.html', # initial URL
+    'operatorMessage' : "Cisco test: no operator actions needed.",
+    'startPageTextLocator' : (By.XPATH, '//DIV/H1[@class="title-section"]'),
+    'startPageVerifyText' : '404 Page Not Found',
+    'inputLocator' : (By.XPATH, '//input[@id = "searchPhrase"]'),
+    'resultPageTextLocator' : (By.XPATH, '//H2[@class="title-page"]'),
+    'resultPageVerifyText' : 'Search Results',
+    'outputLocator' : (By.CLASS_NAME,'searchStatus'),
+    'resultIndexParameters' : {'index' : "of ", 'selector' : 'tail'},  # head, tail, or all
     'dataInFileName' : 'plates.csv',
     'dataOutFileName' : 'platesOut.txt',
     'returnOrClick' : 'return', # use Return or Click to submit form
@@ -127,7 +133,7 @@ def productionValues():
     'inputLocator' : (By.XPATH, '//input[@id = "P_LIC_PLATE_NBR"]'),
     'resultPageTextLocator' : (By.XPATH, '//TD/H1'),
     'resultPageVerifyText' : 'Violation Search Results',
-    'outputLocator' : (By.XPATH,'//*[contains(text(),"Record")]'),
+    'outputLocator' : (By.XPATH,'//BODY/P[contains(text(),"Record")]'),
     'resultIndexParameters' : {'index' : "of ", 'selector' : 'tail'},  # head, tail, or all
     'dataInFileName' : 'LP_Repeats_Count.csv',
     'dataOutFileName' : 'LP_Repeats_Count_Out.txt',
@@ -137,9 +143,10 @@ def productionValues():
 
 if __name__ == '__main__':
 
-    #parameters = hntbValues()
     #parameters = googleValues()
-    parameters = productionValues()
+    #parameters = hntbValues()
+    parameters = ciscoValues()
+    #parameters = productionValues()
 
     print parameters['operatorMessage']
     loadRegExPatterns()

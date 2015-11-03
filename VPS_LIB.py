@@ -5,7 +5,7 @@
 # Author:      mthornton
 #
 # Created:     2015 AUG 01
-# Updates:     2015 OCT 31
+# Updates:     2015 NOV 03
 # Copyright:   (c) michael thornton 2015
 #-------------------------------------------------------------------------------
 
@@ -56,6 +56,15 @@ def openBrowser(url):
     driver.get(url)
     return driver
 
+def cleanUpLicensePlateString(plateString):
+    plateString = plateString.replace(' ' , '') # remove any spaces
+    plateString = plateString.replace('"' , '') # remove any double quotes
+    plateString = plateString.replace('\t' , '') # remove any tabs
+    plateString = plateString.replace(',' , '\n') # replace comma with \n
+    for n in range(10):            # replace multiple newlines with a single \n
+        plateString = plateString.replace('\n\n' , '\n')
+    return plateString
+
 def waitForNewPage(driver, currentElement):
     def isStale():
         try:
@@ -67,18 +76,17 @@ def waitForNewPage(driver, currentElement):
             return True
     wait_for(isStale)
 
-def findSelectedPage(driver, targetText, locator):
-    # wait for page to load
+def findTargetPage(driver, targetText, locator):
     delay = 5 # seconds
     while True:
         for window in driver.window_handles:  # test each window for taget text
             driver.switch_to_window(window)
-            #print "Searching for '" , targetText, "' in window ", window # for debug purposes
+            print "findTargetPage: Searching for '" , targetText, "' in window ", window # for debug purposes
             try:
                 elems = WebDriverWait(driver, delay).until(EC.presence_of_all_elements_located(locator))
                 for element in elems:       # test each element for target
                     if (element.text == targetText) or (targetText == ""):   #all upper case
-                        #print "found '", element.text, "'" # for debug purposes
+                        print "findTargetPage: found '", element.text, "'" # for debug purposes
                         return window, element
             except TimeoutException:
                 timeout('locator element not found')
@@ -88,32 +96,42 @@ def findElementOnPage(driver, window, locator):
     delay = 5 # seconds
     while True:
         driver.switch_to_window(window)
-        print "switched to target window" # for debug purposes
+        print "findElementOnPage: switched to target window" # for debug purposes
         try:
             element = WebDriverWait(driver, delay).until(EC.presence_of_element_located(locator))
             return window, element
         except TimeoutException:
-            timeout('locator element not found')
+            timeout('findElementOnPage: locator element not found')
             continue
 
 def getTextResults(driver, window, element, plateString, parameters):
     delay = 5 # seconds
     #driver.switch_to_window(window)
-    #print "switched to window " + window # for debug purposes
+    print "getTextResults: " + driver.current_url # for debug purposes
+    #print "getTextResults: switched to window " + window # for debug purposes
     element.clear()
     element.send_keys(plateString)
     returnOrClick(element, parameters['returnOrClick'])
     try:
-        pattern = re.compile('^' + parameters['resultIndexParameters']['index'])
-        elems = WebDriverWait(driver, delay).until(EC.presence_of_all_elements_located(parameters['outputLocator']))
-        for resultElement in elems:       # test each element for target
-            isFound = pattern.search(resultElement.text)
-            if (isFound) or (targetText == ""): # ###########is the empty string needed???
-                print "TEXT: '", resultElement.text, "'" # for debug purposes
-                return resultElement.text
+        print "getTextResults: " + driver.current_url # for debug purposes
+        resultElement = WebDriverWait(driver, delay).until(EC.presence_of_element_located(parameters['outputLocator']))
+        resultIndex = parameters['resultIndexParameters']['index']
+        pattern = re.compile(resultIndex)
+        isFound = pattern.search(resultElement.text)
+        if (isFound) or (resultIndex == ""):
+            print "getTextResults: TEXT: '", resultElement.text, "'" # for debug purposes
+            return resultElement.text
     except TimeoutException:
         timeout('text not found')
 
 if __name__ == '__main__':
-    # add unit test and asserts here
-    pass
+    #returnOrClick()
+    #loadRegExPatterns()
+    #timeout()
+    #openBrowser()
+    assert(cleanUpLicensePlateString('123 45   6,,"\n\n') == '123456\n')
+    #waitForNewPage()
+    #findTargetPage()
+    #findElementOnPage()
+    #getTextResults()
+    print "PASSED"
