@@ -104,14 +104,18 @@ def findElementOnPage(driver, window, locator):
             timeout('findElementOnPage: locator element not found')
             continue
 
-def getTextResults(driver, window, element, plateString, parameters):
+def fillFormAndSubmit(driver, window, element, formText, parameters):
     delay = 5 # seconds
-    #driver.switch_to_window(window)
-    print "getTextResults: " + driver.current_url # for debug purposes
-    #print "getTextResults: switched to window " + window # for debug purposes
+    assert(driver.current_window_handle == window)
+    print "fillFormAndSubmit: " + driver.current_url # for debug purposes
     element.clear()
-    element.send_keys(plateString)
+    element.send_keys(formText)
     returnOrClick(element, parameters['returnOrClick'])
+
+def getTextResults(driver, window, plateString, parameters):
+    delay = 5 # seconds
+    assert(driver.current_window_handle == window)
+    print "getTextResults: " + driver.current_url # for debug purposes
     try:
         print "getTextResults: " + driver.current_url # for debug purposes
         resultElement = WebDriverWait(driver, delay).until(EC.presence_of_element_located(parameters['outputLocator']))
@@ -121,6 +125,7 @@ def getTextResults(driver, window, element, plateString, parameters):
         if (isFound) or (resultIndex == ""):
             print "getTextResults: TEXT: '", resultElement.text, "'" # for debug purposes
             return resultElement.text
+        else: return None
     except TimeoutException:
         timeout('text not found')
 

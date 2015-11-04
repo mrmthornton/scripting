@@ -23,6 +23,7 @@ from VPS_LIB import returnOrClick
 from VPS_LIB import openBrowser
 from VPS_LIB import findTargetPage
 from VPS_LIB import findElementOnPage
+from VPS_LIB import fillFormAndSubmit
 from VPS_LIB import getTextResults
 from VPS_LIB import loadRegExPatterns
 from VPS_LIB import cleanUpLicensePlateString
@@ -60,7 +61,9 @@ def dataIO(driver, parameters):
             plateString = cleanUpLicensePlateString(rawString)
             window, element = findTargetPage(driver, parameters['startPageVerifyText'], parameters['startPageTextLocator'])
             window, element = findElementOnPage(driver, window, parameters['inputLocator'])
-            text = getTextResults(driver, window, element, plateString, parameters)
+            fillFormAndSubmit(driver, window, element, plateString, parameters)
+            window = driver.current_window_handle  # ############## need to check for new window loaded
+            text = getTextResults(driver, window, plateString, parameters)
             beginPattern = re.compile(parameters['resultIndexParameters']['index'])
             numCommaPattern = re.compile('[0-9,]+')
             if text!= None:
@@ -113,12 +116,12 @@ def ciscoValues():
     'operatorMessage' : "Cisco test: no operator actions needed.",
     'startPageTextLocator' : (By.XPATH, '//DIV/H1[@class="title-section"]'),
     'startPageVerifyText' : '404 Page Not Found',
-    'inputLocator' : (By.XPATH, '//input[@id = "searchPhrase"]'),
+    'inputLocator' : (By.XPATH, '(//input[@id = "searchPhrase"] | //input[@id = "search-Phrase search-Phrase-only"])'),
     'resultPageTextLocator' : (By.XPATH, '//H2[@class="title-page"]'),
     'resultPageVerifyText' : 'Search Results',
     'outputLocator' : (By.CLASS_NAME,'searchStatus'),
     'resultIndexParameters' : {'index' : "of ", 'selector' : 'tail'},  # head, tail, or all
-    'dataInFileName' : 'plates.csv',
+    'dataInFileName' : 'platesShortList.csv',
     'dataOutFileName' : 'platesOut.txt',
     'returnOrClick' : 'return', # use Return or Click to submit form
     }
@@ -152,3 +155,4 @@ if __name__ == '__main__':
     loadRegExPatterns()
     driver = openBrowser(parameters['url'])
     dataIO(driver, parameters)
+    driver.close()
