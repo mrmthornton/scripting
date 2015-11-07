@@ -18,15 +18,16 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
 import selenium.webdriver.support.expected_conditions as EC
 
-from VPS_LIB import timeout
-from VPS_LIB import returnOrClick
-from VPS_LIB import openBrowser
-from VPS_LIB import findTargetPage
+from VPS_LIB import cleanUpLicensePlateString
 from VPS_LIB import findElementOnPage
 from VPS_LIB import fillFormAndSubmit
+from VPS_LIB import findTargetPage
 from VPS_LIB import getTextResults
 from VPS_LIB import loadRegExPatterns
-from VPS_LIB import cleanUpLicensePlateString
+from VPS_LIB import openBrowser
+from VPS_LIB import returnOrClick
+from VPS_LIB import timeout
+from VPS_LIB import waitForNewPage
 
 import re
 import io
@@ -59,10 +60,10 @@ def dataIO(driver, parameters):
             if rawString == "" or rawString == 0:  #end when LP does not exist
                 break
             plateString = cleanUpLicensePlateString(rawString)
-            window, element = findTargetPage(driver, parameters['startPageVerifyText'], parameters['startPageTextLocator'])
-            window, element = findElementOnPage(driver, window, parameters['inputLocator'])
+            window, ReferenceElement = findTargetPage(driver, parameters['startPageTextLocator'], parameters['startPageVerifyText'])
+            element = findElementOnPage(driver, parameters['inputLocator'])
             fillFormAndSubmit(driver, window, element, plateString, parameters)
-            window = driver.current_window_handle  # ############## need to check for new window loaded
+            waitForNewPage(driver, ReferenceElement)
             text = getTextResults(driver, window, plateString, parameters)
             beginPattern = re.compile(parameters['resultIndexParameters']['index'])
             numCommaPattern = re.compile('[0-9,]+')
@@ -86,6 +87,23 @@ def googleValues():
     'resultPageVerifyText' : '',
     'outputLocator' : (By.ID, "resultStats"),
     'resultIndexParameters' : {'index' : "About ", 'selector' : 'tail'},  # head, tail, or all
+    'dataInFileName' : 'plates.csv',
+    'dataOutFileName' : 'platesOut.txt',
+    'returnOrClick' : 'return', # use Return or Click to submit form
+    }
+    return parameters
+
+def sigmaAldrichValues():
+    parameters = {
+    'url' : 'http://www.sigmaaldrich.com/united-states.html', # initial URL
+    'operatorMessage' : "sigmaaldrich test run:  no operator actions needed.",
+    'startPageTextLocator' : (By.XPATH, '//a'),
+    'startPageVerifyText' : 'Hello. Sign in.',
+    'inputLocator' : (By.XPATH,'//input[@name = "Query"]'),
+    'resultPageTextLocator' : (By.XPATH, '//p[contains(text(),"matches found for"]'),
+    'resultPageVerifyText' : '',
+    'outputLocator' : (By.XPATH, '//p[@class="resultsFoundText"]'),
+    'resultIndexParameters' : {'index' : "matches found for", 'selector' : 'tail'},  # head, tail, or all
     'dataInFileName' : 'plates.csv',
     'dataOutFileName' : 'platesOut.txt',
     'returnOrClick' : 'return', # use Return or Click to submit form
@@ -121,7 +139,7 @@ def ciscoValues():
     'resultPageVerifyText' : 'Search Results',
     'outputLocator' : (By.CLASS_NAME,'searchStatus'),
     'resultIndexParameters' : {'index' : "of ", 'selector' : 'tail'},  # head, tail, or all
-    'dataInFileName' : 'platesShortList.csv',
+    'dataInFileName' : 'plates.csv',
     'dataOutFileName' : 'platesOut.txt',
     'returnOrClick' : 'return', # use Return or Click to submit form
     }
@@ -146,9 +164,10 @@ def productionValues():
 
 if __name__ == '__main__':
 
-    #parameters = googleValues()
+    parameters = googleValues()
+    #parameters = sigmaAldrichValues()
     #parameters = hntbValues()
-    parameters = ciscoValues() # should work on production systems
+    #parameters = ciscoValues() # should work on production systems
     #parameters = productionValues()
 
     print parameters['operatorMessage']
