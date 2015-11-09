@@ -64,6 +64,7 @@ def dataIO(driver, parameters):
             element = findElementOnPage(driver, parameters['inputLocator'])
             fillFormAndSubmit(driver, window, element, plateString, parameters)
             waitForNewPage(driver, ReferenceElement)
+            #selectFrame(By.XPATH, '//frame[@name="menu"]')
             text = getTextResults(driver, window, plateString, parameters)
             beginPattern = re.compile(parameters['resultIndexParameters']['index'])
             numCommaPattern = re.compile('[0-9,]+')
@@ -164,10 +165,10 @@ def productionValues():
 
 if __name__ == '__main__':
 
-    parameters = googleValues()
+    #parameters = googleValues()
     #parameters = sigmaAldrichValues()
     #parameters = hntbValues()
-    #parameters = ciscoValues() # should work on production systems
+    parameters = ciscoValues() # should work on production systems
     #parameters = productionValues()
 
     print parameters['operatorMessage']

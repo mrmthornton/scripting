@@ -97,6 +97,24 @@ def findTargetPage(driver, locator, targetText=""):
                 timeout('findTargetPage: locator element not found')
                 continue
 
+            #try:
+            #    frames = WebDriverWait(driver, delay).until(EC.presence_of_all_elements_located( (By.XPATH, '//frame')))
+            #except TimeoutException:
+            #    frames = [None]
+            #
+            #for frame in frames:
+            #    if frame != None:
+            #        webdriver.Ie.switch_to.frame(frame)
+            #    try:
+            #        elems = WebDriverWait(driver, delay).until(EC.presence_of_all_elements_located(locator))
+            #        for element in elems:       # test each element for target
+            #            if (element.text == targetText) or (targetText == ""):   #all upper case
+            #                #print "findTargetPage: found '", element.text, "'" # for debug purposes
+            #                return handle, element
+            #    except TimeoutException:
+            #        timeout('findTargetPage: locator element not found')
+            #        continue
+
 def findElementOnPage(driver, elementLocator, window=None ):
     delay = 5 # seconds
     if window != None:
