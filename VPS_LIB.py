@@ -5,7 +5,7 @@
 # Author:      mthornton
 #
 # Created:     2015 AUG 01
-# Updates:     2015 NOV 03
+# Updates:     2015 NOV 10
 # Copyright:   (c) michael thornton 2015
 #-------------------------------------------------------------------------------
 
@@ -84,41 +84,25 @@ def waitForNewPage(driver, currentElement, delay=2):
 def findTargetPage(driver, locator, targetText=""):
     delay = 5 # seconds
     while True:
-        for handle in driver.window_handles:  # test each window for target text
+        for handle in driver.window_handles:  # test each window for target
             driver.switch_to_window(handle)
             print "findTargetPage: Searching for '" , targetText, "' in window ", handle # for debug purposes
             try:
                 elems = WebDriverWait(driver, delay).until(EC.presence_of_all_elements_located(locator))
                 for element in elems:       # test each element for target
-                    if (element.text == targetText) or (targetText == ""):   #all upper case
+                    if (element.text == targetText) or (targetText == ""):
                         #print "findTargetPage: found '", element.text, "'" # for debug purposes
                         return handle, element
             except TimeoutException:
                 timeout('findTargetPage: locator element not found')
                 continue
 
-            #try:
-            #    frames = WebDriverWait(driver, delay).until(EC.presence_of_all_elements_located( (By.XPATH, '//frame')))
-            #except TimeoutException:
-            #    frames = [None]
-            #
-            #for frame in frames:
-            #    if frame != None:
-            #        webdriver.Ie.switch_to.frame(frame)
-            #    try:
-            #        elems = WebDriverWait(driver, delay).until(EC.presence_of_all_elements_located(locator))
-            #        for element in elems:       # test each element for target
-            #            if (element.text == targetText) or (targetText == ""):   #all upper case
-            #                #print "findTargetPage: found '", element.text, "'" # for debug purposes
-            #                return handle, element
-            #    except TimeoutException:
-            #        timeout('findTargetPage: locator element not found')
-            #        continue
-
 def findElementOnPage(driver, elementLocator, window=None ):
     delay = 5 # seconds
+    if elementLocator == None:# skip finding the element
+        return None
     if window != None:
-        driver.switch_to_window(window)
+        driver.switch_to_window(window) # switch to window if supplied
         print "findElementOnPage: switched to target window"
     while True:
         try:
@@ -130,16 +114,37 @@ def findElementOnPage(driver, elementLocator, window=None ):
 
 def fillFormAndSubmit(driver, window, element, formText, parameters):
     delay = 5 # seconds
+    if type(element) == type(None): # skip the form submission
+        return
     assert(driver.current_window_handle == window)
     print "fillFormAndSubmit: " + driver.current_url # for debug purposes
     element.clear()
     element.send_keys(formText)
     returnOrClick(element, parameters['returnOrClick'])
 
+def selectFrame(driver, locator, parent=None):
+    delay = 5 # seconds
+    try:
+        locateAllParentFrames = (By.XPATH, '//frame')
+        frames = WebDriverWait(driver, delay).until(EC.presence_of_all_elements_located(locateAllParentFrames))
+        for frame in frames:
+            driver.switch_to.frame(frame)
+            try:
+                resultElement = WebDriverWait(driver, delay).until(EC.presence_of_element_located(locator))
+                return resultElement
+            except TimeoutException:
+                parent = frame
+                return None
+    except TimeoutException:
+        timeout('selectFrame: text not found')
+
+
 def getTextResults(driver, window, plateString, parameters):
     delay = 5 # seconds
     assert(driver.current_window_handle == window)
     #print "getTextResults: " + driver.current_url # for debug purposes
+    if parameters['outputLocator']== None: # skip finding text
+        return None
     try:
         resultElement = WebDriverWait(driver, delay).until(EC.presence_of_element_located(parameters['outputLocator']))
         resultIndex = parameters['resultIndexParameters']['index']
@@ -156,14 +161,14 @@ if __name__ == '__main__':
 
     # setup test parameters
     url = 'file://C:/Users/IEUser/Documents/scripting/testPage.html'
-    locator = (By.XPATH, '//*')
+    locator = (By.XPATH, '//p')
     window = None
 
     # test library components
     assert(cleanUpLicensePlateString('123 45   6,,"\n\n') == '123456\n')
 
     driver = openBrowser(url)
-    window = findTargetPage(driver, locator)
+    window = findTargetPage(driver, locator) # no w ndow, why?
     #returnOrClick()
     #loadRegExPatterns()
     #timeout()

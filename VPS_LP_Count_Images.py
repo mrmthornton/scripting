@@ -8,7 +8,7 @@
 # Author:      mthornton
 #
 # Created:     2015 AUG 01
-# Updates:     2015 NOV 03
+# Updates:     2015 NOV 10
 # Copyright:   (c) michael thornton 2015
 #-------------------------------------------------------------------------------
 
@@ -26,6 +26,7 @@ from VPS_LIB import getTextResults
 from VPS_LIB import loadRegExPatterns
 from VPS_LIB import openBrowser
 from VPS_LIB import returnOrClick
+from VPS_LIB import selectFrame
 from VPS_LIB import timeout
 from VPS_LIB import waitForNewPage
 
@@ -52,6 +53,9 @@ def parseString(inputString,indexPattern, targetPattern, segment="all"): # segme
     return None
 
 def dataIO(driver, parameters):
+    beginPattern = re.compile(parameters['resultIndexParameters']['index'])
+    currentHandle = None # the window handle after 'driver.back()'
+    window = None        # the window found by 'findTargetPage()'
     with open(parameters['dataInFileName'], 'r') as infile, open(parameters['dataOutFileName'], 'a') as outfile:
         outfile.truncate()
         csvInput = csv.reader(infile)
@@ -60,13 +64,19 @@ def dataIO(driver, parameters):
             if rawString == "" or rawString == 0:  #end when LP does not exist
                 break
             plateString = cleanUpLicensePlateString(rawString)
-            window, ReferenceElement = findTargetPage(driver, parameters['startPageTextLocator'], parameters['startPageVerifyText'])
+            if window!=currentHandle or window == None:
+                window, ReferenceElement = findTargetPage(driver, parameters['startPageTextLocator'], parameters['startPageVerifyText'])
             element = findElementOnPage(driver, parameters['inputLocator'])
             fillFormAndSubmit(driver, window, element, plateString, parameters)
             waitForNewPage(driver, ReferenceElement)
-            #selectFrame(By.XPATH, '//frame[@name="menu"]')
+
+            #frame = selectFrame(driver, (By.XPATH, '//frame[@name="menu"]'))
+            frame = selectFrame(driver, (By.XPATH, '//frame'))
+            if frame != None:
+                window = driver.current_window_handle
+
             text = getTextResults(driver, window, plateString, parameters)
-            beginPattern = re.compile(parameters['resultIndexParameters']['index'])
+            # #beginPattern = re.compile(parameters['resultIndexParameters']['index'])
             numCommaPattern = re.compile('[0-9,]+')
             if text!= None:
                 stringSegment = parseString(text, beginPattern, numCommaPattern, "all")
@@ -74,6 +84,7 @@ def dataIO(driver, parameters):
                 outfile.write(plateString + ", " + str(stringSegment) + '\n')
                 outfile.flush()
             driver.back() # go back to 'startPage'
+            currentHandle = driver.current_window_handle
     print "main: Finished parsing plate file."
 
 
@@ -101,7 +112,7 @@ def sigmaAldrichValues():
     'startPageTextLocator' : (By.XPATH, '//a'),
     'startPageVerifyText' : 'Hello. Sign in.',
     'inputLocator' : (By.XPATH,'//input[@name = "Query"]'),
-    'resultPageTextLocator' : (By.XPATH, '//p[contains(text(),"matches found for"]'),
+    'resultPageTextLocator' : (By.XPATH, '//p[contains(text(),"matches found for")]'),
     'resultPageVerifyText' : '',
     'outputLocator' : (By.XPATH, '//p[@class="resultsFoundText"]'),
     'resultIndexParameters' : {'index' : "matches found for", 'selector' : 'tail'},  # head, tail, or all
@@ -133,12 +144,29 @@ def ciscoValues():
     parameters = {
     'url' : 'http://www.cisco.com/univercd/cc/td/doc/product/voice/c_ipphone/index.html', # initial URL
     'operatorMessage' : "Cisco test: no operator actions needed.",
-    'startPageTextLocator' : (By.XPATH, '//DIV/H1[@class="title-section"]'),
+    'startPageTextLocator' : (By.XPATH, '(//DIV/H1[@class="title-section"] | //div/h1[@class="title-section title-section-only"])'),
     'startPageVerifyText' : '404 Page Not Found',
     'inputLocator' : (By.XPATH, '(//input[@id = "searchPhrase"] | //input[@id = "search-Phrase search-Phrase-only"])'),
     'resultPageTextLocator' : (By.XPATH, '//H2[@class="title-page"]'),
     'resultPageVerifyText' : 'Search Results',
     'outputLocator' : (By.CLASS_NAME,'searchStatus'),
+    'resultIndexParameters' : {'index' : "of ", 'selector' : 'tail'},  # head, tail, or all
+    'dataInFileName' : 'plates.csv',
+    'dataOutFileName' : 'platesOut.txt',
+    'returnOrClick' : 'return', # use Return or Click to submit form
+    }
+    return parameters
+
+def theInternet():
+    parameters = {
+    'url' : 'http://the-internet.herokuapp.com/nested_frames', # initial URL
+    'operatorMessage' : "the-internet test: no operator actions needed.",
+    'startPageTextLocator' : (By.XPATH, '//frameset'),
+    'startPageVerifyText' : '',
+    'inputLocator' : None,
+    'resultPageTextLocator' : (By.XPATH, '//frame[@name="frame-top"]'),
+    'resultPageVerifyText' : None,
+    'outputLocator' : None,
     'resultIndexParameters' : {'index' : "of ", 'selector' : 'tail'},  # head, tail, or all
     'dataInFileName' : 'plates.csv',
     'dataOutFileName' : 'platesOut.txt',
@@ -168,7 +196,8 @@ if __name__ == '__main__':
     #parameters = googleValues()
     #parameters = sigmaAldrichValues()
     #parameters = hntbValues()
-    parameters = ciscoValues() # should work on production systems
+    #parameters = ciscoValues() # should work on production systems
+    parameters = theInternet() # sites for testing
     #parameters = productionValues()
 
     print parameters['operatorMessage']
