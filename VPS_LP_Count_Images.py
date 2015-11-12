@@ -21,14 +21,14 @@ import selenium.webdriver.support.expected_conditions as EC
 from VPS_LIB import cleanUpLicensePlateString
 from VPS_LIB import findElementOnPage
 from VPS_LIB import fillFormAndSubmit
+from VPS_LIB import findAndSelectFrame
 from VPS_LIB import findTargetPage
 from VPS_LIB import getTextResults
 from VPS_LIB import loadRegExPatterns
+from VPS_LIB import newPageLoaded
 from VPS_LIB import openBrowser
 from VPS_LIB import returnOrClick
-from VPS_LIB import selectFrame
 from VPS_LIB import timeout
-from VPS_LIB import waitForNewPage
 
 import re
 import io
@@ -54,6 +54,7 @@ def parseString(inputString,indexPattern, targetPattern, segment="all"): # segme
 
 def dataIO(driver, parameters):
     beginPattern = re.compile(parameters['resultIndexParameters']['index'])
+    numCommaPattern = re.compile('[0-9,]+')
     currentHandle = None # the window handle after 'driver.back()'
     window = None        # the window found by 'findTargetPage()'
     with open(parameters['dataInFileName'], 'r') as infile, open(parameters['dataOutFileName'], 'a') as outfile:
@@ -65,25 +66,24 @@ def dataIO(driver, parameters):
                 break
             plateString = cleanUpLicensePlateString(rawString)
             if window!=currentHandle or window == None:
-                window, ReferenceElement = findTargetPage(driver, parameters['startPageTextLocator'], parameters['startPageVerifyText'])
+                startWindow, ReferenceElement = findTargetPage(driver, parameters['startPageTextLocator'], parameters['startPageVerifyText'])
+                window = startWindow
             element = findElementOnPage(driver, parameters['inputLocator'])
-            fillFormAndSubmit(driver, window, element, plateString, parameters)
-            waitForNewPage(driver, ReferenceElement)
-
-            #frame = selectFrame(driver, (By.XPATH, '//frame[@name="menu"]'))
-            frame = selectFrame(driver, (By.XPATH, '//frame'))
-            if frame != None:
-                window = driver.current_window_handle
-
+            fillFormAndSubmit(driver, startWindow, element, plateString, parameters)
+            pageLoaded = newPageLoaded(driver, ReferenceElement)
+            if parameters['resultFrames'] == True:
+                foundFrame = findAndSelectFrame(driver, parameters['resultFrameLocator'])
+                window = webdriver.Ie.current_window_handle
             text = getTextResults(driver, window, plateString, parameters)
-            # #beginPattern = re.compile(parameters['resultIndexParameters']['index'])
-            numCommaPattern = re.compile('[0-9,]+')
+
+            #numCommaPattern = re.compile('[0-9,]+')
             if text!= None:
                 stringSegment = parseString(text, beginPattern, numCommaPattern, "all")
                 sys.stdout.write(plateString + ", " + str(stringSegment) + '\n')
                 outfile.write(plateString + ", " + str(stringSegment) + '\n')
                 outfile.flush()
-            driver.back() # go back to 'startPage'
+            if window != startWindow:
+                driver.back() # go back to 'startPage'
             currentHandle = driver.current_window_handle
     print "main: Finished parsing plate file."
 
@@ -95,6 +95,7 @@ def googleValues():
     'startPageTextLocator' : (By.XPATH,'//input[@value = "Google Search"]'),
     'startPageVerifyText' : '',
     'inputLocator' : (By.XPATH,'//input[@name = "q"]'),
+    'resultFrames' : False,
     'resultPageTextLocator' : (By.XPATH, '//TD/H1'),
     'resultPageVerifyText' : '',
     'outputLocator' : (By.ID, "resultStats"),
@@ -112,6 +113,7 @@ def sigmaAldrichValues():
     'startPageTextLocator' : (By.XPATH, '//a'),
     'startPageVerifyText' : 'Hello. Sign in.',
     'inputLocator' : (By.XPATH,'//input[@name = "Query"]'),
+    'resultFrames' : False,
     'resultPageTextLocator' : (By.XPATH, '//p[contains(text(),"matches found for")]'),
     'resultPageVerifyText' : '',
     'outputLocator' : (By.XPATH, '//p[@class="resultsFoundText"]'),
@@ -129,7 +131,7 @@ def hntbValues():
     'startPageTextLocator' : (By.XPATH, '//h2'),
     'startPageVerifyText' : 'About HNTB',
     'inputLocator' : (By.XPATH,'//input[@name = "s"]'),
-    #'resultPageTextLocator' : (By.XPATH, '//TD/H1'),
+    'resultFrames' : False,
     'resultPageTextLocator' : (By.XPATH, '//TITLE'),
     'resultPageVerifyText' : 'Search Result',
     'outputLocator' : (By.ID, "resultStats"),
@@ -147,6 +149,7 @@ def ciscoValues():
     'startPageTextLocator' : (By.XPATH, '(//DIV/H1[@class="title-section"] | //div/h1[@class="title-section title-section-only"])'),
     'startPageVerifyText' : '404 Page Not Found',
     'inputLocator' : (By.XPATH, '(//input[@id = "searchPhrase"] | //input[@id = "search-Phrase search-Phrase-only"])'),
+    'resultFrames' : False,
     'resultPageTextLocator' : (By.XPATH, '//H2[@class="title-page"]'),
     'resultPageVerifyText' : 'Search Results',
     'outputLocator' : (By.CLASS_NAME,'searchStatus'),
@@ -164,6 +167,8 @@ def theInternet():
     'startPageTextLocator' : (By.XPATH, '//frameset'),
     'startPageVerifyText' : '',
     'inputLocator' : None,
+    'resultFrames' : True,
+    'resultFrameLocator' : (By.XPATH, '//frame[@name="frame-left"]'),
     'resultPageTextLocator' : (By.XPATH, '//frame[@name="frame-top"]'),
     'resultPageVerifyText' : None,
     'outputLocator' : None,
@@ -181,6 +186,8 @@ def productionValues():
     'startPageTextLocator' : (By.XPATH, '//TD/H1'),
     'startPageVerifyText' : 'Violation Search',
     'inputLocator' : (By.XPATH, '//input[@id = "P_LIC_PLATE_NBR"]'),
+    'resultFrames' : True,
+    'resultFrameLocator' : (By.XPATH, '//frame[@name="fraRL"]'),
     'resultPageTextLocator' : (By.XPATH, '//TD/H1'),
     'resultPageVerifyText' : 'Violation Search Results',
     'outputLocator' : (By.XPATH,'//BODY/P[contains(text(),"Record")]'),
@@ -193,11 +200,11 @@ def productionValues():
 
 if __name__ == '__main__':
 
-    #parameters = googleValues()
+    parameters = googleValues()
     #parameters = sigmaAldrichValues()
     #parameters = hntbValues()
     #parameters = ciscoValues() # should work on production systems
-    parameters = theInternet() # sites for testing
+    #parameters = theInternet() # sites for testing
     #parameters = productionValues()
 
     print parameters['operatorMessage']

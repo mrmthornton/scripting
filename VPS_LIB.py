@@ -30,25 +30,17 @@ def returnOrClick(element, select):
         print "'select' should be one of 'return' or 'click'"
 
 def loadRegExPatterns():
-    global linePattern
-    global wordPattern
-    global csvPattern
-    global commaToEOLpattern
-    global LICpattern
-    global issuedPattern
-    global reg_dtPattern
-    global datePattern
-    global dateYearFirstPattern
-
-    linePattern = re.compile('^.+')
-    wordPattern = re.compile('\w+')
-    csvPattern = re.compile('[A-Z0-9 .#&]*,')
-    commaToEOLpattern = re.compile(',[A-Z0-9 .#&]+$')
-    LICpattern = re.compile('^LIC ')
-    issuedPattern = re.compile('ISSUED ')
-    reg_dtPattern = re.compile('REG DT ')
-    datePattern = re.compile('[0-9]{2,2}/[0-9]{2,2}/[0-9]{4,4}') # mo/day/year
-    dateYearFirstPattern = re.compile(r'\d{4,4}/\d{2,2}/\d{2,2}') # year/mo/day
+    patterns = {
+    'linePattern' : re.compile('^.+'),
+    'wordPattern' : re.compile('\w+'),
+    'csvPattern' : re.compile('[A-Z0-9 .#&]*,'),
+    'commaToEOLpattern' : re.compile(',[A-Z0-9 .#&]+$'),
+    'LICpattern' : re.compile('^LIC '),
+    'issuedPattern' : re.compile('ISSUED '),
+    'reg_dtPattern' : re.compile('REG DT '),
+    'datePattern' : re.compile('[0-9]{2,2}/[0-9]{2,2}/[0-9]{4,4}'), # mo/day/year
+    'dateYearFirstPattern' : re.compile(r'\d{4,4}/\d{2,2}/\d{2,2}'), # year/mo/day
+    }
 
 def timeout(msg="Took too much time!"):
     print msg
@@ -68,7 +60,7 @@ def cleanUpLicensePlateString(plateString):
         plateString = plateString.replace('\n\n' , '\n')
     return plateString
 
-def waitForNewPage(driver, currentElement, delay=2):
+def newPageLoaded(driver, currentElement, delay=2):
     def isStale(self):
         try:
             # poll the current element with an arbitrary call
@@ -78,8 +70,10 @@ def waitForNewPage(driver, currentElement, delay=2):
             return True
     try:
         WebDriverWait(driver, delay).until(isStale)
+        return True
     except TimeoutException:
-        timeout('waitForNewPage: old page reference never went stale')
+        timeout('newPageLoaded: old page reference never went stale')
+        return False
 
 def findTargetPage(driver, locator, targetText=""):
     delay = 5 # seconds
@@ -122,7 +116,7 @@ def fillFormAndSubmit(driver, window, element, formText, parameters):
     element.send_keys(formText)
     returnOrClick(element, parameters['returnOrClick'])
 
-def selectFrame(driver, locator, parent=None):
+def findAndSelectFrame(driver, locator, parent=None):
     delay = 5 # seconds
     try:
         locateAllParentFrames = (By.XPATH, '//frame')
@@ -131,17 +125,18 @@ def selectFrame(driver, locator, parent=None):
             driver.switch_to.frame(frame)
             try:
                 resultElement = WebDriverWait(driver, delay).until(EC.presence_of_element_located(locator))
-                return resultElement
+                driver.switch_to_frame(resultElement)
+                return True
             except TimeoutException:
                 parent = frame
-                return None
+                return False
     except TimeoutException:
-        timeout('selectFrame: text not found')
+        timeout('findAndSelectFrame: text not found')
 
 
 def getTextResults(driver, window, plateString, parameters):
     delay = 5 # seconds
-    assert(driver.current_window_handle == window)
+    # #assert(driver.current_window_handle == window)
     #print "getTextResults: " + driver.current_url # for debug purposes
     if parameters['outputLocator']== None: # skip finding text
         return None
