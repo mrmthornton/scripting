@@ -8,7 +8,7 @@
 # Author:      mthornton
 #
 # Created:     2015 AUG 01
-# Updates:     2015 NOV 10
+# Updates:     2015 NOV 12
 # Copyright:   (c) michael thornton 2015
 #-------------------------------------------------------------------------------
 
@@ -27,6 +27,7 @@ from VPS_LIB import getTextResults
 from VPS_LIB import loadRegExPatterns
 from VPS_LIB import newPageLoaded
 from VPS_LIB import openBrowser
+from VPS_LIB import parseString
 from VPS_LIB import returnOrClick
 from VPS_LIB import timeout
 
@@ -36,60 +37,9 @@ import csv
 import sys
 import string
 
-def parseString(inputString,indexPattern, targetPattern, segment="all"): # segment may be start, end, or all
-    # the iterator is used to search for all possible target pattern instances
-    found = indexPattern.search(inputString)
-    if found != None:
-        indexStart = found.start()
-        indexEnd = found.end()
-        print "parseString: found start", indexStart #debug statement
-        iterator = targetPattern.finditer(inputString)
-        for found in iterator:
-            if found.start() > indexStart and found != None:
-                targetStart = found.start()
-                targetEnd = found.end()
-                print "findStartEnd: found end", targetStart #debug statement
-                return inputString[indexEnd:targetEnd:]
-    return None
-
-def dataIO(driver, parameters):
-    beginPattern = re.compile(parameters['resultIndexParameters']['index'])
-    numCommaPattern = re.compile('[0-9,]+')
-    currentHandle = None # the window handle after 'driver.back()'
-    window = None        # the window found by 'findTargetPage()'
-    with open(parameters['dataInFileName'], 'r') as infile, open(parameters['dataOutFileName'], 'a') as outfile:
-        outfile.truncate()
-        csvInput = csv.reader(infile)
-        for row in csvInput:
-            rawString = row[0]
-            if rawString == "" or rawString == 0:  #end when LP does not exist
-                break
-            plateString = cleanUpLicensePlateString(rawString)
-            if window!=currentHandle or window == None:
-                startWindow, ReferenceElement = findTargetPage(driver, parameters['startPageTextLocator'], parameters['startPageVerifyText'])
-                window = startWindow
-            element = findElementOnPage(driver, parameters['inputLocator'])
-            fillFormAndSubmit(driver, startWindow, element, plateString, parameters)
-            pageLoaded = newPageLoaded(driver, ReferenceElement)
-            if parameters['resultFrames'] == True:
-                foundFrame = findAndSelectFrame(driver, parameters['resultFrameLocator'])
-                window = webdriver.Ie.current_window_handle
-            text = getTextResults(driver, window, plateString, parameters)
-
-            #numCommaPattern = re.compile('[0-9,]+')
-            if text!= None:
-                stringSegment = parseString(text, beginPattern, numCommaPattern, "all")
-                sys.stdout.write(plateString + ", " + str(stringSegment) + '\n')
-                outfile.write(plateString + ", " + str(stringSegment) + '\n')
-                outfile.flush()
-            if window != startWindow:
-                driver.back() # go back to 'startPage'
-            currentHandle = driver.current_window_handle
-    print "main: Finished parsing plate file."
-
-
 def googleValues():
     parameters = {
+    'delay' : 5,
     'url' : 'http://www.google.com', # initial URL
     'operatorMessage' : "Google test: no operator actions needed.",
     'startPageTextLocator' : (By.XPATH,'//input[@value = "Google Search"]'),
@@ -108,6 +58,7 @@ def googleValues():
 
 def sigmaAldrichValues():
     parameters = {
+    'delay' : 5,
     'url' : 'http://www.sigmaaldrich.com/united-states.html', # initial URL
     'operatorMessage' : "sigmaaldrich test run:  no operator actions needed.",
     'startPageTextLocator' : (By.XPATH, '//a'),
@@ -126,6 +77,7 @@ def sigmaAldrichValues():
 
 def hntbValues():
     parameters = {
+    'delay' : 5,
     'url' : 'http://www.hntb.com/about', # initial URL
     'operatorMessage' : "HNTB test run:  no operator actions needed.",
     'startPageTextLocator' : (By.XPATH, '//h2'),
@@ -144,6 +96,7 @@ def hntbValues():
 
 def ciscoValues():
     parameters = {
+    'delay' : 5,
     'url' : 'http://www.cisco.com/univercd/cc/td/doc/product/voice/c_ipphone/index.html', # initial URL
     'operatorMessage' : "Cisco test: no operator actions needed.",
     'startPageTextLocator' : (By.XPATH, '(//DIV/H1[@class="title-section"] | //div/h1[@class="title-section title-section-only"])'),
@@ -162,6 +115,7 @@ def ciscoValues():
 
 def theInternet():
     parameters = {
+    'delay' : 5,
     'url' : 'http://the-internet.herokuapp.com/nested_frames', # initial URL
     'operatorMessage' : "the-internet test: no operator actions needed.",
     'startPageTextLocator' : (By.XPATH, '//frameset'),
@@ -181,6 +135,7 @@ def theInternet():
 
 def productionValues():
     parameters = {
+    'delay' : 5,
     'url' : 'https://lprod.scip.ntta.org/scip/jsp/SignIn.jsp', # initial URL
     'operatorMessage' : "Use debug mode, open VPS, new violator search window, and run to completion",
     'startPageTextLocator' : (By.XPATH, '//TD/H1'),
@@ -198,13 +153,52 @@ def productionValues():
     }
     return parameters
 
+def dataIO(driver, parameters):
+    beginPattern = re.compile(parameters['resultIndexParameters']['index'])
+    numCommaPattern = re.compile('[0-9,]+')
+    currentHandle = None # the window handle after 'driver.back()'
+    window = None        # the window found by 'findTargetPage()'
+    delay = parameters['delay']
+    #if window!=currentHandle or window == None:
+    #    startWindow, ReferenceElement = findTargetPage(driver, delay, parameters['startPageTextLocator'], parameters['startPageVerifyText'])
+    #    window = startWindow
+    with open(parameters['dataInFileName'], 'r') as infile, open(parameters['dataOutFileName'], 'a') as outfile:
+        outfile.truncate()
+        csvInput = csv.reader(infile)
+        for row in csvInput:
+            rawString = row[0]
+            if rawString == "" or rawString == 0:  #end when LP does not exist
+                break
+            plateString = cleanUpLicensePlateString(rawString)
+            if window != currentHandle or window == None:
+                startWindow, ReferenceElement = findTargetPage(driver, delay, parameters['startPageTextLocator'], parameters['startPageVerifyText'])
+                window = startWindow
+            element = findElementOnPage(driver, delay, parameters['inputLocator'])
+            #print driver.execute_script("return jQuery.active")
+            fillFormAndSubmit(driver, startWindow, element, plateString, parameters)
+            pageLoaded = newPageLoaded(driver, delay, ReferenceElement)
+            if parameters['resultFrames'] == True:
+                foundFrame = findAndSelectFrame(driver, delay, parameters['resultFrameLocator'])
+            text = getTextResults(driver, delay, window, plateString, parameters)
+            if text!= None:
+                stringSegment = parseString(text, beginPattern, numCommaPattern, "all")
+                sys.stdout.write(plateString + ", " + str(stringSegment) + '\n')
+                outfile.write(plateString + ", " + str(stringSegment) + '\n')
+                outfile.flush()
+            if window != startWindow:
+                driver.back() # go back to 'startPage'
+            #else:
+                # return to top frame?
+            currentHandle = driver.current_window_handle
+    print "main: Finished parsing plate file."
+
 if __name__ == '__main__':
 
     parameters = googleValues()
     #parameters = sigmaAldrichValues()
     #parameters = hntbValues()
     #parameters = ciscoValues() # should work on production systems
-    #parameters = theInternet() # sites for testing
+    parameters = theInternet() # sites for testing
     #parameters = productionValues()
 
     print parameters['operatorMessage']

@@ -5,7 +5,7 @@
 # Author:      mthornton
 #
 # Created:     2015 AUG 01
-# Updates:     2015 NOV 10
+# Updates:     2015 NOV 12
 # Copyright:   (c) michael thornton 2015
 #-------------------------------------------------------------------------------
 
@@ -20,15 +20,6 @@ from selenium.webdriver.support.ui import WebDriverWait
 import re
 
 
-def returnOrClick(element, select):
-    if select =='return':
-        element.send_keys(Keys.RETURN)
-    elif select == 'click':
-        element.click()
-    else:
-        print "ERROR: returnOrClick:"
-        print "'select' should be one of 'return' or 'click'"
-
 def loadRegExPatterns():
     patterns = {
     'linePattern' : re.compile('^.+'),
@@ -42,15 +33,6 @@ def loadRegExPatterns():
     'dateYearFirstPattern' : re.compile(r'\d{4,4}/\d{2,2}/\d{2,2}'), # year/mo/day
     }
 
-def timeout(msg="Took too much time!"):
-    print msg
-
-def openBrowser(url):
-    driver = webdriver.Ie()
-    #driver.maximize_window()
-    driver.get(url)
-    return driver
-
 def cleanUpLicensePlateString(plateString):
     plateString = plateString.replace(' ' , '') # remove any spaces
     plateString = plateString.replace('"' , '') # remove any double quotes
@@ -60,64 +42,16 @@ def cleanUpLicensePlateString(plateString):
         plateString = plateString.replace('\n\n' , '\n')
     return plateString
 
-def newPageLoaded(driver, currentElement, delay=2):
-    def isStale(self):
-        try:
-            # poll the current element with an arbitrary call
-            nullText = currentElement.text
-            return False
-        except StaleElementReferenceException:
-            return True
-    try:
-        WebDriverWait(driver, delay).until(isStale)
-        return True
-    except TimeoutException:
-        timeout('newPageLoaded: old page reference never went stale')
-        return False
-
-def findTargetPage(driver, locator, targetText=""):
-    delay = 5 # seconds
-    while True:
-        for handle in driver.window_handles:  # test each window for target
-            driver.switch_to_window(handle)
-            print "findTargetPage: Searching for '" , targetText, "' in window ", handle # for debug purposes
-            try:
-                elems = WebDriverWait(driver, delay).until(EC.presence_of_all_elements_located(locator))
-                for element in elems:       # test each element for target
-                    if (element.text == targetText) or (targetText == ""):
-                        #print "findTargetPage: found '", element.text, "'" # for debug purposes
-                        return handle, element
-            except TimeoutException:
-                timeout('findTargetPage: locator element not found')
-                continue
-
-def findElementOnPage(driver, elementLocator, window=None ):
-    delay = 5 # seconds
-    if elementLocator == None:# skip finding the element
-        return None
-    if window != None:
-        driver.switch_to_window(window) # switch to window if supplied
-        print "findElementOnPage: switched to target window"
-    while True:
-        try:
-            element = WebDriverWait(driver, delay).until(EC.presence_of_element_located(elementLocator))
-            return element
-        except TimeoutException:
-            timeout('findElementOnPage: element not found')
-            continue
-
-def fillFormAndSubmit(driver, window, element, formText, parameters):
-    delay = 5 # seconds
+def fillFormAndSubmit(driver, window, element, textForForm, parameters):
     if type(element) == type(None): # skip the form submission
         return
-    assert(driver.current_window_handle == window)
-    print "fillFormAndSubmit: " + driver.current_url # for debug purposes
+    #assert(driver.current_window_handle == window)
+    #print "fillFormAndSubmit: " + driver.current_url # for debug purposes
     element.clear()
-    element.send_keys(formText)
+    element.send_keys(textForForm)
     returnOrClick(element, parameters['returnOrClick'])
 
-def findAndSelectFrame(driver, locator, parent=None):
-    delay = 5 # seconds
+def findAndSelectFrame(driver, delay, locator):
     try:
         locateAllParentFrames = (By.XPATH, '//frame')
         frames = WebDriverWait(driver, delay).until(EC.presence_of_all_elements_located(locateAllParentFrames))
@@ -133,9 +67,36 @@ def findAndSelectFrame(driver, locator, parent=None):
     except TimeoutException:
         timeout('findAndSelectFrame: text not found')
 
+def findElementOnPage(driver, delay, elementLocator, window=None):
+    if elementLocator == None:# skip finding the element
+        return None
+    if window != None:
+        driver.switch_to_window(window) # switch to window if supplied
+        print "findElementOnPage: switched to target window"
+    while True:
+        try:
+            element = WebDriverWait(driver, delay).until(EC.presence_of_element_located(elementLocator))
+            return element
+        except TimeoutException:
+            timeout('findElementOnPage: element not found')
+            continue
 
-def getTextResults(driver, window, plateString, parameters):
-    delay = 5 # seconds
+def findTargetPage(driver, delay, locator, targetText=""):
+    while True:
+        for handle in driver.window_handles:  # test each window for target
+            driver.switch_to_window(handle)
+            print "findTargetPage: Searching for '" , targetText, "' in window ", handle # for debug purposes
+            try:
+                elems = WebDriverWait(driver, delay).until(EC.presence_of_all_elements_located(locator))
+                for element in elems:       # test each element for target
+                    if (element.text == targetText) or (targetText == ""):
+                        #print "findTargetPage: found '", element.text, "'" # for debug purposes
+                        return handle, element
+            except TimeoutException:
+                timeout('findTargetPage: locator element not found')
+                continue
+
+def getTextResults(driver, delay, window, plateString, parameters):
     # #assert(driver.current_window_handle == window)
     #print "getTextResults: " + driver.current_url # for debug purposes
     if parameters['outputLocator']== None: # skip finding text
@@ -146,11 +107,60 @@ def getTextResults(driver, window, plateString, parameters):
         pattern = re.compile(resultIndex)
         isFound = pattern.search(resultElement.text)
         if (isFound) or (resultIndex == ""):
-            print "getTextResults: TEXT: '", resultElement.text, "'" # for debug purposes
+            #print "getTextResults: TEXT: '", resultElement.text, "'" # for debug purposes
             return resultElement.text
         else: return None
     except TimeoutException:
         timeout('text not found')
+
+def newPageLoaded(driver, delay, currentElement):
+    def isStale(self):
+        try:
+            # poll the current element with an arbitrary call
+            nullText = currentElement.text
+            return False
+        except StaleElementReferenceException:
+            return True
+    try:
+        WebDriverWait(driver, delay).until(isStale)
+        return True
+    except TimeoutException:
+        timeout('newPageLoaded: old page reference never went stale')
+        return False
+
+def openBrowser(url):
+    driver = webdriver.Ie()
+    #driver.maximize_window()
+    driver.get(url)
+    return driver
+
+def parseString(inputString,indexPattern, targetPattern, segment="all"): # segment may be start, end, or all
+    # the iterator is used to search for all possible target pattern instances
+    found = indexPattern.search(inputString)
+    if found != None:
+        indexStart = found.start()
+        indexEnd = found.end()
+        #print "parseString: found start", indexStart #debug statement
+        iterator = targetPattern.finditer(inputString)
+        for found in iterator:
+            if found.start() > indexStart and found != None:
+                targetStart = found.start()
+                targetEnd = found.end()
+                #print "parseString: found end", targetStart #debug statement
+                return inputString[indexEnd:targetEnd:]
+    return None
+
+def returnOrClick(element, select):
+    if select =='return':
+        element.send_keys(Keys.RETURN)
+    elif select == 'click':
+        element.click()
+    else:
+        print "ERROR: returnOrClick:"
+        print "'select' should be one of 'return' or 'click'"
+
+def timeout(msg="Took too much time!"):
+    print msg
 
 if __name__ == '__main__':
 
@@ -158,19 +168,19 @@ if __name__ == '__main__':
     url = 'file://C:/Users/IEUser/Documents/scripting/testPage.html'
     locator = (By.XPATH, '//p')
     window = None
+    delay = 1
 
     # test library components
     assert(cleanUpLicensePlateString('123 45   6,,"\n\n') == '123456\n')
-
     driver = openBrowser(url)
-    window = findTargetPage(driver, locator) # no w ndow, why?
+    window = findTargetPage(driver, delay, locator) # no window, why?
     #returnOrClick()
     #loadRegExPatterns()
     #timeout()
 
     #waitForNewPage()
 
-    findElementOnPage(driver, elementLocator)
+    findElementOnPage(driver, delay, elementLocator)
     #getTextResults()
     driver.close()
     print "PASSED"
