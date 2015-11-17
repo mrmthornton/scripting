@@ -8,7 +8,7 @@
 # Author:      mthornton
 #
 # Created:     2015 AUG 01
-# Updates:     2015 NOV 12
+# Updates:     2015 NOV 17
 # Copyright:   (c) michael thornton 2015
 #-------------------------------------------------------------------------------
 
