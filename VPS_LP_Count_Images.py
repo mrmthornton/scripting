@@ -194,7 +194,7 @@ def dataIO(driver, parameters):
 
 if __name__ == '__main__':
 
-    parameters = googleValues()
+    #parameters = googleValues()
     #parameters = sigmaAldrichValues()
     #parameters = hntbValues()
     #parameters = ciscoValues() # should work on production systems
