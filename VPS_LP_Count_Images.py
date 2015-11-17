@@ -25,7 +25,7 @@ from VPS_LIB import findAndSelectFrame
 from VPS_LIB import findTargetPage
 from VPS_LIB import getTextResults
 from VPS_LIB import loadRegExPatterns
-from VPS_LIB import newPageLoaded
+from VPS_LIB import newPageIsLoaded
 from VPS_LIB import openBrowser
 from VPS_LIB import parseString
 from VPS_LIB import returnOrClick
@@ -48,7 +48,7 @@ def googleValues():
     'resultFrames' : False,
     'resultPageTextLocator' : (By.XPATH, '//TD/H1'),
     'resultPageVerifyText' : '',
-    'outputLocator' : (By.ID, "resultStats"),
+    'outputLocator' : (By.XPATH, '//div[@id="resultStats"][contains(text(),"About")]'),
     'resultIndexParameters' : {'index' : "About ", 'selector' : 'tail'},  # head, tail, or all
     'dataInFileName' : 'plates.csv',
     'dataOutFileName' : 'platesOut.txt',
@@ -174,9 +174,10 @@ def dataIO(driver, parameters):
                 startWindow, ReferenceElement = findTargetPage(driver, delay, parameters['startPageTextLocator'], parameters['startPageVerifyText'])
                 window = startWindow
             element = findElementOnPage(driver, delay, parameters['inputLocator'])
+            goesStaleElement = findElementOnPage(driver, delay, parameters['outputLocator'])
             #print driver.execute_script("return jQuery.active")
             fillFormAndSubmit(driver, startWindow, element, plateString, parameters)
-            pageLoaded = newPageLoaded(driver, delay, ReferenceElement)
+            pageLoaded = newPageIsLoaded(driver, delay, goesStaleElement)
             if parameters['resultFrames'] == True:
                 foundFrame = findAndSelectFrame(driver, delay, parameters['resultFrameLocator'])
             text = getTextResults(driver, delay, window, plateString, parameters)
@@ -194,7 +195,7 @@ def dataIO(driver, parameters):
 
 if __name__ == '__main__':
 
-    #parameters = googleValues()
+    parameters = googleValues()
     #parameters = sigmaAldrichValues()
     #parameters = hntbValues()
     #parameters = ciscoValues() # should work on production systems

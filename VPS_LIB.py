@@ -10,6 +10,8 @@
 #-------------------------------------------------------------------------------
 
 from selenium import webdriver
+from selenium.common.exceptions import NoSuchFrameException
+from selenium.common.exceptions import NoSuchWindowException
 from selenium.common.exceptions import TimeoutException
 from selenium.common.exceptions import StaleElementReferenceException
 from selenium.webdriver.common.by import By
@@ -52,6 +54,8 @@ def fillFormAndSubmit(driver, window, element, textForForm, parameters):
     returnOrClick(element, parameters['returnOrClick'])
 
 def findAndSelectFrame(driver, delay, locator):
+    # can this be made recursive, or will the timeout activate while
+    # waiting for a child?
     try:
         locateAllParentFrames = (By.XPATH, '//frame')
         frames = WebDriverWait(driver, delay).until(EC.presence_of_all_elements_located(locateAllParentFrames))
@@ -73,28 +77,32 @@ def findElementOnPage(driver, delay, elementLocator, window=None):
     if window != None:
         driver.switch_to_window(window) # switch to window if supplied
         print "findElementOnPage: switched to target window"
-    while True:
-        try:
-            element = WebDriverWait(driver, delay).until(EC.presence_of_element_located(elementLocator))
-            return element
-        except TimeoutException:
-            timeout('findElementOnPage: element not found')
-            continue
+    try:
+        element = WebDriverWait(driver, delay).until(EC.presence_of_element_located(elementLocator))
+        return element
+    except TimeoutException:
+        timeout('findElementOnPage: element not found')
+        return None
 
 def findTargetPage(driver, delay, locator, targetText=""):
-    while True:
-        for handle in driver.window_handles:  # test each window for target
-            driver.switch_to_window(handle)
-            print "findTargetPage: Searching for '" , targetText, "' in window ", handle # for debug purposes
-            try:
-                elems = WebDriverWait(driver, delay).until(EC.presence_of_all_elements_located(locator))
-                for element in elems:       # test each element for target
-                    if (element.text == targetText) or (targetText == ""):
-                        #print "findTargetPage: found '", element.text, "'" # for debug purposes
-                        return handle, element
-            except TimeoutException:
-                timeout('findTargetPage: locator element not found')
-                continue
+    try:
+        handle = driver.current_window_handle
+    except NoSuchWindowException:
+        print "findTargetPage: nothing to process, all windows finished?"
+        return None, None
+    handles = driver.window_handles
+    for handle in handles:  # test each window for target
+        driver.switch_to_window(handle)
+        print "findTargetPage: Searching for '" , targetText, "' in window ", handle # for debug purposes
+        try:
+            elems = WebDriverWait(driver, delay).until(EC.presence_of_all_elements_located(locator))
+            for element in elems:       # test each element for target
+                if (element.text == targetText) or (targetText == ""):
+                    #print "findTargetPage: found '", element.text, "'" # for debug purposes
+                    return handle, element
+        except TimeoutException:
+            timeout('findTargetPage: locator element not found')
+            continue
 
 def getTextResults(driver, delay, window, plateString, parameters):
     # #assert(driver.current_window_handle == window)
@@ -103,18 +111,24 @@ def getTextResults(driver, delay, window, plateString, parameters):
         return None
     try:
         resultElement = WebDriverWait(driver, delay).until(EC.presence_of_element_located(parameters['outputLocator']))
-        resultIndex = parameters['resultIndexParameters']['index']
-        pattern = re.compile(resultIndex)
-        isFound = pattern.search(resultElement.text)
-        if (isFound) or (resultIndex == ""):
-            #print "getTextResults: TEXT: '", resultElement.text, "'" # for debug purposes
-            return resultElement.text
-        else: return None
     except TimeoutException:
-        timeout('text not found')
+        timeout('getTextResults: text not found')
+        return None
+    text = resultElement.text
+    resultIndex = parameters['resultIndexParameters']['index']
+    pattern = re.compile(resultIndex)
+    isFound = pattern.search(text)
+    if isFound != None:
+        print "getTextResults: TEXT: '", text, "'" # for debug purposes
+        return text
+    else:
+        return None
 
-def newPageLoaded(driver, delay, currentElement):
+
+def newPageIsLoaded(driver, delay, currentElement):
     def isStale(self):
+        if type(currentElement) == type(None):# when there is no element to check,
+            return False          # loop until timeout occurs
         try:
             # poll the current element with an arbitrary call
             nullText = currentElement.text
