@@ -57,19 +57,22 @@ def findAndSelectFrame(driver, delay, locator):
     # can this be made recursive, or will the timeout activate while
     # waiting for a child?
     try:
-        locateAllParentFrames = (By.XPATH, '//frame')
-        frames = WebDriverWait(driver, delay).until(EC.presence_of_all_elements_located(locateAllParentFrames))
-        for frame in frames:
-            driver.switch_to.frame(frame)
-            try:
-                resultElement = WebDriverWait(driver, delay).until(EC.presence_of_element_located(locator))
-                driver.switch_to_frame(resultElement)
-                return True
-            except TimeoutException:
-                parent = frame
-                return False
+        allParentFramesLocator = (By.XPATH, '//frame[@name="fraRL"]')
+        frames = WebDriverWait(driver, delay).until(EC.presence_of_all_elements_located(allParentFramesLocator))
     except TimeoutException:
         timeout('findAndSelectFrame: text not found')
+        return False
+    for frame in frames:
+        print frames.len
+        driver.switch_to.frame(frame)
+        try:
+            resultElement = WebDriverWait(driver, delay).until(EC.presence_of_element_located(By.XPATH,'//th[@id="LIC_PLATE_NBR"]'))
+            driver.switch_to_frame(resultElement)
+            return True
+        except TimeoutException:
+            driver.switch_to.frame(parent)
+            continue
+
 
 def findElementOnPage(driver, delay, elementLocator, window=None):
     if elementLocator == None:# skip finding the element
@@ -98,7 +101,7 @@ def findTargetPage(driver, delay, locator, targetText=""):
             elems = WebDriverWait(driver, delay).until(EC.presence_of_all_elements_located(locator))
             for element in elems:       # test each element for target
                 if (element.text == targetText) or (targetText == ""):
-                    #print "findTargetPage: found '", element.text, "'" # for debug purposes
+                    print "findTargetPage: found '", element.text, "'" # for debug purposes
                     return handle, element
         except TimeoutException:
             timeout('findTargetPage: locator element not found')
