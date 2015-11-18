@@ -1,0 +1,5 @@
+Start regedit.exe, go to
+
+_CURRENT_USER\Software\Microsoft\Internet Explorer\Main\FeatureControl\FEATURE_BROWSER_EMULATION
+
+create a DWORD 'iexplore.exe' and set the value to 0x270F (9999) .

@@ -199,7 +199,7 @@ if __name__ == '__main__':
     #parameters = sigmaAldrichValues()
     #parameters = hntbValues()
     #parameters = ciscoValues() # should work on production systems
-    parameters = theInternet() # sites for testing
+    #parameters = theInternet() # sites for testing
     #parameters = productionValues()
 
     print parameters['operatorMessage']

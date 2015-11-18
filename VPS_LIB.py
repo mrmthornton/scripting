@@ -56,20 +56,25 @@ def fillFormAndSubmit(driver, window, element, textForForm, parameters):
 def findAndSelectFrame(driver, delay, locator):
     # can this be made recursive, or will the timeout activate while
     # waiting for a child?
+
+    allParentFramesLocator = (By.XPATH, '//frame')
     try:
-        locateAllParentFrames = (By.XPATH, '//frame')
-        frames = WebDriverWait(driver, delay).until(EC.presence_of_all_elements_located(locateAllParentFrames))
-        for frame in frames:
-            driver.switch_to.frame(frame)
-            try:
-                resultElement = WebDriverWait(driver, delay).until(EC.presence_of_element_located(locator))
-                driver.switch_to_frame(resultElement)
-                return True
-            except TimeoutException:
-                parent = frame
-                return False
+        frames = WebDriverWait(driver, delay).until(EC.presence_of_all_elements_located(allParentFramesLocator))
     except TimeoutException:
         timeout('findAndSelectFrame: text not found')
+        return False
+    for frame in frames:
+        driver.switch_to.frame(frame)
+        try:
+            resultElement = WebDriverWait(driver, delay).until(EC.presence_of_element_located(locator))
+        except TimeoutException:
+            driver.switch_to_default_content()
+            continue
+        finally:
+            return False
+        driver.switch_to_frame(resultElement)
+        return True
+
 
 def findElementOnPage(driver, delay, elementLocator, window=None):
     if elementLocator == None:# skip finding the element
@@ -81,7 +86,7 @@ def findElementOnPage(driver, delay, elementLocator, window=None):
         element = WebDriverWait(driver, delay).until(EC.presence_of_element_located(elementLocator))
         return element
     except TimeoutException:
-        timeout('findElementOnPage: element not found')
+        timeout('findElementOnPage: element' + str(elementLocator) + 'not found')
         return None
 
 def findTargetPage(driver, delay, locator, targetText=""):
@@ -96,13 +101,15 @@ def findTargetPage(driver, delay, locator, targetText=""):
         print "findTargetPage: Searching for '" , targetText, "' in window ", handle # for debug purposes
         try:
             elems = WebDriverWait(driver, delay).until(EC.presence_of_all_elements_located(locator))
-            for element in elems:       # test each element for target
-                if (element.text == targetText) or (targetText == ""):
-                    #print "findTargetPage: found '", element.text, "'" # for debug purposes
-                    return handle, element
         except TimeoutException:
             timeout('findTargetPage: locator element not found')
             continue
+        for element in elems:       # test each element for target
+            if (element.text == targetText) or (targetText == ""):
+                #print "findTargetPage: found '", element.text, "'" # for debug purposes
+                return handle, element
+    print "findTargetPage: 'target text' not found"
+    return None, None
 
 def getTextResults(driver, delay, window, plateString, parameters):
     # #assert(driver.current_window_handle == window)
