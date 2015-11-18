@@ -195,12 +195,12 @@ def dataIO(driver, parameters):
 
 if __name__ == '__main__':
 
-    parameters = googleValues()
+    #parameters = googleValues()
     #parameters = sigmaAldrichValues()
     #parameters = hntbValues()
     #parameters = ciscoValues() # should work on production systems
-    parameters = theInternet() # sites for testing
-    #parameters = productionValues()
+    #parameters = theInternet() # sites for testing
+    parameters = productionValues()
 
     print parameters['operatorMessage']
     loadRegExPatterns()
