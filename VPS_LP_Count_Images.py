@@ -45,7 +45,7 @@ def googleValues():
     'startPageTextLocator' : (By.XPATH,'//input[@value = "Google Search"]'),
     'startPageVerifyText' : '',
     'inputLocator' : (By.XPATH,'//input[@name = "q"]'),
-    'resultFrames' : False,
+    'frameParamters' : {'useFrames' : False},
     'resultPageTextLocator' : (By.XPATH, '//TD/H1'),
     'resultPageVerifyText' : '',
     'outputLocator' : (By.XPATH, '//div[@id="resultStats"][contains(text(),"About")]'),
@@ -64,7 +64,7 @@ def sigmaAldrichValues():
     'startPageTextLocator' : (By.XPATH, '//a'),
     'startPageVerifyText' : 'Hello. Sign in.',
     'inputLocator' : (By.XPATH,'//input[@name = "Query"]'),
-    'resultFrames' : False,
+    'frameParamters' : {'useFrames' : False},
     'resultPageTextLocator' : (By.XPATH, '//p[contains(text(),"matches found for")]'),
     'resultPageVerifyText' : '',
     'outputLocator' : (By.XPATH, '//p[@class="resultsFoundText"]'),
@@ -78,12 +78,12 @@ def sigmaAldrichValues():
 def hntbValues():
     parameters = {
     'delay' : 5,
-    'url' : 'http://www.hntb.com/about', # initial URL
-    'operatorMessage' : "HNTB test run:  no operator actions needed.",
+    'url' : 'http://www.hntb.com', # initial URL
+    'operatorMessage' : "HNTB test run:  run in debug mode, click magnifying glass.",
     'startPageTextLocator' : (By.XPATH, '//h2'),
     'startPageVerifyText' : 'About HNTB',
     'inputLocator' : (By.XPATH,'//input[@name = "s"]'),
-    'resultFrames' : False,
+    'frameParamters' : {'useFrames' : False},
     'resultPageTextLocator' : (By.XPATH, '//TITLE'),
     'resultPageVerifyText' : 'Search Result',
     'outputLocator' : (By.ID, "resultStats"),
@@ -102,7 +102,7 @@ def ciscoValues():
     'startPageTextLocator' : (By.XPATH, '(//DIV/H1[@class="title-section"] | //div/h1[@class="title-section title-section-only"])'),
     'startPageVerifyText' : '404 Page Not Found',
     'inputLocator' : (By.XPATH, '(//input[@id = "searchPhrase"] | //input[@id = "search-Phrase search-Phrase-only"])'),
-    'resultFrames' : False,
+    'frameParamters' : {'useFrames' : False},
     'resultPageTextLocator' : (By.XPATH, '//H2[@class="title-page"]'),
     'resultPageVerifyText' : 'Search Results',
     'outputLocator' : (By.CLASS_NAME,'searchStatus'),
@@ -121,15 +121,14 @@ def theInternet():
     'startPageTextLocator' : (By.XPATH, '//frameset'),
     'startPageVerifyText' : '',
     'inputLocator' : None,
-    'resultFrames' : True,
-    'resultFrameLocator' : (By.XPATH, '//frame[@name="frame-left"]'),
+    'frameParamters' : {'useFrames' : True, 'frameLocator' : (By.XPATH, '//frame[@name="frame-top"]')},
     'resultPageTextLocator' : (By.XPATH, '//frame[@name="frame-top"]'),
     'resultPageVerifyText' : None,
     'outputLocator' : None,
-    'resultIndexParameters' : {'index' : "of ", 'selector' : 'tail'},  # head, tail, or all
+    'resultIndexParameters' : {'index' : "", 'selector' : ''},  # head, tail, or all
     'dataInFileName' : 'plates.csv',
     'dataOutFileName' : 'platesOut.txt',
-    'returnOrClick' : 'return', # use Return or Click to submit form
+    'returnOrClick' : 'click', # use Return or Click to submit form
     }
     return parameters
 
@@ -141,8 +140,7 @@ def productionValues():
     'startPageTextLocator' : (By.XPATH, '//TD/H1'),
     'startPageVerifyText' : 'Violation Search',
     'inputLocator' : (By.XPATH, '//input[@id = "P_LIC_PLATE_NBR"]'),
-    'resultFrames' : True,
-    'resultFrameLocator' : (By.XPATH, '//frame[@name="fraRL"]'),
+    'frameParamters' : {'useFrames' : True, 'frameLocator' : (By.XPATH, '//frame[@name="fraRL"]')},
     'resultPageTextLocator' : (By.XPATH, '//TD/H1'),
     'resultPageVerifyText' : 'Violation Search Results',
     'outputLocator' : (By.XPATH,'//BODY/P[contains(text(),"Record")]'),
@@ -156,7 +154,6 @@ def productionValues():
 def dataIO(driver, parameters):
     beginPattern = re.compile(parameters['resultIndexParameters']['index'])
     numCommaPattern = re.compile('[0-9,]+')
-    currentHandle = None # the window handle after 'driver.back()'
     window = None        # the window found by 'findTargetPage()'
     delay = parameters['delay']
     #if window!=currentHandle or window == None:
@@ -170,7 +167,7 @@ def dataIO(driver, parameters):
             if rawString == "" or rawString == 0:  #end when LP does not exist
                 break
             plateString = cleanUpLicensePlateString(rawString)
-            if window != currentHandle or window == None:
+            if window != driver.current_window_handle or window == None:
                 startWindow, ReferenceElement = findTargetPage(driver, delay, parameters['startPageTextLocator'], parameters['startPageVerifyText'])
                 window = startWindow
             element = findElementOnPage(driver, delay, parameters['inputLocator'])
@@ -178,19 +175,20 @@ def dataIO(driver, parameters):
             #print driver.execute_script("return jQuery.active")
             fillFormAndSubmit(driver, startWindow, element, plateString, parameters)
             pageLoaded = newPageIsLoaded(driver, delay, goesStaleElement)
-            if parameters['resultFrames'] == True:
-                foundFrame = findAndSelectFrame(driver, delay, parameters['resultFrameLocator'])
+            foundFrame = findAndSelectFrame(driver, delay, parameters)
             text = getTextResults(driver, delay, window, plateString, parameters)
             if text!= None:
                 stringSegment = parseString(text, beginPattern, numCommaPattern, "all")
                 sys.stdout.write(plateString + ", " + str(stringSegment) + '\n')
                 outfile.write(plateString + ", " + str(stringSegment) + '\n')
                 outfile.flush()
+            # navigate to search page
+            if foundFrame:
+                driver.switch_to_default_content()
             if window != startWindow:
                 driver.back() # go back to 'startPage'
             #else:
                 # return to top frame?
-            currentHandle = driver.current_window_handle
     print "main: Finished parsing plate file."
 
 if __name__ == '__main__':
@@ -199,7 +197,7 @@ if __name__ == '__main__':
     #parameters = sigmaAldrichValues()
     #parameters = hntbValues()
     #parameters = ciscoValues() # should work on production systems
-    #parameters = theInternet() # sites for testing
+    parameters = theInternet() # sites for testing
     #parameters = productionValues()
 
     print parameters['operatorMessage']

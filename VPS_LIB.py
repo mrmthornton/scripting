@@ -53,28 +53,16 @@ def fillFormAndSubmit(driver, window, element, textForForm, parameters):
     element.send_keys(textForForm)
     returnOrClick(element, parameters['returnOrClick'])
 
-def findAndSelectFrame(driver, delay, locator):
-    # can this be made recursive, or will the timeout activate while
-    # waiting for a child?
-
-    allParentFramesLocator = (By.XPATH, '//frame')
-    try:
-        frames = WebDriverWait(driver, delay).until(EC.presence_of_all_elements_located(allParentFramesLocator))
-    except TimeoutException:
-        timeout('findAndSelectFrame: text not found')
-        return False
-    for frame in frames:
-        driver.switch_to.frame(frame)
+def findAndSelectFrame(driver, delay, parameters):
+    if parameters['frameParamters']['useFrames']:
+        locator = parameters['frameParamters']['frameLocator']
         try:
-            resultElement = WebDriverWait(driver, delay).until(EC.presence_of_element_located(locator))
+            foundFrame = WebDriverWait(driver, delay).until(EC.presence_of_element_located(locator))
         except TimeoutException:
-            driver.switch_to_default_content()
-            continue
-        finally:
+            print "findAndSelectFrame: frame not found."
             return False
-        driver.switch_to_frame(resultElement)
+        driver.switch_to_frame(foundFrame)
         return True
-
 
 def findElementOnPage(driver, delay, elementLocator, window=None):
     if elementLocator == None:# skip finding the element
