@@ -1,12 +1,11 @@
 *.csv
+*.exe
 *.lnk
+*.log
+*.pyc
+*.txt
 *.xlsx
 *.xlsm
-*.txt
-*.log
-*.exe
-*.pyc
-*.html
 .metadata/
 How To Read a TXDOT.pdf
 RemoteSystemsTempFiles/
