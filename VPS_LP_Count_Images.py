@@ -22,6 +22,7 @@ from VPS_LIB import cleanUpLicensePlateString
 from VPS_LIB import findElementOnPage
 from VPS_LIB import fillFormAndSubmit
 from VPS_LIB import findAndSelectFrame
+from VPS_LIB import findAndClickButton
 from VPS_LIB import findTargetPage
 from VPS_LIB import getTextResults
 from VPS_LIB import loadRegExPatterns
@@ -44,14 +45,16 @@ def googleValues():
     'operatorMessage' : "Google test: no operator actions needed.",
     'startPageTextLocator' : (By.XPATH,'//input[@value = "Google Search"]'),
     'startPageVerifyText' : '',
-    'inputLocator' : (By.XPATH,'//input[@name = "q"]'),
+    'inputLocator' : (By.XPATH,'//input[@name="q"]'),
+    'staleLocator' : None,
+    'buttonLocator' : (By.XPATH,'//button[@value="Search"]'),
     'frameParamters' : {'useFrames' : False},
     'resultPageTextLocator' : (By.XPATH, '//TD/H1'),
     'resultPageVerifyText' : '',
     'outputLocator' : (By.XPATH, '//div[@id="resultStats"][contains(text(),"About")]'),
     'resultIndexParameters' : {'index' : "About ", 'selector' : 'tail'},  # head, tail, or all
-    'dataInFileName' : 'plates.csv',
-    'dataOutFileName' : 'platesOut.txt',
+    'dataInFileName' : 'google.csv',
+    'dataOutFileName' : 'output.txt',
     'returnOrClick' : 'return', # use Return or Click to submit form
     }
     return parameters
@@ -64,6 +67,7 @@ def sigmaAldrichValues():
     'startPageTextLocator' : (By.XPATH, '//a'),
     'startPageVerifyText' : 'Hello. Sign in.',
     'inputLocator' : (By.XPATH,'//input[@name = "Query"]'),
+    'staleLocator' : (By.XPATH,'//A[contains(text(),"query?")]'),
     'frameParamters' : {'useFrames' : False},
     'resultPageTextLocator' : (By.XPATH, '//p[contains(text(),"matches found for")]'),
     'resultPageVerifyText' : '',
@@ -121,6 +125,8 @@ def theInternet():
     'startPageTextLocator' : (By.XPATH, '//frameset'),
     'startPageVerifyText' : '',
     'inputLocator' : None,
+    'staleLocator' : None,
+    'buttonLocator' : None,
     'frameParamters' : {'useFrames' : True, 'frameLocator' : (By.XPATH, '//frame[@name="frame-top"]')},
     'resultPageTextLocator' : (By.XPATH, '//frame[@name="frame-top"]'),
     'resultPageVerifyText' : None,
@@ -132,7 +138,7 @@ def theInternet():
     }
     return parameters
 
-def productionValues():
+def violatorSearch():
     parameters = {
     'delay' : 5,
     'url' : 'https://lprod.scip.ntta.org/scip/jsp/SignIn.jsp', # initial URL
@@ -140,6 +146,8 @@ def productionValues():
     'startPageTextLocator' : (By.XPATH, '//TD/H1'),
     'startPageVerifyText' : 'Violation Search',
     'inputLocator' : (By.XPATH, '//input[@id = "P_LIC_PLATE_NBR"]'),
+    'staleLocator' : (By.XPATH,'//P[contains(text(),"query fill")]'),
+    'buttonLocator' : (By.XPATH,'//button[@value="query again"]'),
     'frameParamters' : {'useFrames' : True, 'frameLocator' : (By.XPATH, '//frame[@name="fraRL"]')},
     'resultPageTextLocator' : (By.XPATH, '//TD/H1'),
     'resultPageVerifyText' : 'Violation Search Results',
@@ -171,8 +179,7 @@ def dataIO(driver, parameters):
                 startWindow, ReferenceElement = findTargetPage(driver, delay, parameters['startPageTextLocator'], parameters['startPageVerifyText'])
                 window = startWindow
             element = findElementOnPage(driver, delay, parameters['inputLocator'])
-            goesStaleElement = findElementOnPage(driver, delay, parameters['outputLocator'])
-            #print driver.execute_script("return jQuery.active")
+            goesStaleElement = findElementOnPage(driver, delay, parameters['staleLocator'])
             fillFormAndSubmit(driver, startWindow, element, plateString, parameters)
             pageLoaded = newPageIsLoaded(driver, delay, goesStaleElement)
             foundFrame = findAndSelectFrame(driver, delay, parameters)
@@ -183,12 +190,9 @@ def dataIO(driver, parameters):
                 outfile.write(plateString + ", " + str(stringSegment) + '\n')
                 outfile.flush()
             # navigate to search page
-            if foundFrame:
-                driver.switch_to_default_content()
-            if window != startWindow:
-                driver.back() # go back to 'startPage'
-            #else:
-                # return to top frame?
+            driver.switch_to_default_content()
+            clicked = findAndClickButton(driver, delay, parameters)
+            #driver.back()
     print "main: Finished parsing plate file."
 
 if __name__ == '__main__':
@@ -197,8 +201,8 @@ if __name__ == '__main__':
     #parameters = sigmaAldrichValues()
     #parameters = hntbValues()
     #parameters = ciscoValues() # should work on production systems
-    parameters = theInternet() # sites for testing
-    #parameters = productionValues()
+    #parameters = theInternet() # sites for testing
+    #parameters = violatorSearch()
 
     print parameters['operatorMessage']
     loadRegExPatterns()

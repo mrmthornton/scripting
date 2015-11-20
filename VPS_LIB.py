@@ -21,20 +21,6 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 import re
 
-
-def loadRegExPatterns():
-    patterns = {
-    'linePattern' : re.compile('^.+'),
-    'wordPattern' : re.compile('\w+'),
-    'csvPattern' : re.compile('[A-Z0-9 .#&]*,'),
-    'commaToEOLpattern' : re.compile(',[A-Z0-9 .#&]+$'),
-    'LICpattern' : re.compile('^LIC '),
-    'issuedPattern' : re.compile('ISSUED '),
-    'reg_dtPattern' : re.compile('REG DT '),
-    'datePattern' : re.compile('[0-9]{2,2}/[0-9]{2,2}/[0-9]{4,4}'), # mo/day/year
-    'dateYearFirstPattern' : re.compile(r'\d{4,4}/\d{2,2}/\d{2,2}'), # year/mo/day
-    }
-
 def cleanUpLicensePlateString(plateString):
     plateString = plateString.replace(' ' , '') # remove any spaces
     plateString = plateString.replace('"' , '') # remove any double quotes
@@ -52,6 +38,17 @@ def fillFormAndSubmit(driver, window, element, textForForm, parameters):
     element.clear()
     element.send_keys(textForForm)
     returnOrClick(element, parameters['returnOrClick'])
+
+def findAndClickButton(driver, delay, parameters):
+    if type(parameters['buttonLocator']) == type(None):
+        return False
+    try:
+        button = WebDriverWait(driver, delay).until(EC.presence_of_element_located(parameters['buttonLocator']))
+    except TimeoutException:
+        print "findAndClickButton: button not found."
+        return False
+    button.click()
+    return True
 
 def findAndSelectFrame(driver, delay, parameters):
     if parameters['frameParamters']['useFrames']:
@@ -114,16 +111,29 @@ def getTextResults(driver, delay, window, plateString, parameters):
     pattern = re.compile(resultIndex)
     isFound = pattern.search(text)
     if isFound != None:
-        print "getTextResults: TEXT: '", text, "'" # for debug purposes
+        #print "getTextResults: TEXT: '", text, "'" # for debug purposes
         return text
     else:
         return None
 
+def loadRegExPatterns():
+    patterns = {
+    'linePattern' : re.compile('^.+'),
+    'wordPattern' : re.compile('\w+'),
+    'csvPattern' : re.compile('[A-Z0-9 .#&]*,'),
+    'commaToEOLpattern' : re.compile(',[A-Z0-9 .#&]+$'),
+    'LICpattern' : re.compile('^LIC '),
+    'issuedPattern' : re.compile('ISSUED '),
+    'reg_dtPattern' : re.compile('REG DT '),
+    'datePattern' : re.compile('[0-9]{2,2}/[0-9]{2,2}/[0-9]{4,4}'), # mo/day/year
+    'dateYearFirstPattern' : re.compile(r'\d{4,4}/\d{2,2}/\d{2,2}'), # year/mo/day
+    }
 
 def newPageIsLoaded(driver, delay, currentElement):
     def isStale(self):
         if type(currentElement) == type(None):# when there is no element to check,
-            return False          # loop until timeout occurs
+            return True          # quit immediately
+            #return False          # loop until timeout occurs
         try:
             # poll the current element with an arbitrary call
             nullText = currentElement.text
@@ -175,7 +185,7 @@ if __name__ == '__main__':
 
     # setup test parameters
     url = 'file://C:/Users/IEUser/Documents/scripting/testPage.html'
-    locator = (By.XPATH, '//p')
+    elementLocator = (By.XPATH, '//p')
     window = None
     delay = 1
 
