@@ -127,7 +127,8 @@ def theInternet():
     'inputLocator' : None,
     'staleLocator' : None,
     'buttonLocator' : None,
-    'frameParamters' : {'useFrames' : True, 'frameLocator' : (By.XPATH, '//frame[@name="frame-top"]')},
+    'frameParamters' : {'useFrames' : True, 'frameLocator' : [(By.XPATH, '//frame[@name="frame-top"]'),
+                                                             (By.XPATH, '//frame[@name="frame-middle"]')]},
     'resultPageTextLocator' : (By.XPATH, '//frame[@name="frame-top"]'),
     'resultPageVerifyText' : None,
     'outputLocator' : None,
@@ -148,7 +149,7 @@ def violatorSearch():
     'inputLocator' : (By.XPATH, '//input[@id = "P_LIC_PLATE_NBR"]'),
     'staleLocator' : (By.XPATH,'//P[contains(text(),"query fill")]'),
     'buttonLocator' : (By.XPATH,'//button[@value="query again"]'),
-    'frameParamters' : {'useFrames' : True, 'frameLocator' : (By.XPATH, '//frame[@name="fraRL"]')},
+    'frameParamters' : {'useFrames' : True, 'frameLocator' : [(By.XPATH, '//frame[@name="fraRL"]')] },
     'resultPageTextLocator' : (By.XPATH, '//TD/H1'),
     'resultPageVerifyText' : 'Violation Search Results',
     'outputLocator' : (By.XPATH,'//BODY/P[contains(text(),"Record")]'),
@@ -162,11 +163,8 @@ def violatorSearch():
 def dataIO(driver, parameters):
     beginPattern = re.compile(parameters['resultIndexParameters']['index'])
     numCommaPattern = re.compile('[0-9,]+')
-    window = None        # the window found by 'findTargetPage()'
     delay = parameters['delay']
-    #if window!=currentHandle or window == None:
-    #    startWindow, ReferenceElement = findTargetPage(driver, delay, parameters['startPageTextLocator'], parameters['startPageVerifyText'])
-    #    window = startWindow
+    startWindow, ReferenceElement = findTargetPage(driver, delay, parameters['startPageTextLocator'], parameters['startPageVerifyText'])
     with open(parameters['dataInFileName'], 'r') as infile, open(parameters['dataOutFileName'], 'a') as outfile:
         outfile.truncate()
         csvInput = csv.reader(infile)
@@ -175,15 +173,12 @@ def dataIO(driver, parameters):
             if rawString == "" or rawString == 0:  #end when LP does not exist
                 break
             plateString = cleanUpLicensePlateString(rawString)
-            if window != driver.current_window_handle or window == None:
-                startWindow, ReferenceElement = findTargetPage(driver, delay, parameters['startPageTextLocator'], parameters['startPageVerifyText'])
-                window = startWindow
             element = findElementOnPage(driver, delay, parameters['inputLocator'])
             goesStaleElement = findElementOnPage(driver, delay, parameters['staleLocator'])
             fillFormAndSubmit(driver, startWindow, element, plateString, parameters)
             pageLoaded = newPageIsLoaded(driver, delay, goesStaleElement)
             foundFrame = findAndSelectFrame(driver, delay, parameters)
-            text = getTextResults(driver, delay, window, plateString, parameters)
+            text = getTextResults(driver, delay, plateString, parameters)
             if text!= None:
                 stringSegment = parseString(text, beginPattern, numCommaPattern, "all")
                 sys.stdout.write(plateString + ", " + str(stringSegment) + '\n')

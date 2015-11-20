@@ -52,13 +52,13 @@ def findAndClickButton(driver, delay, parameters):
 
 def findAndSelectFrame(driver, delay, parameters):
     if parameters['frameParamters']['useFrames']:
-        locator = parameters['frameParamters']['frameLocator']
-        try:
-            foundFrame = WebDriverWait(driver, delay).until(EC.presence_of_element_located(locator))
-        except TimeoutException:
-            print "findAndSelectFrame: frame not found."
-            return False
-        driver.switch_to_frame(foundFrame)
+        for locator in parameters['frameParamters']['frameLocator']:
+            try:
+                foundFrame = WebDriverWait(driver, delay).until(EC.presence_of_element_located(locator))
+            except TimeoutException:
+                print "findAndSelectFrame: ", locator, " not found."
+                return False
+            driver.switch_to_frame(foundFrame)
         return True
 
 def findElementOnPage(driver, delay, elementLocator, window=None):
@@ -96,8 +96,7 @@ def findTargetPage(driver, delay, locator, targetText=""):
     print "findTargetPage: 'target text' not found"
     return None, None
 
-def getTextResults(driver, delay, window, plateString, parameters):
-    # #assert(driver.current_window_handle == window)
+def getTextResults(driver, delay, plateString, parameters):
     #print "getTextResults: " + driver.current_url # for debug purposes
     if parameters['outputLocator']== None: # skip finding text
         return None
