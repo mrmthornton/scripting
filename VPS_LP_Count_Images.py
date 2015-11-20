@@ -117,7 +117,28 @@ def ciscoValues():
     }
     return parameters
 
-def theInternet():
+def theInternetNavigate():
+    parameters = {
+    'delay' : 5,
+    'url' : 'http://the-internet.herokuapp.com/dynamic_controls', # initial URL
+    'operatorMessage' : "the-internet test: no operator actions needed.",
+    'startPageTextLocator' : (By.XPATH, '//H4[contains(text(), "Dynamic Controls")]'),
+    'startPageVerifyText' : '',
+    'inputLocator' : None,
+    'staleLocator' : None,
+    'buttonLocator' : (By.XPATH, '//button[@id="btn"]'),
+    'frameParamters' : {'useFrames' : False },
+    'resultPageTextLocator' : (By.XPATH, '//input[@id="checkbox"]'),
+    'resultPageVerifyText' : None,
+    'outputLocator' : None,
+    'resultIndexParameters' : {'index' : '', 'selector' : ''},  # head, tail, or all
+    'dataInFileName' : 'plates.csv',
+    'dataOutFileName' : 'platesOut.txt',
+    'returnOrClick' : 'click', # use Return or Click to submit form
+    }
+    return parameters
+
+def theInternetFrames():
     parameters = {
     'delay' : 5,
     'url' : 'http://the-internet.herokuapp.com/nested_frames', # initial URL
@@ -196,7 +217,8 @@ if __name__ == '__main__':
     #parameters = sigmaAldrichValues()
     #parameters = hntbValues()
     #parameters = ciscoValues() # should work on production systems
-    #parameters = theInternet() # sites for testing
+    #parameters = theInternetFrames() # sites for testing
+    #parameters = theInternetNavigate()
     #parameters = violatorSearch()
 
     print parameters['operatorMessage']

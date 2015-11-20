@@ -43,11 +43,11 @@ def findAndClickButton(driver, delay, parameters):
     if type(parameters['buttonLocator']) == type(None):
         return False
     try:
-        button = WebDriverWait(driver, delay).until(EC.presence_of_element_located(parameters['buttonLocator']))
+        button = WebDriverWait(driver, delay).until(
+            EC.presence_of_element_located(parameters['buttonLocator'])).click()
     except TimeoutException:
         print "findAndClickButton: button not found."
         return False
-    button.click()
     return True
 
 def findAndSelectFrame(driver, delay, parameters):
