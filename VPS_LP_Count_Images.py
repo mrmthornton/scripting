@@ -1,9 +1,6 @@
 #-------------------------------------------------------------------------------
-# Name:        VPS_LP_Count_Images.py
-# Purpose:     Examine web pages until the VPS Violation Search page is found.
-#              enter a licence plate in the search box
-#              find the text number of images
-#              write the licence plate and number of images to the output file.
+# Name:        VPS_LIB.py
+# Purpose:     A library for common VPS actions.
 #
 # Author:      mthornton
 #
@@ -13,192 +10,186 @@
 #-------------------------------------------------------------------------------
 
 from selenium import webdriver
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.common.by import By
+from selenium.common.exceptions import NoSuchFrameException
+from selenium.common.exceptions import NoSuchWindowException
 from selenium.common.exceptions import TimeoutException
-import selenium.webdriver.support.expected_conditions as EC
-
-from VPS_LIB import cleanUpLicensePlateString
-from VPS_LIB import findElementOnPage
-from VPS_LIB import fillFormAndSubmit
-from VPS_LIB import findAndSelectFrame
-from VPS_LIB import findTargetPage
-from VPS_LIB import getTextResults
-from VPS_LIB import loadRegExPatterns
-from VPS_LIB import newPageIsLoaded
-from VPS_LIB import openBrowser
-from VPS_LIB import parseString
-from VPS_LIB import returnOrClick
-from VPS_LIB import timeout
+from selenium.common.exceptions import StaleElementReferenceException
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 
 import re
-import io
-import csv
-import sys
-import string
 
-def googleValues():
-    parameters = {
-    'delay' : 5,
-    'url' : 'http://www.google.com', # initial URL
-    'operatorMessage' : "Google test: no operator actions needed.",
-    'startPageTextLocator' : (By.XPATH,'//input[@value = "Google Search"]'),
-    'startPageVerifyText' : '',
-    'inputLocator' : (By.XPATH,'//input[@name = "q"]'),
-    'frameParamters' : {'useFrames' : False},
-    'resultPageTextLocator' : (By.XPATH, '//TD/H1'),
-    'resultPageVerifyText' : '',
-    'outputLocator' : (By.XPATH, '//div[@id="resultStats"][contains(text(),"About")]'),
-    'resultIndexParameters' : {'index' : "About ", 'selector' : 'tail'},  # head, tail, or all
-    'dataInFileName' : 'plates.csv',
-    'dataOutFileName' : 'platesOut.txt',
-    'returnOrClick' : 'return', # use Return or Click to submit form
+
+def loadRegExPatterns():
+    patterns = {
+    'linePattern' : re.compile('^.+'),
+    'wordPattern' : re.compile('\w+'),
+    'csvPattern' : re.compile('[A-Z0-9 .#&]*,'),
+    'commaToEOLpattern' : re.compile(',[A-Z0-9 .#&]+$'),
+    'LICpattern' : re.compile('^LIC '),
+    'issuedPattern' : re.compile('ISSUED '),
+    'reg_dtPattern' : re.compile('REG DT '),
+    'datePattern' : re.compile('[0-9]{2,2}/[0-9]{2,2}/[0-9]{4,4}'), # mo/day/year
+    'dateYearFirstPattern' : re.compile(r'\d{4,4}/\d{2,2}/\d{2,2}'), # year/mo/day
     }
-    return parameters
 
-def sigmaAldrichValues():
-    parameters = {
-    'delay' : 5,
-    'url' : 'http://www.sigmaaldrich.com/united-states.html', # initial URL
-    'operatorMessage' : "sigmaaldrich test run:  no operator actions needed.",
-    'startPageTextLocator' : (By.XPATH, '//a'),
-    'startPageVerifyText' : 'Hello. Sign in.',
-    'inputLocator' : (By.XPATH,'//input[@name = "Query"]'),
-    'frameParamters' : {'useFrames' : False},
-    'resultPageTextLocator' : (By.XPATH, '//p[contains(text(),"matches found for")]'),
-    'resultPageVerifyText' : '',
-    'outputLocator' : (By.XPATH, '//p[@class="resultsFoundText"]'),
-    'resultIndexParameters' : {'index' : "matches found for", 'selector' : 'tail'},  # head, tail, or all
-    'dataInFileName' : 'plates.csv',
-    'dataOutFileName' : 'platesOut.txt',
-    'returnOrClick' : 'return', # use Return or Click to submit form
-    }
-    return parameters
+def cleanUpLicensePlateString(plateString):
+    plateString = plateString.replace(' ' , '') # remove any spaces
+    plateString = plateString.replace('"' , '') # remove any double quotes
+    plateString = plateString.replace('\t' , '') # remove any tabs
+    plateString = plateString.replace(',' , '\n') # replace comma with \n
+    for n in range(10):            # replace multiple newlines with a single \n
+        plateString = plateString.replace('\n\n' , '\n')
+    return plateString
 
-def hntbValues():
-    parameters = {
-    'delay' : 5,
-    'url' : 'http://www.hntb.com', # initial URL
-    'operatorMessage' : "HNTB test run:  run in debug mode, click magnifying glass.",
-    'startPageTextLocator' : (By.XPATH, '//h2'),
-    'startPageVerifyText' : 'About HNTB',
-    'inputLocator' : (By.XPATH,'//input[@name = "s"]'),
-    'frameParamters' : {'useFrames' : False},
-    'resultPageTextLocator' : (By.XPATH, '//TITLE'),
-    'resultPageVerifyText' : 'Search Result',
-    'outputLocator' : (By.ID, "resultStats"),
-    'resultIndexParameters' : {'index' : " Results", 'selector' : 'tail'},  # head, tail, or all
-    'dataInFileName' : 'plates.csv',
-    'dataOutFileName' : 'platesOut.txt',
-    'returnOrClick' : 'return', # use Return or Click to submit form
-    }
-    return parameters
+def fillFormAndSubmit(driver, window, element, textForForm, parameters):
+    if type(element) == type(None): # skip the form submission
+        return
+    #assert(driver.current_window_handle == window)
+    #print "fillFormAndSubmit: " + driver.current_url # for debug purposes
+    element.clear()
+    element.send_keys(textForForm)
+    returnOrClick(element, parameters['returnOrClick'])
 
-def ciscoValues():
-    parameters = {
-    'delay' : 5,
-    'url' : 'http://www.cisco.com/univercd/cc/td/doc/product/voice/c_ipphone/index.html', # initial URL
-    'operatorMessage' : "Cisco test: no operator actions needed.",
-    'startPageTextLocator' : (By.XPATH, '(//DIV/H1[@class="title-section"] | //div/h1[@class="title-section title-section-only"])'),
-    'startPageVerifyText' : '404 Page Not Found',
-    'inputLocator' : (By.XPATH, '(//input[@id = "searchPhrase"] | //input[@id = "search-Phrase search-Phrase-only"])'),
-    'frameParamters' : {'useFrames' : False},
-    'resultPageTextLocator' : (By.XPATH, '//H2[@class="title-page"]'),
-    'resultPageVerifyText' : 'Search Results',
-    'outputLocator' : (By.CLASS_NAME,'searchStatus'),
-    'resultIndexParameters' : {'index' : "of ", 'selector' : 'tail'},  # head, tail, or all
-    'dataInFileName' : 'plates.csv',
-    'dataOutFileName' : 'platesOut.txt',
-    'returnOrClick' : 'return', # use Return or Click to submit form
-    }
-    return parameters
+def findAndSelectFrame(driver, delay, parameters):
+    if parameters['frameParamters']['useFrames']:
+        locator = parameters['frameParamters']['frameLocator']
+        try:
+            foundFrame = WebDriverWait(driver, delay).until(EC.presence_of_element_located(locator))
+        except TimeoutException:
+            print "findAndSelectFrame: frame not found."
+            return False
+        driver.switch_to_frame(foundFrame)
+        return True
 
-def theInternet():
-    parameters = {
-    'delay' : 5,
-    'url' : 'http://the-internet.herokuapp.com/nested_frames', # initial URL
-    'operatorMessage' : "the-internet test: no operator actions needed.",
-    'startPageTextLocator' : (By.XPATH, '//frameset'),
-    'startPageVerifyText' : '',
-    'inputLocator' : None,
-    'frameParamters' : {'useFrames' : True, 'frameLocator' : (By.XPATH, '//frame[@name="frame-top"]')},
-    'resultPageTextLocator' : (By.XPATH, '//frame[@name="frame-top"]'),
-    'resultPageVerifyText' : None,
-    'outputLocator' : None,
-    'resultIndexParameters' : {'index' : "", 'selector' : ''},  # head, tail, or all
-    'dataInFileName' : 'plates.csv',
-    'dataOutFileName' : 'platesOut.txt',
-    'returnOrClick' : 'click', # use Return or Click to submit form
-    }
-    return parameters
+def findElementOnPage(driver, delay, elementLocator, window=None):
+    if elementLocator == None:# skip finding the element
+        return None
+    if window != None:
+        driver.switch_to_window(window) # switch to window if supplied
+        print "findElementOnPage: switched to target window"
+    try:
+        element = WebDriverWait(driver, delay).until(EC.presence_of_element_located(elementLocator))
+        return element
+    except TimeoutException:
+        timeout('findElementOnPage: element' + str(elementLocator) + 'not found')
+        return None
 
-def productionValues():
-    parameters = {
-    'delay' : 5,
-    'url' : 'https://lprod.scip.ntta.org/scip/jsp/SignIn.jsp', # initial URL
-    'operatorMessage' : "Use debug mode, open VPS, new violator search window, and run to completion",
-    'startPageTextLocator' : (By.XPATH, '//TD/H1'),
-    'startPageVerifyText' : 'Violation Search',
-    'inputLocator' : (By.XPATH, '//input[@id = "P_LIC_PLATE_NBR"]'),
-    'staleLocator' : (By.XPATH,'//BODY/P[contains(text(),"Enter query criteria")]'),
-    'frameParamters' : {'useFrames' : True, 'frameLocator' : (By.XPATH, '//frame[@name="fraRL"]')},
-    'resultPageTextLocator' : (By.XPATH, '//TD/H1'),
-    'resultPageVerifyText' : 'Violation Search Results',
-    'outputLocator' : (By.XPATH,'//BODY/P[contains(text(),"Record")]'),
-    'resultIndexParameters' : {'index' : "of ", 'selector' : 'tail'},  # head, tail, or all
-    'dataInFileName' : 'LP_Repeats_Count.csv',
-    'dataOutFileName' : 'LP_Repeats_Count_Out.txt',
-    'returnOrClick' : 'return', # use Return or Click to submit form
-    }
-    return parameters
+def findTargetPage(driver, delay, locator, targetText=""):
+    try:
+        handle = driver.current_window_handle
+    except NoSuchWindowException:
+        print "findTargetPage: nothing to process, all windows finished?"
+        return None, None
+    handles = driver.window_handles
+    for handle in handles:  # test each window for target
+        driver.switch_to_window(handle)
+        print "findTargetPage: Searching for '" , targetText, "' in window ", handle # for debug purposes
+        try:
+            elems = WebDriverWait(driver, delay).until(EC.presence_of_all_elements_located(locator))
+        except TimeoutException:
+            timeout('findTargetPage: locator element not found')
+            continue
+        for element in elems:       # test each element for target
+            if (element.text == targetText) or (targetText == ""):
+                #print "findTargetPage: found '", element.text, "'" # for debug purposes
+                return handle, element
+    print "findTargetPage: 'target text' not found"
+    return None, None
 
-def dataIO(driver, parameters):
-    beginPattern = re.compile(parameters['resultIndexParameters']['index'])
-    numCommaPattern = re.compile('[0-9,]+')
-    window = None        # the window found by 'findTargetPage()'
-    delay = parameters['delay']
-    #if window!=currentHandle or window == None:
-    #    startWindow, ReferenceElement = findTargetPage(driver, delay, parameters['startPageTextLocator'], parameters['startPageVerifyText'])
-    #    window = startWindow
-    with open(parameters['dataInFileName'], 'r') as infile, open(parameters['dataOutFileName'], 'a') as outfile:
-        outfile.truncate()
-        csvInput = csv.reader(infile)
-        for row in csvInput:
-            rawString = row[0]
-            if rawString == "" or rawString == 0:  #end when LP does not exist
-                break
-            plateString = cleanUpLicensePlateString(rawString)
-            if window != driver.current_window_handle or window == None:
-                startWindow, ReferenceElement = findTargetPage(driver, delay, parameters['startPageTextLocator'], parameters['startPageVerifyText'])
-            element = findElementOnPage(driver, delay, parameters['inputLocator'])
-            goesStaleElement = findElementOnPage(driver, delay, parameters['staleLocator'])
-            #print driver.execute_script("return jQuery.active")
-            fillFormAndSubmit(driver, startWindow, element, plateString, parameters)
-            pageLoaded = newPageIsLoaded(driver, delay, goesStaleElement)
-            foundFrame = findAndSelectFrame(driver, delay, parameters)
-            text = getTextResults(driver, delay, window, plateString, parameters)
-            if text!= None:
-                stringSegment = parseString(text, beginPattern, numCommaPattern, "all")
-                sys.stdout.write(plateString + ", " + str(stringSegment) + '\n')
-                outfile.write(plateString + ", " + str(stringSegment) + '\n')
-                outfile.flush()
-            # navigate to search page
-            if foundFrame:
-                driver.switch_to_default_content()
-            driver.back() # go back to 'startPage'
-    print "main: Finished parsing plate file."
+def getTextResults(driver, delay, window, plateString, parameters):
+    # #assert(driver.current_window_handle == window)
+    #print "getTextResults: " + driver.current_url # for debug purposes
+    if parameters['outputLocator']== None: # skip finding text
+        return None
+    try:
+        resultElement = WebDriverWait(driver, delay).until(EC.presence_of_element_located(parameters['outputLocator']))
+    except TimeoutException:
+        timeout('getTextResults: text not found')
+        return None
+    text = resultElement.text
+    resultIndex = parameters['resultIndexParameters']['index']
+    pattern = re.compile(resultIndex)
+    isFound = pattern.search(text)
+    if isFound != None:
+        print "getTextResults: TEXT: '", text, "'" # for debug purposes
+        return text
+    else:
+        return None
+
+
+def newPageIsLoaded(driver, delay, currentElement):
+    def isStale(self):
+        if type(currentElement) == type(None):# when there is no element to check,
+            return False          # loop until timeout occurs
+        try:
+            # poll the current element with an arbitrary call
+            nullText = currentElement.text
+            return False
+        except StaleElementReferenceException:
+            return True
+    try:
+        WebDriverWait(driver, delay).until(isStale)
+        return True
+    except TimeoutException:
+        timeout('newPageLoaded: old page reference never went stale')
+        return False
+
+def openBrowser(url):
+    driver = webdriver.Ie()
+    #driver.maximize_window()
+    driver.get(url)
+    return driver
+
+def parseString(inputString,indexPattern, targetPattern, segment="all"): # segment may be start, end, or all
+    # the iterator is used to search for all possible target pattern instances
+    found = indexPattern.search(inputString)
+    if found != None:
+        indexStart = found.start()
+        indexEnd = found.end()
+        #print "parseString: found start", indexStart #debug statement
+        iterator = targetPattern.finditer(inputString)
+        for found in iterator:
+            if found.start() > indexStart and found != None:
+                targetStart = found.start()
+                targetEnd = found.end()
+                #print "parseString: found end", targetStart #debug statement
+                return inputString[indexEnd:targetEnd:]
+    return None
+
+def returnOrClick(element, select):
+    if select =='return':
+        element.send_keys(Keys.RETURN)
+    elif select == 'click':
+        element.click()
+    else:
+        print "ERROR: returnOrClick:"
+        print "'select' should be one of 'return' or 'click'"
+
+def timeout(msg="Took too much time!"):
+    print msg
 
 if __name__ == '__main__':
 
-    #parameters = googleValues()
-    #parameters = sigmaAldrichValues()
-    #parameters = hntbValues()
-    #parameters = ciscoValues() # should work on production systems
-    #parameters = theInternet() # sites for testing
-    parameters = productionValues()
+    # setup test parameters
+    url = 'file://C:/Users/IEUser/Documents/scripting/testPage.html'
+    locator = (By.XPATH, '//p')
+    window = None
+    delay = 1
 
-    print parameters['operatorMessage']
-    loadRegExPatterns()
-    driver = openBrowser(parameters['url'])
-    dataIO(driver, parameters)
+    # test library components
+    assert(cleanUpLicensePlateString('123 45   6,,"\n\n') == '123456\n')
+    driver = openBrowser(url)
+    window = findTargetPage(driver, delay, locator) # no window, why?
+    #returnOrClick()
+    #loadRegExPatterns()
+    #timeout()
+
+    #waitForNewPage()
+
+    findElementOnPage(driver, delay, elementLocator)
+    #getTextResults()
     driver.close()
+    print "PASSED"
