@@ -132,8 +132,8 @@ def theInternetNavigate():
     'resultPageVerifyText' : None,
     'outputLocator' : None,
     'resultIndexParameters' : {'index' : '', 'selector' : ''},  # head, tail, or all
-    'dataInFileName' : 'plates.csv',
-    'dataOutFileName' : 'platesOut.txt',
+    'dataInFileName' : 'google.csv',
+    'dataOutFileName' : 'output.txt',
     'returnOrClick' : 'click', # use Return or Click to submit form
     }
     return parameters
@@ -154,8 +154,8 @@ def theInternetFrames():
     'resultPageVerifyText' : None,
     'outputLocator' : None,
     'resultIndexParameters' : {'index' : "", 'selector' : ''},  # head, tail, or all
-    'dataInFileName' : 'plates.csv',
-    'dataOutFileName' : 'platesOut.txt',
+    'dataInFileName' : 'google.csv',
+    'dataOutFileName' : 'output.txt',
     'returnOrClick' : 'click', # use Return or Click to submit form
     }
     return parameters
@@ -194,6 +194,7 @@ def dataIO(driver, parameters):
             if rawString == "" or rawString == 0:  #end when LP does not exist
                 break
             plateString = cleanUpLicensePlateString(rawString)
+            print plateString # debug
             element = findElementOnPage(driver, delay, parameters['inputLocator'])
             goesStaleElement = findElementOnPage(driver, delay, parameters['staleLocator'])
             fillFormAndSubmit(driver, startWindow, element, plateString, parameters)
@@ -217,8 +218,8 @@ if __name__ == '__main__':
     #parameters = sigmaAldrichValues()
     #parameters = hntbValues()
     #parameters = ciscoValues() # should work on production systems
+    parameters = theInternetNavigate()
     #parameters = theInternetFrames() # sites for testing
-    #parameters = theInternetNavigate()
     #parameters = violatorSearch()
 
     print parameters['operatorMessage']
