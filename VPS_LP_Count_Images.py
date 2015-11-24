@@ -8,7 +8,7 @@
 # Author:      mthornton
 #
 # Created:     2015 AUG 01
-# Updates:     2015 NOV 19
+# Updates:     2015 NOV 20
 # Copyright:   (c) michael thornton 2015
 #-------------------------------------------------------------------------------
 
@@ -22,6 +22,7 @@ from VPS_LIB import cleanUpLicensePlateString
 from VPS_LIB import findElementOnPage
 from VPS_LIB import fillFormAndSubmit
 from VPS_LIB import findAndSelectFrame
+from VPS_LIB import findAndClickButton
 from VPS_LIB import findTargetPage
 from VPS_LIB import getTextResults
 from VPS_LIB import loadRegExPatterns
@@ -44,14 +45,16 @@ def googleValues():
     'operatorMessage' : "Google test: no operator actions needed.",
     'startPageTextLocator' : (By.XPATH,'//input[@value = "Google Search"]'),
     'startPageVerifyText' : '',
-    'inputLocator' : (By.XPATH,'//input[@name = "q"]'),
+    'inputLocator' : (By.XPATH,'//input[@name="q"]'),
+    'staleLocator' : None,
+    'buttonLocator' : (By.XPATH,'//button[@value="Search"]'),
     'frameParamters' : {'useFrames' : False},
     'resultPageTextLocator' : (By.XPATH, '//TD/H1'),
     'resultPageVerifyText' : '',
     'outputLocator' : (By.XPATH, '//div[@id="resultStats"][contains(text(),"About")]'),
     'resultIndexParameters' : {'index' : "About ", 'selector' : 'tail'},  # head, tail, or all
-    'dataInFileName' : 'plates.csv',
-    'dataOutFileName' : 'platesOut.txt',
+    'dataInFileName' : 'google.csv',
+    'dataOutFileName' : 'output.txt',
     'returnOrClick' : 'return', # use Return or Click to submit form
     }
     return parameters
@@ -64,6 +67,7 @@ def sigmaAldrichValues():
     'startPageTextLocator' : (By.XPATH, '//a'),
     'startPageVerifyText' : 'Hello. Sign in.',
     'inputLocator' : (By.XPATH,'//input[@name = "Query"]'),
+    'staleLocator' : (By.XPATH,'//A[contains(text(),"query?")]'),
     'frameParamters' : {'useFrames' : False},
     'resultPageTextLocator' : (By.XPATH, '//p[contains(text(),"matches found for")]'),
     'resultPageVerifyText' : '',
@@ -113,7 +117,28 @@ def ciscoValues():
     }
     return parameters
 
-def theInternet():
+def theInternetNavigate():
+    parameters = {
+    'delay' : 5,
+    'url' : 'http://the-internet.herokuapp.com/dynamic_controls', # initial URL
+    'operatorMessage' : "the-internet test: no operator actions needed.",
+    'startPageTextLocator' : (By.XPATH, '//H4[contains(text(), "Dynamic Controls")]'),
+    'startPageVerifyText' : '',
+    'inputLocator' : None,
+    'staleLocator' : None,
+    'buttonLocator' : (By.XPATH, '//button[@id="btn"]'),
+    'frameParamters' : {'useFrames' : False },
+    'resultPageTextLocator' : (By.XPATH, '//input[@id="checkbox"]'),
+    'resultPageVerifyText' : None,
+    'outputLocator' : None,
+    'resultIndexParameters' : {'index' : '', 'selector' : ''},  # head, tail, or all
+    'dataInFileName' : 'google.csv',
+    'dataOutFileName' : 'output.txt',
+    'returnOrClick' : 'click', # use Return or Click to submit form
+    }
+    return parameters
+
+def theInternetFrames():
     parameters = {
     'delay' : 5,
     'url' : 'http://the-internet.herokuapp.com/nested_frames', # initial URL
@@ -121,18 +146,21 @@ def theInternet():
     'startPageTextLocator' : (By.XPATH, '//frameset'),
     'startPageVerifyText' : '',
     'inputLocator' : None,
-    'frameParamters' : {'useFrames' : True, 'frameLocator' : (By.XPATH, '//frame[@name="frame-top"]')},
+    'staleLocator' : None,
+    'buttonLocator' : None,
+    'frameParamters' : {'useFrames' : True, 'frameLocator' : [(By.XPATH, '//frame[@name="frame-top"]'),
+                                                             (By.XPATH, '//frame[@name="frame-middle"]')]},
     'resultPageTextLocator' : (By.XPATH, '//frame[@name="frame-top"]'),
     'resultPageVerifyText' : None,
     'outputLocator' : None,
     'resultIndexParameters' : {'index' : "", 'selector' : ''},  # head, tail, or all
-    'dataInFileName' : 'plates.csv',
-    'dataOutFileName' : 'platesOut.txt',
+    'dataInFileName' : 'google.csv',
+    'dataOutFileName' : 'output.txt',
     'returnOrClick' : 'click', # use Return or Click to submit form
     }
     return parameters
 
-def productionValues():
+def violatorSearch():
     parameters = {
     'delay' : 5,
     'url' : 'https://lprod.scip.ntta.org/scip/jsp/SignIn.jsp', # initial URL
@@ -140,8 +168,9 @@ def productionValues():
     'startPageTextLocator' : (By.XPATH, '//TD/H1'),
     'startPageVerifyText' : 'Violation Search',
     'inputLocator' : (By.XPATH, '//input[@id = "P_LIC_PLATE_NBR"]'),
-    'staleLocator' : (By.XPATH,'//BODY/P[contains(text(),"Enter query criteria")]'),
-    'frameParamters' : {'useFrames' : True, 'frameLocator' : (By.XPATH, '//frame[@name="fraRL"]')},
+    'staleLocator' : (By.XPATH,'//input[contains(text(),"Query")]'),
+    'buttonLocator' : (By.XPATH,'//input[@value="Query"]'),
+    'frameParamters' : {'useFrames' : True, 'frameLocator' : [(By.XPATH, '//frame[@name="fraRL"]')] },
     'resultPageTextLocator' : (By.XPATH, '//TD/H1'),
     'resultPageVerifyText' : 'Violation Search Results',
     'outputLocator' : (By.XPATH,'//BODY/P[contains(text(),"Record")]'),
@@ -155,11 +184,8 @@ def productionValues():
 def dataIO(driver, parameters):
     beginPattern = re.compile(parameters['resultIndexParameters']['index'])
     numCommaPattern = re.compile('[0-9,]+')
-    window = None        # the window found by 'findTargetPage()'
     delay = parameters['delay']
-    #if window!=currentHandle or window == None:
-    #    startWindow, ReferenceElement = findTargetPage(driver, delay, parameters['startPageTextLocator'], parameters['startPageVerifyText'])
-    #    window = startWindow
+    startWindow, ReferenceElement = findTargetPage(driver, delay, parameters['startPageTextLocator'], parameters['startPageVerifyText'])
     with open(parameters['dataInFileName'], 'r') as infile, open(parameters['dataOutFileName'], 'a') as outfile:
         outfile.truncate()
         csvInput = csv.reader(infile)
@@ -168,24 +194,23 @@ def dataIO(driver, parameters):
             if rawString == "" or rawString == 0:  #end when LP does not exist
                 break
             plateString = cleanUpLicensePlateString(rawString)
-            if window != driver.current_window_handle or window == None:
-                startWindow, ReferenceElement = findTargetPage(driver, delay, parameters['startPageTextLocator'], parameters['startPageVerifyText'])
+            print plateString # debug
             element = findElementOnPage(driver, delay, parameters['inputLocator'])
             goesStaleElement = findElementOnPage(driver, delay, parameters['staleLocator'])
-            #print driver.execute_script("return jQuery.active")
             fillFormAndSubmit(driver, startWindow, element, plateString, parameters)
             pageLoaded = newPageIsLoaded(driver, delay, goesStaleElement)
             foundFrame = findAndSelectFrame(driver, delay, parameters)
-            text = getTextResults(driver, delay, window, plateString, parameters)
+            text = getTextResults(driver, delay, plateString, parameters)
             if text!= None:
                 stringSegment = parseString(text, beginPattern, numCommaPattern, "all")
                 sys.stdout.write(plateString + ", " + str(stringSegment) + '\n')
                 outfile.write(plateString + ", " + str(stringSegment) + '\n')
                 outfile.flush()
             # navigate to search page
-            if foundFrame:
-                driver.switch_to_default_content()
-            driver.back() # go back to 'startPage'
+            pageLoaded = newPageIsLoaded(driver, delay, goesStaleElement)
+            clicked = findAndClickButton(driver, delay, parameters)
+            driver.switch_to_default_content()
+            #driver.back()
     print "main: Finished parsing plate file."
 
 if __name__ == '__main__':
@@ -194,8 +219,9 @@ if __name__ == '__main__':
     #parameters = sigmaAldrichValues()
     #parameters = hntbValues()
     #parameters = ciscoValues() # should work on production systems
-    #parameters = theInternet() # sites for testing
-    parameters = productionValues()
+    parameters = theInternetNavigate()
+    #parameters = theInternetFrames() # sites for testing
+    parameters = violatorSearch()
 
     print parameters['operatorMessage']
     loadRegExPatterns()
