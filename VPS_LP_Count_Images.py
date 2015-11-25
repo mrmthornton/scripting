@@ -196,7 +196,7 @@ def dataIO(driver, parameters):
             plateString = cleanUpLicensePlateString(rawString)
             print plateString # debug
             element = findElementOnPage(driver, delay, parameters['inputLocator'])
-            goesStaleElement = findElementOnPage(driver, delay, parameters['staleLocator'])
+            goesStaleElement = findElementOnPage(driver, delay, (By.XPATH, '//TD/H1[contains(text(),"Violation Search")]'))
             fillFormAndSubmit(driver, startWindow, element, plateString, parameters)
             pageLoaded = newPageIsLoaded(driver, delay, goesStaleElement)
             foundFrame = findAndSelectFrame(driver, delay, parameters)
@@ -207,8 +207,10 @@ def dataIO(driver, parameters):
                 outfile.write(plateString + ", " + str(stringSegment) + '\n')
                 outfile.flush()
             # navigate to search page
-            pageLoaded = newPageIsLoaded(driver, delay, goesStaleElement)
+            goesStaleElement = findElementOnPage(driver, delay, parameters['outputLocator'])
             clicked = findAndClickButton(driver, delay, parameters)
+            pageLoaded = newPageIsLoaded(driver, delay, goesStaleElement)
+
             driver.switch_to_default_content()
             #driver.back()
     print "main: Finished parsing plate file."
