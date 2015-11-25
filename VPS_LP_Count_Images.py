@@ -47,6 +47,7 @@ def googleValues():
     'startPageVerifyText' : '',
     'inputLocator' : (By.XPATH,'//input[@name="q"]'),
     'staleLocator' : None,
+    'buttonLocator' : None,
     'buttonLocator' : (By.XPATH,'//button[@value="Search"]'),
     'frameParamters' : {'useFrames' : False},
     'resultPageTextLocator' : (By.XPATH, '//TD/H1'),
@@ -68,6 +69,7 @@ def sigmaAldrichValues():
     'startPageVerifyText' : 'Hello. Sign in.',
     'inputLocator' : (By.XPATH,'//input[@name = "Query"]'),
     'staleLocator' : (By.XPATH,'//A[contains(text(),"query?")]'),
+    'buttonLocator' : None,
     'frameParamters' : {'useFrames' : False},
     'resultPageTextLocator' : (By.XPATH, '//p[contains(text(),"matches found for")]'),
     'resultPageVerifyText' : '',
@@ -87,6 +89,8 @@ def hntbValues():
     'startPageTextLocator' : (By.XPATH, '//h2'),
     'startPageVerifyText' : 'About HNTB',
     'inputLocator' : (By.XPATH,'//input[@name = "s"]'),
+    'staleLocator' : None,
+    'buttonLocator' : None,
     'frameParamters' : {'useFrames' : False},
     'resultPageTextLocator' : (By.XPATH, '//TITLE'),
     'resultPageVerifyText' : 'Search Result',
@@ -106,6 +110,8 @@ def ciscoValues():
     'startPageTextLocator' : (By.XPATH, '(//DIV/H1[@class="title-section"] | //div/h1[@class="title-section title-section-only"])'),
     'startPageVerifyText' : '404 Page Not Found',
     'inputLocator' : (By.XPATH, '(//input[@id = "searchPhrase"] | //input[@id = "search-Phrase search-Phrase-only"])'),
+    'staleLocator' : None,
+    'buttonLocator' : None,
     'frameParamters' : {'useFrames' : False},
     'resultPageTextLocator' : (By.XPATH, '//H2[@class="title-page"]'),
     'resultPageVerifyText' : 'Search Results',
@@ -119,13 +125,13 @@ def ciscoValues():
 
 def theInternetNavigate():
     parameters = {
-    'delay' : 5,
+    'delay' : 10,
     'url' : 'http://the-internet.herokuapp.com/dynamic_controls', # initial URL
     'operatorMessage' : "the-internet test: no operator actions needed.",
     'startPageTextLocator' : (By.XPATH, '//H4[contains(text(), "Dynamic Controls")]'),
     'startPageVerifyText' : '',
     'inputLocator' : None,
-    'staleLocator' : None,
+    'staleLocator' : (By.XPATH, '(//button[contains(text(),"Remove")] | //button[contains(text(),"Add")])'),
     'buttonLocator' : (By.XPATH, '//button[@id="btn"]'),
     'frameParamters' : {'useFrames' : False },
     'resultPageTextLocator' : (By.XPATH, '//input[@id="checkbox"]'),
@@ -162,14 +168,14 @@ def theInternetFrames():
 
 def violatorSearch():
     parameters = {
-    'delay' : 5,
+    'delay' : 15,
     'url' : 'https://lprod.scip.ntta.org/scip/jsp/SignIn.jsp', # initial URL
     'operatorMessage' : "Use debug mode, open VPS, new violator search window, and run to completion",
     'startPageTextLocator' : (By.XPATH, '//TD/H1'),
     'startPageVerifyText' : 'Violation Search',
     'inputLocator' : (By.XPATH, '//input[@id = "P_LIC_PLATE_NBR"]'),
-    'staleLocator' : (By.XPATH,'//P[contains(text(),"query fill")]'),
-    'buttonLocator' : (By.XPATH,'//button[@value="query again"]'),
+    'staleLocator' : (By.XPATH,'//P[contains(text(),"Query")]'),
+    'buttonLocator' : (By.XPATH,'//button[@value="Query"]'),
     'frameParamters' : {'useFrames' : True, 'frameLocator' : [(By.XPATH, '//frame[@name="fraRL"]')] },
     'resultPageTextLocator' : (By.XPATH, '//TD/H1'),
     'resultPageVerifyText' : 'Violation Search Results',
@@ -194,22 +200,30 @@ def dataIO(driver, parameters):
             if rawString == "" or rawString == 0:  #end when LP does not exist
                 break
             plateString = cleanUpLicensePlateString(rawString)
-            print plateString # debug
             element = findElementOnPage(driver, delay, parameters['inputLocator'])
+            print "L"
             goesStaleElement = findElementOnPage(driver, delay, parameters['staleLocator'])
-            fillFormAndSubmit(driver, startWindow, element, plateString, parameters)
-            pageLoaded = newPageIsLoaded(driver, delay, goesStaleElement)
+            submitted = fillFormAndSubmit(driver, startWindow, element, plateString, parameters)
+            if submitted: # if nothing was submitted, don't wait for the page to load
+                pageLoaded = newPageIsLoaded(driver, delay, goesStaleElement)
             foundFrame = findAndSelectFrame(driver, delay, parameters)
             text = getTextResults(driver, delay, plateString, parameters)
             if text!= None:
+                # if there is text, process it
                 stringSegment = parseString(text, beginPattern, numCommaPattern, "all")
                 sys.stdout.write(plateString + ", " + str(stringSegment) + '\n')
                 outfile.write(plateString + ", " + str(stringSegment) + '\n')
                 outfile.flush()
-            # navigate to search page
-            driver.switch_to_default_content()
-            clicked = findAndClickButton(driver, delay, parameters)
-            #driver.back()
+            # navigate to search position
+            if type(parameters['buttonLocator']) == type(None):
+                # since there is no button, start at the 'top' of the page
+                driver.switch_to_default_content()
+            else:
+                # there is a button, so click it and wait for the page to load
+                goesStaleElement = findElementOnPage(driver, delay, parameters['staleLocator'])
+                clicked = findAndClickButton(driver, delay, parameters)
+                pageLoaded = newPageIsLoaded(driver, 10, goesStaleElement) # Wait for page to load
+
     print "main: Finished parsing plate file."
 
 if __name__ == '__main__':
@@ -219,7 +233,7 @@ if __name__ == '__main__':
     #parameters = hntbValues()
     #parameters = ciscoValues() # should work on production systems
     parameters = theInternetNavigate()
-    #parameters = theInternetFrames() # sites for testing
+    ##parameters = theInternetFrames() # sites for testing
     #parameters = violatorSearch()
 
     print parameters['operatorMessage']

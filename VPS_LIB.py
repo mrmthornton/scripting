@@ -38,16 +38,17 @@ def fillFormAndSubmit(driver, window, element, textForForm, parameters):
     element.clear()
     element.send_keys(textForForm)
     returnOrClick(element, parameters['returnOrClick'])
+    return
 
 def findAndClickButton(driver, delay, parameters):
     if type(parameters['buttonLocator']) == type(None):
         return False
     try:
-        button = WebDriverWait(driver, delay).until(
-            EC.presence_of_element_located(parameters['buttonLocator'])).click()
+        button = WebDriverWait(driver, delay).until(EC.presence_of_element_located(parameters['buttonLocator']))
     except TimeoutException:
         print "findAndClickButton: button not found."
         return False
+    button.click()
     return True
 
 def findAndSelectFrame(driver, delay, parameters):
@@ -83,7 +84,7 @@ def findTargetPage(driver, delay, locator, targetText=""):
     handles = driver.window_handles
     for handle in handles:  # test each window for target
         driver.switch_to_window(handle)
-        print "findTargetPage: Searching for '" , targetText, "' in window ", handle # for debug purposes
+        #print "findTargetPage: Searching for '" , targetText, "' in window ", handle # for debug purposes
         try:
             elems = WebDriverWait(driver, delay).until(EC.presence_of_all_elements_located(locator))
         except TimeoutException:
@@ -135,7 +136,7 @@ def newPageIsLoaded(driver, delay, currentElement):
             #return False          # loop until timeout occurs
         try:
             # poll the current element with an arbitrary call
-            nullText = currentElement.text
+            currentElement.find_elements_by_id("doesn't-matter")
             return False
         except StaleElementReferenceException:
             return True
@@ -191,7 +192,7 @@ if __name__ == '__main__':
     # test library components
     assert(cleanUpLicensePlateString('123 45   6,,"\n\n') == '123456\n')
     driver = openBrowser(url)
-    window = findTargetPage(driver, delay, locator) # no window, why?
+    window = findTargetPage(driver, delay, elementLocator) # no window, why?
     #returnOrClick()
     #loadRegExPatterns()
     #timeout()
