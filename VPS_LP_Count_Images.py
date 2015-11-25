@@ -168,7 +168,7 @@ def violatorSearch():
     'startPageTextLocator' : (By.XPATH, '//TD/H1'),
     'startPageVerifyText' : 'Violation Search',
     'inputLocator' : (By.XPATH, '//input[@id = "P_LIC_PLATE_NBR"]'),
-    'staleLocator' : (By.XPATH,'//input[contains(text(),"Query")]'),
+    'staleLocator' : (By.XPATH, '//TD/H1[contains(text(),"Violation Search")]'),
     'buttonLocator' : (By.XPATH,'//input[@value="Query"]'),
     'frameParamters' : {'useFrames' : True, 'frameLocator' : [(By.XPATH, '//frame[@name="fraRL"]')] },
     'resultPageTextLocator' : (By.XPATH, '//TD/H1'),
@@ -194,13 +194,14 @@ def dataIO(driver, parameters):
             if rawString == "" or rawString == 0:  #end when LP does not exist
                 break
             plateString = cleanUpLicensePlateString(rawString)
-            print plateString # debug
+            #print plateString # debug
             element = findElementOnPage(driver, delay, parameters['inputLocator'])
             goesStaleElement = findElementOnPage(driver, delay, (By.XPATH, '//TD/H1[contains(text(),"Violation Search")]'))
             fillFormAndSubmit(driver, startWindow, element, plateString, parameters)
-            pageLoaded = newPageIsLoaded(driver, delay, goesStaleElement)
+            wentStale = newPageIsLoaded(driver, delay, goesStaleElement)
+            #wait for page load
             foundFrame = findAndSelectFrame(driver, delay, parameters)
-            text = getTextResults(driver, delay, plateString, parameters)
+            text = getTextResults(driver, 10, plateString, parameters)
             if text!= None:
                 stringSegment = parseString(text, beginPattern, numCommaPattern, "all")
                 sys.stdout.write(plateString + ", " + str(stringSegment) + '\n')
@@ -209,10 +210,12 @@ def dataIO(driver, parameters):
             # navigate to search page
             goesStaleElement = findElementOnPage(driver, delay, parameters['outputLocator'])
             clicked = findAndClickButton(driver, delay, parameters)
-            pageLoaded = newPageIsLoaded(driver, delay, goesStaleElement)
+            if clicked:
+                wentStale = newPageIsLoaded(driver, delay, goesStaleElement)
+                #wait for page load
+            if foundFrame:
+                driver.switch_to_default_content()
 
-            driver.switch_to_default_content()
-            #driver.back()
     print "main: Finished parsing plate file."
 
 if __name__ == '__main__':

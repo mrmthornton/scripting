@@ -137,6 +137,7 @@ def newPageIsLoaded(driver, delay, currentElement):
         try:
             # poll the current element with an arbitrary call
             nullText = currentElement.text
+            #nullText = currentElement.find_elements_by_id('doesnt_matter')
             return False
         except StaleElementReferenceException:
             return True
