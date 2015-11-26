@@ -43,12 +43,11 @@ def findAndClickButton(driver, delay, parameters):
     if type(parameters['buttonLocator']) == type(None):
         return False
     try:
-        button = WebDriverWait(driver, delay).until(EC.presence_of_element_located(parameters['buttonLocator']))
-
+        button = WebDriverWait(driver, delay).until(
+            EC.presence_of_element_located(parameters['buttonLocator'])).click()
     except TimeoutException:
         print "findAndClickButton: button not found."
         return False
-    button.click()
     return True
 
 def findAndSelectFrame(driver, delay, parameters):
@@ -63,7 +62,7 @@ def findAndSelectFrame(driver, delay, parameters):
         return True
 
 def findElementOnPage(driver, delay, elementLocator, window=None):
-    if elementLocator == None:# skip finding the element
+    if elementLocator == None: # skip finding the element
         return None
     if window != None:
         driver.switch_to_window(window) # switch to window if supplied
@@ -136,7 +135,7 @@ def newPageIsLoaded(driver, delay, currentElement):
             #return False          # loop until timeout occurs
         try:
             # poll the current element with an arbitrary call
-            nullText = currentElement.find_elements_by_tag("a")
+            nullText = currentElement.text
             return False
         except StaleElementReferenceException:
             return True
