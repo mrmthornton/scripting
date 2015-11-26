@@ -8,7 +8,7 @@
 # Author:      mthornton
 #
 # Created:     2015 AUG 01
-# Updates:     2015 NOV 25
+# Updates:     2015 NOV 20
 # Copyright:   (c) michael thornton 2015
 #-------------------------------------------------------------------------------
 
@@ -168,7 +168,7 @@ def violatorSearch():
     'startPageTextLocator' : (By.XPATH, '//TD/H1'),
     'startPageVerifyText' : 'Violation Search',
     'inputLocator' : (By.XPATH, '//input[@id = "P_LIC_PLATE_NBR"]'),
-    'staleLocator' : (By.XPATH, '//TD/H1[contains(text(),"Violation Search")]'),
+    'staleLocator' : (By.XPATH,'//h1[contains(text(),"Violation Search")]'),
     'buttonLocator' : (By.XPATH,'//input[@value="Query"]'),
     'frameParamters' : {'useFrames' : True, 'frameLocator' : [(By.XPATH, '//frame[@name="fraRL"]')] },
     'resultPageTextLocator' : (By.XPATH, '//TD/H1'),
@@ -194,33 +194,29 @@ def dataIO(driver, parameters):
             if rawString == "" or rawString == 0:  #end when LP does not exist
                 break
             plateString = cleanUpLicensePlateString(rawString)
-            #print plateString # debug
+            print plateString # debug
             element = findElementOnPage(driver, delay, parameters['inputLocator'])
-            goesStaleElement = findElementOnPage(driver, delay, (By.XPATH, '//TD/H1[contains(text(),"Violation Search")]'))
+            goesStaleElement = findElementOnPage(driver, delay, parameters['staleLocator'])
             fillFormAndSubmit(driver, startWindow, element, plateString, parameters)
             wentStale = newPageIsLoaded(driver, delay, goesStaleElement)
-            #wait for page load
             foundFrame = findAndSelectFrame(driver, delay, parameters)
-            text = getTextResults(driver, 10, plateString, parameters)
+            waitForNextPage = findElementOnPage(driver,delay,parameters['buttonLocator'])
+            text = getTextResults(driver, delay, plateString, parameters)
             if text!= None:
                 stringSegment = parseString(text, beginPattern, numCommaPattern, "all")
                 sys.stdout.write(plateString + ", " + str(stringSegment) + '\n')
                 outfile.write(plateString + ", " + str(stringSegment) + '\n')
                 outfile.flush()
             # navigate to search page
-            goesStaleElement = findElementOnPage(driver, delay, parameters['outputLocator'])
+            goesStaleElement = findElementOnPage(driver, delay, parameters['buttonLocator'])
             clicked = findAndClickButton(driver, delay, parameters)
-            if clicked:
-                wentStale = newPageIsLoaded(driver, delay, goesStaleElement)
-                #wait for page load
-            else:
-                driver.switch_to_default_content()
-
+            wentStale = newPageIsLoaded(driver, delay, goesStaleElement)
+            waitForNextPage = findElementOnPage(driver,delay,parameters['staleLocator'])
     print "main: Finished parsing plate file."
 
 if __name__ == '__main__':
 
-    #parameters = googleValues()
+    parameters = googleValues()
     #parameters = sigmaAldrichValues()
     #parameters = hntbValues()
     #parameters = ciscoValues() # should work on production systems
