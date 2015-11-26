@@ -213,7 +213,7 @@ def dataIO(driver, parameters):
             if clicked:
                 wentStale = newPageIsLoaded(driver, delay, goesStaleElement)
                 #wait for page load
-            if foundFrame:
+            else:
                 driver.switch_to_default_content()
 
     print "main: Finished parsing plate file."

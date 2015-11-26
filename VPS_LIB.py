@@ -136,8 +136,7 @@ def newPageIsLoaded(driver, delay, currentElement):
             #return False          # loop until timeout occurs
         try:
             # poll the current element with an arbitrary call
-            nullText = currentElement.text
-            #nullText = currentElement.find_elements_by_id('doesnt_matter')
+            nullText = currentElement.find_elements_by_tag("a")
             return False
         except StaleElementReferenceException:
             return True
