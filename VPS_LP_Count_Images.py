@@ -18,19 +18,7 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
 import selenium.webdriver.support.expected_conditions as EC
 
-from VPS_LIB import cleanUpLicensePlateString
-from VPS_LIB import findElementOnPage
-from VPS_LIB import fillFormAndSubmit
-from VPS_LIB import findAndSelectFrame
-from VPS_LIB import findAndClickButton
-from VPS_LIB import findTargetPage
-from VPS_LIB import getTextResults
-from VPS_LIB import loadRegExPatterns
-from VPS_LIB import newPageIsLoaded
-from VPS_LIB import openBrowser
-from VPS_LIB import parseString
-from VPS_LIB import returnOrClick
-from VPS_LIB import timeout
+from VPS_LIB import *
 
 import re
 import io
@@ -233,7 +221,7 @@ if __name__ == '__main__':
     #parameters = sigmaAldrichValues()
     #parameters = hntbValues()
     #parameters = ciscoValues() # should work on production systems
-    parameters = theInternetNavigate()
+    ##parameters = theInternetNavigate()
     ##parameters = theInternetFrames() # sites for testing
     #parameters = violatorSearch()
 

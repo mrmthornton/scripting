@@ -136,7 +136,7 @@ def newPageIsLoaded(driver, delay, currentElement):
             #return False          # loop until timeout occurs
         try:
             # poll the current element with an arbitrary call
-            currentElement.find_elements_by_id("doesn't-matter")
+            WebDriverWait(driver, delay).until(EC.staleness_of(currentElement))
             return False
         except StaleElementReferenceException:
             return True
