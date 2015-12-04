@@ -197,15 +197,15 @@ def dataIO(driver, parameters):
         csvInput = csv.reader(infile)
         for row in csvInput:
             rawString = row[0]
-            if rawString == "" or rawString == 0:  #end when LP does not exist
+            if rawString == "" or rawString == 0:  #end when input does not exist
                 break
             plateString = cleanUpLicensePlateString(rawString)
             element = findElementOnPage(driver, delay, parameters['inputLocator'])
-            print "L"
             goesStaleElement = findElementOnPage(driver, delay, parameters['staleLocator'])
             submitted = fillFormAndSubmit(driver, startWindow, element, plateString, parameters)
             if submitted: # if nothing was submitted, don't wait for the page to load
                 pageLoaded = newPageIsLoaded(driver, delay, goesStaleElement)
+                # wait for next go stale element or something slow
             foundFrame = findAndSelectFrame(driver, delay, parameters)
             text = getTextResults(driver, delay, plateString, parameters)
             if text!= None:
@@ -222,7 +222,8 @@ def dataIO(driver, parameters):
                 # there is a button, so click it and wait for the page to load
                 goesStaleElement = findElementOnPage(driver, delay, parameters['staleLocator'])
                 clicked = findAndClickButton(driver, delay, parameters)
-                pageLoaded = newPageIsLoaded(driver, 10, goesStaleElement) # Wait for page to load
+                pageLoaded = newPageIsLoaded(driver, 6, goesStaleElement) # Wait for page to load
+                # wait for next go stale element or something slow
 
     print "main: Finished parsing plate file."
 
