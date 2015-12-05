@@ -9,6 +9,7 @@
 # Copyright:   (c) michael thornton 2015
 #-------------------------------------------------------------------------------
 
+from contextlib import contextmanager
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchFrameException
 from selenium.common.exceptions import NoSuchWindowException
@@ -135,7 +136,7 @@ def newPageIsLoaded(driver, delay, currentElement):
             #return False          # loop until timeout occurs
         try:
             # poll the current element with an arbitrary call
-            nullText = currentElement.text
+            WebDriverWait(driver, delay).until(EC.staleness_of(currentElement))
             return False
         except StaleElementReferenceException:
             return True
