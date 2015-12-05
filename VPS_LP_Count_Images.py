@@ -18,19 +18,7 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
 import selenium.webdriver.support.expected_conditions as EC
 
-from VPS_LIB import cleanUpLicensePlateString
-from VPS_LIB import findElementOnPage
-from VPS_LIB import fillFormAndSubmit
-from VPS_LIB import findAndSelectFrame
-from VPS_LIB import findAndClickButton
-from VPS_LIB import findTargetPage
-from VPS_LIB import getTextResults
-from VPS_LIB import loadRegExPatterns
-from VPS_LIB import newPageIsLoaded
-from VPS_LIB import openBrowser
-from VPS_LIB import parseString
-from VPS_LIB import returnOrClick
-from VPS_LIB import timeout
+from VPS_LIB import *
 
 import re
 import io
@@ -162,7 +150,7 @@ def theInternetFrames():
 
 def violatorSearch():
     parameters = {
-    'delay' : 5,
+    'delay' : 15,
     'url' : 'https://lprod.scip.ntta.org/scip/jsp/SignIn.jsp', # initial URL
     'operatorMessage' : "Use debug mode, open VPS, new violator search window, and run to completion",
     'startPageTextLocator' : (By.XPATH, '//TD/H1'),
@@ -185,7 +173,7 @@ def dataIO(driver, parameters):
     beginPattern = re.compile(parameters['resultIndexParameters']['index'])
     numCommaPattern = re.compile('[0-9,]+')
     delay = parameters['delay']
-    startWindow, ReferenceElement = findTargetPage(driver, delay, parameters['startPageTextLocator'], parameters['startPageVerifyText'])
+    startWindow, ReferenceElement = findTargetPage(driver, 5, parameters['startPageTextLocator'], parameters['startPageVerifyText'])
     with open(parameters['dataInFileName'], 'r') as infile, open(parameters['dataOutFileName'], 'a') as outfile:
         outfile.truncate()
         csvInput = csv.reader(infile)
