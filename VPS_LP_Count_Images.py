@@ -174,7 +174,7 @@ def violatorSearch():
     'startPageTextLocator' : (By.XPATH, '//TD/H1'),
     'startPageVerifyText' : 'Violation Search',
     'inputLocator' : (By.XPATH, '//input[@id = "P_LIC_PLATE_NBR"]'),
-    'staleLocator' : (By.XPATH,'//P[contains(text(),"Query")]'),
+    'staleLocator' : (By.XPATH,'//h1[contains(text(),"Violation Search")]'),
     'buttonLocator' : (By.XPATH,'//button[@value="Query"]'),
     'frameParamters' : {'useFrames' : True, 'frameLocator' : [(By.XPATH, '//frame[@name="fraRL"]')] },
     'resultPageTextLocator' : (By.XPATH, '//TD/H1'),
