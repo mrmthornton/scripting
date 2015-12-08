@@ -8,7 +8,7 @@
 # Author:      mthornton
 #
 # Created:     2015 AUG 01
-# Updates:     2015 NOV 25
+# Updates:     2015 NOV 20
 # Copyright:   (c) michael thornton 2015
 #-------------------------------------------------------------------------------
 
@@ -18,7 +18,19 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
 import selenium.webdriver.support.expected_conditions as EC
 
-from VPS_LIB import *
+from VPS_LIB import cleanUpLicensePlateString
+from VPS_LIB import findElementOnPage
+from VPS_LIB import fillFormAndSubmit
+from VPS_LIB import findAndSelectFrame
+from VPS_LIB import findAndClickButton
+from VPS_LIB import findTargetPage
+from VPS_LIB import getTextResults
+from VPS_LIB import loadRegExPatterns
+from VPS_LIB import newPageIsLoaded
+from VPS_LIB import openBrowser
+from VPS_LIB import parseString
+from VPS_LIB import returnOrClick
+from VPS_LIB import timeout
 
 import re
 import io
@@ -35,6 +47,7 @@ def googleValues():
     'startPageVerifyText' : '',
     'inputLocator' : (By.XPATH,'//input[@name="q"]'),
     'staleLocator' : None,
+    'buttonLocator' : None,
     'buttonLocator' : (By.XPATH,'//button[@value="Search"]'),
     'frameParamters' : {'useFrames' : False},
     'resultPageTextLocator' : (By.XPATH, '//TD/H1'),
@@ -56,6 +69,7 @@ def sigmaAldrichValues():
     'startPageVerifyText' : 'Hello. Sign in.',
     'inputLocator' : (By.XPATH,'//input[@name = "Query"]'),
     'staleLocator' : (By.XPATH,'//A[contains(text(),"query?")]'),
+    'buttonLocator' : None,
     'frameParamters' : {'useFrames' : False},
     'resultPageTextLocator' : (By.XPATH, '//p[contains(text(),"matches found for")]'),
     'resultPageVerifyText' : '',
@@ -75,6 +89,8 @@ def hntbValues():
     'startPageTextLocator' : (By.XPATH, '//h2'),
     'startPageVerifyText' : 'About HNTB',
     'inputLocator' : (By.XPATH,'//input[@name = "s"]'),
+    'staleLocator' : None,
+    'buttonLocator' : None,
     'frameParamters' : {'useFrames' : False},
     'resultPageTextLocator' : (By.XPATH, '//TITLE'),
     'resultPageVerifyText' : 'Search Result',
@@ -94,6 +110,8 @@ def ciscoValues():
     'startPageTextLocator' : (By.XPATH, '(//DIV/H1[@class="title-section"] | //div/h1[@class="title-section title-section-only"])'),
     'startPageVerifyText' : '404 Page Not Found',
     'inputLocator' : (By.XPATH, '(//input[@id = "searchPhrase"] | //input[@id = "search-Phrase search-Phrase-only"])'),
+    'staleLocator' : None,
+    'buttonLocator' : None,
     'frameParamters' : {'useFrames' : False},
     'resultPageTextLocator' : (By.XPATH, '//H2[@class="title-page"]'),
     'resultPageVerifyText' : 'Search Results',
@@ -107,13 +125,13 @@ def ciscoValues():
 
 def theInternetNavigate():
     parameters = {
-    'delay' : 5,
+    'delay' : 10,
     'url' : 'http://the-internet.herokuapp.com/dynamic_controls', # initial URL
     'operatorMessage' : "the-internet test: no operator actions needed.",
     'startPageTextLocator' : (By.XPATH, '//H4[contains(text(), "Dynamic Controls")]'),
     'startPageVerifyText' : '',
     'inputLocator' : None,
-    'staleLocator' : None,
+    'staleLocator' : (By.XPATH, '(//button[contains(text(),"Remove")] | //button[contains(text(),"Add")])'),
     'buttonLocator' : (By.XPATH, '//button[@id="btn"]'),
     'frameParamters' : {'useFrames' : False },
     'resultPageTextLocator' : (By.XPATH, '//input[@id="checkbox"]'),
@@ -156,8 +174,8 @@ def violatorSearch():
     'startPageTextLocator' : (By.XPATH, '//TD/H1'),
     'startPageVerifyText' : 'Violation Search',
     'inputLocator' : (By.XPATH, '//input[@id = "P_LIC_PLATE_NBR"]'),
-    'staleLocator' : (By.XPATH,'//h1[contains(text(),"Violation Search")]'),
-    'buttonLocator' : (By.XPATH,'//input[@value="Query"]'),
+    'staleLocator' : (By.XPATH,'//P[contains(text(),"Query")]'),
+    'buttonLocator' : (By.XPATH,'//button[@value="Query"]'),
     'frameParamters' : {'useFrames' : True, 'frameLocator' : [(By.XPATH, '//frame[@name="fraRL"]')] },
     'resultPageTextLocator' : (By.XPATH, '//TD/H1'),
     'resultPageVerifyText' : 'Violation Search Results',
@@ -179,27 +197,34 @@ def dataIO(driver, parameters):
         csvInput = csv.reader(infile)
         for row in csvInput:
             rawString = row[0]
-            if rawString == "" or rawString == 0:  #end when LP does not exist
+            if rawString == "" or rawString == 0:  #end when input does not exist
                 break
             plateString = cleanUpLicensePlateString(rawString)
-            print plateString # debug
             element = findElementOnPage(driver, delay, parameters['inputLocator'])
             goesStaleElement = findElementOnPage(driver, delay, parameters['staleLocator'])
-            fillFormAndSubmit(driver, startWindow, element, plateString, parameters)
-            wentStale = newPageIsLoaded(driver, delay, goesStaleElement)
+            submitted = fillFormAndSubmit(driver, startWindow, element, plateString, parameters)
+            if submitted: # if nothing was submitted, don't wait for the page to load
+                pageLoaded = newPageIsLoaded(driver, delay, goesStaleElement)
+                # wait for next go stale element or something slow
             foundFrame = findAndSelectFrame(driver, delay, parameters)
-            waitForNextPage = findElementOnPage(driver,delay,parameters['buttonLocator'])
             text = getTextResults(driver, delay, plateString, parameters)
             if text!= None:
+                # if there is text, process it
                 stringSegment = parseString(text, beginPattern, numCommaPattern, "all")
                 sys.stdout.write(plateString + ", " + str(stringSegment) + '\n')
                 outfile.write(plateString + ", " + str(stringSegment) + '\n')
                 outfile.flush()
-            # navigate to search page
-            goesStaleElement = findElementOnPage(driver, delay, parameters['buttonLocator'])
-            clicked = findAndClickButton(driver, delay, parameters)
-            wentStale = newPageIsLoaded(driver, delay, goesStaleElement)
-            waitForNextPage = findElementOnPage(driver,delay,parameters['staleLocator'])
+            # navigate to search position
+            if type(parameters['buttonLocator']) == type(None):
+                # since there is no button, start at the 'top' of the page
+                driver.switch_to_default_content()
+            else:
+                # there is a button, so click it and wait for the page to load
+                goesStaleElement = findElementOnPage(driver, delay, parameters['staleLocator'])
+                clicked = findAndClickButton(driver, delay, parameters)
+                pageLoaded = newPageIsLoaded(driver, 6, goesStaleElement) # Wait for page to load
+                # wait for next go stale element or something slow
+
     print "main: Finished parsing plate file."
 
 if __name__ == '__main__':
@@ -208,7 +233,7 @@ if __name__ == '__main__':
     #parameters = sigmaAldrichValues()
     #parameters = hntbValues()
     #parameters = ciscoValues() # should work on production systems
-    parameters = theInternetNavigate()
+    #parameters = theInternetNavigate()
     #parameters = theInternetFrames() # sites for testing
     parameters = violatorSearch()
 
