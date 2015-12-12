@@ -175,8 +175,10 @@ def violatorSearch():
     'startPageVerifyText' : 'Violation Search',
     'inputLocator' : (By.XPATH, '//input[@id = "P_LIC_PLATE_NBR"]'),
     'staleLocator' : (By.XPATH,'//h1[contains(text(),"Violation Search")]'),
+    'staleLocator2' : (By.XPATH,'//h1[contains(text(),"Violation Search Results")]'),
     'buttonLocator' : (By.XPATH,'//button[@value="Query"]'),
-    'frameParamters' : {'useFrames' : True, 'frameLocator' : [(By.XPATH, '//frame[@name="fraRL"]')] },
+    'frameParamters' : {'useFrames' : True, 'frameLocator' : [ (By.XPATH, '//frame[@name="fraRL"]'),
+                                                               (By.XPATH, '//frame[@name="fraTOP"]') ] },
     'resultPageTextLocator' : (By.XPATH, '//TD/H1'),
     'resultPageVerifyText' : 'Violation Search Results',
     'outputLocator' : (By.XPATH,'//BODY/P[contains(text(),"Record")]'),
@@ -220,7 +222,8 @@ def dataIO(driver, parameters):
                 driver.switch_to_default_content()
             else:
                 # there is a button, so click it and wait for the page to load
-                goesStaleElement = findElementOnPage(driver, delay, parameters['staleLocator'])
+                foundFrame = findAndSelectFrame(driver, delay, parameters)
+                #  goesStaleElement = findElementOnPage(driver, delay, parameters['staleLocator2'])
                 clicked = findAndClickButton(driver, delay, parameters)
                 pageLoaded = newPageIsLoaded(driver, 6, goesStaleElement) # Wait for page to load
                 # wait for next go stale element or something slow
