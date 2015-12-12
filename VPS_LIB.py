@@ -5,11 +5,10 @@
 # Author:      mthornton
 #
 # Created:     2015 AUG 01
-# Updates:     2015 NOV 25
+# Updates:     2015 NOV 17
 # Copyright:   (c) michael thornton 2015
 #-------------------------------------------------------------------------------
 
-from contextlib import contextmanager
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchFrameException
 from selenium.common.exceptions import NoSuchWindowException
@@ -33,22 +32,23 @@ def cleanUpLicensePlateString(plateString):
 
 def fillFormAndSubmit(driver, window, element, textForForm, parameters):
     if type(element) == type(None): # skip the form submission
-        return
+        return False
     #assert(driver.current_window_handle == window)
     #print "fillFormAndSubmit: " + driver.current_url # for debug purposes
     element.clear()
     element.send_keys(textForForm)
     returnOrClick(element, parameters['returnOrClick'])
+    return True
 
 def findAndClickButton(driver, delay, parameters):
     if type(parameters['buttonLocator']) == type(None):
         return False
     try:
-        button = WebDriverWait(driver, delay).until(
-            EC.presence_of_element_located(parameters['buttonLocator'])).click()
+        button = WebDriverWait(driver, delay).until(EC.presence_of_element_located(parameters['buttonLocator']))
     except TimeoutException:
         print "findAndClickButton: button not found."
         return False
+    button.click()
     return True
 
 def findAndSelectFrame(driver, delay, parameters):
@@ -56,14 +56,16 @@ def findAndSelectFrame(driver, delay, parameters):
         for locator in parameters['frameParamters']['frameLocator']:
             try:
                 foundFrame = WebDriverWait(driver, delay).until(EC.presence_of_element_located(locator))
+                driver.switch_to_frame(foundFrame)
+                return True
             except TimeoutException:
                 print "findAndSelectFrame: ", locator, " not found."
-                return False
-            driver.switch_to_frame(foundFrame)
-        return True
+                continue
+            #driver.switch_to_frame(foundFrame)
+        return False
 
 def findElementOnPage(driver, delay, elementLocator, window=None):
-    if elementLocator == None: # skip finding the element
+    if elementLocator == None:# skip finding the element
         return None
     if window != None:
         driver.switch_to_window(window) # switch to window if supplied
@@ -84,7 +86,7 @@ def findTargetPage(driver, delay, locator, targetText=""):
     handles = driver.window_handles
     for handle in handles:  # test each window for target
         driver.switch_to_window(handle)
-        print "findTargetPage: Searching for '" , targetText, "' in window ", handle # for debug purposes
+        #print "findTargetPage: Searching for '" , targetText, "' in window ", handle # for debug purposes
         try:
             elems = WebDriverWait(driver, delay).until(EC.presence_of_all_elements_located(locator))
         except TimeoutException:
@@ -137,7 +139,6 @@ def newPageIsLoaded(driver, delay, currentElement):
         try:
             # poll the current element with an arbitrary call
             WebDriverWait(driver, delay).until(EC.staleness_of(currentElement))
-            test = currentElement.find_elements_by_id('doesnt_matter')
             return False
         except StaleElementReferenceException:
             return True
@@ -193,7 +194,7 @@ if __name__ == '__main__':
     # test library components
     assert(cleanUpLicensePlateString('123 45   6,,"\n\n') == '123456\n')
     driver = openBrowser(url)
-    window = findTargetPage(driver, delay, locator) # no window, why?
+    window = findTargetPage(driver, delay, elementLocator) # no window, why?
     #returnOrClick()
     #loadRegExPatterns()
     #timeout()
