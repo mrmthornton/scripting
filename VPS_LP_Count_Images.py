@@ -142,8 +142,9 @@ def theInternetFrames():
     'inputLocator' : None,
     'staleLocator' : None,
     'buttonLocator' : None,
-    'frameParamters' : {'useFrames' : True, 'frameLocator' : [(By.XPATH, '//frame[@name="frame-top"]'),
-                                                             (By.XPATH, '//frame[@name="frame-middle"]')]},
+    'frameParamters' : {'useFrames' : True, 'frameLocator' : [(By.XPATH, '//frame[@name="skipThisOne"]'),
+                                                              (By.XPATH, '//frame[@name="frameX-top"]'),
+                                                              (By.XPATH, '//frame[@name="frame-bottom"]')]},
     'resultPageTextLocator' : (By.XPATH, '//frame[@name="frame-top"]'),
     'resultPageVerifyText' : None,
     'outputLocator' : None,
@@ -164,7 +165,8 @@ def violatorSearch():
     'inputLocator' : (By.XPATH, '//input[@id = "P_LIC_PLATE_NBR"]'),
     'staleLocator' : (By.XPATH,'//h1[contains(text(),"Violation Search")]'),
     'buttonLocator' : (By.XPATH,'//button[@value="Query"]'),
-    'frameParamters' : {'useFrames' : True, 'frameLocator' : [(By.XPATH, '//frame[@name="fraRL"]')] },
+    'frameParamters' : {'useFrames' : True, 'frameLocator' : [(By.XPATH, '//frame[@name="fraRL"]'),
+                                                              (By.XPATH, '//frame[@name="fraRL"]')] },
     'resultPageTextLocator' : (By.XPATH, '//TD/H1'),
     'resultPageVerifyText' : 'Violation Search Results',
     'outputLocator' : (By.XPATH,'//BODY/P[contains(text(),"Record")]'),
@@ -220,9 +222,9 @@ if __name__ == '__main__':
     parameters = googleValues()
     #parameters = sigmaAldrichValues()
     #parameters = hntbValues()
-    parameters = ciscoValues() # should work on production systems
+    #parameters = ciscoValues() # should work on production systems
     ##parameters = theInternetNavigate()
-    ##parameters = theInternetFrames() # sites for testing
+    parameters = theInternetFrames()
     #parameters = violatorSearch()
 
     print parameters['operatorMessage']

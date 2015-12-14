@@ -32,13 +32,13 @@ def cleanUpLicensePlateString(plateString):
 
 def fillFormAndSubmit(driver, window, element, textForForm, parameters):
     if type(element) == type(None): # skip the form submission
-        return
+        return False
     #assert(driver.current_window_handle == window)
     #print "fillFormAndSubmit: " + driver.current_url # for debug purposes
     element.clear()
     element.send_keys(textForForm)
     returnOrClick(element, parameters['returnOrClick'])
-    return
+    return True
 
 def findAndClickButton(driver, delay, parameters):
     if type(parameters['buttonLocator']) == type(None):
@@ -56,11 +56,12 @@ def findAndSelectFrame(driver, delay, parameters):
         for locator in parameters['frameParamters']['frameLocator']:
             try:
                 foundFrame = WebDriverWait(driver, delay).until(EC.presence_of_element_located(locator))
+                driver.switch_to_frame(foundFrame)
+                return True
             except TimeoutException:
                 print "findAndSelectFrame: ", locator, " not found."
-                return False
-            driver.switch_to_frame(foundFrame)
-        return True
+                continue
+        return False
 
 def findElementOnPage(driver, delay, elementLocator, window=None):
     if elementLocator == None:# skip finding the element
