@@ -21,20 +21,6 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 import re
 
-
-def loadRegExPatterns():
-    patterns = {
-    'linePattern' : re.compile('^.+'),
-    'wordPattern' : re.compile('\w+'),
-    'csvPattern' : re.compile('[A-Z0-9 .#&]*,'),
-    'commaToEOLpattern' : re.compile(',[A-Z0-9 .#&]+$'),
-    'LICpattern' : re.compile('^LIC '),
-    'issuedPattern' : re.compile('ISSUED '),
-    'reg_dtPattern' : re.compile('REG DT '),
-    'datePattern' : re.compile('[0-9]{2,2}/[0-9]{2,2}/[0-9]{4,4}'), # mo/day/year
-    'dateYearFirstPattern' : re.compile(r'\d{4,4}/\d{2,2}/\d{2,2}'), # year/mo/day
-    }
-
 def cleanUpLicensePlateString(plateString):
     plateString = plateString.replace(' ' , '') # remove any spaces
     plateString = plateString.replace('"' , '') # remove any double quotes
@@ -46,23 +32,36 @@ def cleanUpLicensePlateString(plateString):
 
 def fillFormAndSubmit(driver, window, element, textForForm, parameters):
     if type(element) == type(None): # skip the form submission
-        return
+        return False
     #assert(driver.current_window_handle == window)
     #print "fillFormAndSubmit: " + driver.current_url # for debug purposes
     element.clear()
     element.send_keys(textForForm)
     returnOrClick(element, parameters['returnOrClick'])
+    return True
+
+def findAndClickButton(driver, delay, parameters):
+    if type(parameters['buttonLocator']) == type(None):
+        return False
+    try:
+        button = WebDriverWait(driver, delay).until(EC.presence_of_element_located(parameters['buttonLocator']))
+    except TimeoutException:
+        print "findAndClickButton: button not found."
+        return False
+    button.click()
+    return True
 
 def findAndSelectFrame(driver, delay, parameters):
     if parameters['frameParamters']['useFrames']:
-        locator = parameters['frameParamters']['frameLocator']
-        try:
-            foundFrame = WebDriverWait(driver, delay).until(EC.presence_of_element_located(locator))
-        except TimeoutException:
-            print "findAndSelectFrame: frame not found."
-            return False
-        driver.switch_to_frame(foundFrame)
-        return True
+        for locator in parameters['frameParamters']['frameLocator']:
+            try:
+                foundFrame = WebDriverWait(driver, delay).until(EC.presence_of_element_located(locator))
+                driver.switch_to_frame(foundFrame)
+                return True
+            except TimeoutException:
+                print "findAndSelectFrame: ", locator, " not found."
+                continue
+        return False
 
 def findElementOnPage(driver, delay, elementLocator, window=None):
     if elementLocator == None:# skip finding the element
@@ -86,7 +85,7 @@ def findTargetPage(driver, delay, locator, targetText=""):
     handles = driver.window_handles
     for handle in handles:  # test each window for target
         driver.switch_to_window(handle)
-        print "findTargetPage: Searching for '" , targetText, "' in window ", handle # for debug purposes
+        #print "findTargetPage: Searching for '" , targetText, "' in window ", handle # for debug purposes
         try:
             elems = WebDriverWait(driver, delay).until(EC.presence_of_all_elements_located(locator))
         except TimeoutException:
@@ -99,8 +98,7 @@ def findTargetPage(driver, delay, locator, targetText=""):
     print "findTargetPage: 'target text' not found"
     return None, None
 
-def getTextResults(driver, delay, window, plateString, parameters):
-    # #assert(driver.current_window_handle == window)
+def getTextResults(driver, delay, plateString, parameters):
     #print "getTextResults: " + driver.current_url # for debug purposes
     if parameters['outputLocator']== None: # skip finding text
         return None
@@ -114,19 +112,32 @@ def getTextResults(driver, delay, window, plateString, parameters):
     pattern = re.compile(resultIndex)
     isFound = pattern.search(text)
     if isFound != None:
-        print "getTextResults: TEXT: '", text, "'" # for debug purposes
+        #print "getTextResults: TEXT: '", text, "'" # for debug purposes
         return text
     else:
         return None
 
+def loadRegExPatterns():
+    patterns = {
+    'linePattern' : re.compile('^.+'),
+    'wordPattern' : re.compile('\w+'),
+    'csvPattern' : re.compile('[A-Z0-9 .#&]*,'),
+    'commaToEOLpattern' : re.compile(',[A-Z0-9 .#&]+$'),
+    'LICpattern' : re.compile('^LIC '),
+    'issuedPattern' : re.compile('ISSUED '),
+    'reg_dtPattern' : re.compile('REG DT '),
+    'datePattern' : re.compile('[0-9]{2,2}/[0-9]{2,2}/[0-9]{4,4}'), # mo/day/year
+    'dateYearFirstPattern' : re.compile(r'\d{4,4}/\d{2,2}/\d{2,2}'), # year/mo/day
+    }
 
 def newPageIsLoaded(driver, delay, currentElement):
     def isStale(self):
         if type(currentElement) == type(None):# when there is no element to check,
-            return False          # loop until timeout occurs
+            return True          # quit immediately
+            #return False          # loop until timeout occurs
         try:
             # poll the current element with an arbitrary call
-            nullText = currentElement.text
+            WebDriverWait(driver, delay).until(EC.staleness_of(currentElement))
             return False
         except StaleElementReferenceException:
             return True
@@ -175,14 +186,14 @@ if __name__ == '__main__':
 
     # setup test parameters
     url = 'file://C:/Users/IEUser/Documents/scripting/testPage.html'
-    locator = (By.XPATH, '//p')
+    elementLocator = (By.XPATH, '//p')
     window = None
     delay = 1
 
     # test library components
     assert(cleanUpLicensePlateString('123 45   6,,"\n\n') == '123456\n')
     driver = openBrowser(url)
-    window = findTargetPage(driver, delay, locator) # no window, why?
+    window = findTargetPage(driver, delay, elementLocator) # no window, why?
     #returnOrClick()
     #loadRegExPatterns()
     #timeout()
