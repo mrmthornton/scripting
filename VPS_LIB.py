@@ -5,7 +5,7 @@
 # Author:      mthornton
 #
 # Created:     2015 AUG 01
-# Updates:     2015 NOV 17
+# Updates:     2015 DEC 14
 # Copyright:   (c) michael thornton 2015
 #-------------------------------------------------------------------------------
 
@@ -61,7 +61,6 @@ def findAndSelectFrame(driver, delay, parameters):
             except TimeoutException:
                 print "findAndSelectFrame: ", locator, " not found."
                 continue
-            #driver.switch_to_frame(foundFrame)
         return False
 
 def findElementOnPage(driver, delay, elementLocator, window=None):

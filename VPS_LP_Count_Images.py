@@ -8,7 +8,7 @@
 # Author:      mthornton
 #
 # Created:     2015 AUG 01
-# Updates:     2015 NOV 20
+# Updates:     2015 DEC 14
 # Copyright:   (c) michael thornton 2015
 #-------------------------------------------------------------------------------
 
@@ -18,19 +18,7 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
 import selenium.webdriver.support.expected_conditions as EC
 
-from VPS_LIB import cleanUpLicensePlateString
-from VPS_LIB import findElementOnPage
-from VPS_LIB import fillFormAndSubmit
-from VPS_LIB import findAndSelectFrame
-from VPS_LIB import findAndClickButton
-from VPS_LIB import findTargetPage
-from VPS_LIB import getTextResults
-from VPS_LIB import loadRegExPatterns
-from VPS_LIB import newPageIsLoaded
-from VPS_LIB import openBrowser
-from VPS_LIB import parseString
-from VPS_LIB import returnOrClick
-from VPS_LIB import timeout
+from VPS_LIB import *
 
 import re
 import io
@@ -125,7 +113,7 @@ def ciscoValues():
 
 def theInternetNavigate():
     parameters = {
-    'delay' : 10,
+    'delay' : 6,
     'url' : 'http://the-internet.herokuapp.com/dynamic_controls', # initial URL
     'operatorMessage' : "the-internet test: no operator actions needed.",
     'startPageTextLocator' : (By.XPATH, '//H4[contains(text(), "Dynamic Controls")]'),
@@ -154,8 +142,9 @@ def theInternetFrames():
     'inputLocator' : None,
     'staleLocator' : None,
     'buttonLocator' : None,
-    'frameParamters' : {'useFrames' : True, 'frameLocator' : [(By.XPATH, '//frame[@name="frame-top"]'),
-                                                             (By.XPATH, '//frame[@name="frame-middle"]')]},
+    'frameParamters' : {'useFrames' : True, 'frameLocator' : [(By.XPATH, '//frame[@name="skipThisOne"]'),
+                                                              (By.XPATH, '//frame[@name="frameX-top"]'),
+                                                              (By.XPATH, '//frame[@name="frame-bottom"]')]},
     'resultPageTextLocator' : (By.XPATH, '//frame[@name="frame-top"]'),
     'resultPageVerifyText' : None,
     'outputLocator' : None,
@@ -168,7 +157,7 @@ def theInternetFrames():
 
 def violatorSearch():
     parameters = {
-    'delay' : 15,
+    'delay' : 5,
     'url' : 'https://lprod.scip.ntta.org/scip/jsp/SignIn.jsp', # initial URL
     'operatorMessage' : "Use debug mode, open VPS, new violator search window, and run to completion",
     'startPageTextLocator' : (By.XPATH, '//TD/H1'),
@@ -176,7 +165,7 @@ def violatorSearch():
     'inputLocator' : (By.XPATH, '//input[@id = "P_LIC_PLATE_NBR"]'),
     'staleLocator' : (By.XPATH,'//h1[contains(text(),"Violation Search")]'),
     'staleLocator2' : (By.XPATH,'//h1[contains(text(),"Violation Search Results")]'),
-    'buttonLocator' : (By.XPATH,'//button[@value="Query"]'),
+    'buttonLocator' : (By.XPATH,'//input[@value="Query"]'),
     'frameParamters' : {'useFrames' : True, 'frameLocator' : [ (By.XPATH, '//frame[@name="fraRL"]'),
                                                                (By.XPATH, '//frame[@name="fraTOP"]') ] },
     'resultPageTextLocator' : (By.XPATH, '//TD/H1'),
@@ -193,7 +182,7 @@ def dataIO(driver, parameters):
     beginPattern = re.compile(parameters['resultIndexParameters']['index'])
     numCommaPattern = re.compile('[0-9,]+')
     delay = parameters['delay']
-    startWindow, ReferenceElement = findTargetPage(driver, 5, parameters['startPageTextLocator'], parameters['startPageVerifyText'])
+    startWindow, ReferenceElement = findTargetPage(driver, delay, parameters['startPageTextLocator'], parameters['startPageVerifyText'])
     with open(parameters['dataInFileName'], 'r') as infile, open(parameters['dataOutFileName'], 'a') as outfile:
         outfile.truncate()
         csvInput = csv.reader(infile)
@@ -210,20 +199,17 @@ def dataIO(driver, parameters):
                 # wait for next go stale element or something slow
             foundFrame = findAndSelectFrame(driver, delay, parameters)
             text = getTextResults(driver, delay, plateString, parameters)
-            if text!= None:
-                # if there is text, process it
+            if text!= None: # if there is text, process it
                 stringSegment = parseString(text, beginPattern, numCommaPattern, "all")
                 sys.stdout.write(plateString + ", " + str(stringSegment) + '\n')
                 outfile.write(plateString + ", " + str(stringSegment) + '\n')
                 outfile.flush()
             # navigate to search position
-            if type(parameters['buttonLocator']) == type(None):
-                # since there is no button, start at the 'top' of the page
+            if type(parameters['buttonLocator']) == type(None): # since there is no button, start at the 'top' of the page
                 driver.switch_to_default_content()
             else:
-                # there is a button, so click it and wait for the page to load
-                foundFrame = findAndSelectFrame(driver, delay, parameters)
-                #  goesStaleElement = findElementOnPage(driver, delay, parameters['staleLocator2'])
+                # there is a button. find it/click it/wait for page to load
+                goesStaleElement = findElementOnPage(driver, delay, parameters['buttonLocator'])
                 clicked = findAndClickButton(driver, delay, parameters)
                 pageLoaded = newPageIsLoaded(driver, 6, goesStaleElement) # Wait for page to load
                 # wait for next go stale element or something slow
@@ -236,8 +222,8 @@ if __name__ == '__main__':
     #parameters = sigmaAldrichValues()
     #parameters = hntbValues()
     #parameters = ciscoValues() # should work on production systems
-    #parameters = theInternetNavigate()
-    #parameters = theInternetFrames() # sites for testing
+    parameters = theInternetNavigate()
+    parameters = theInternetFrames()
     parameters = violatorSearch()
 
     print parameters['operatorMessage']
@@ -245,3 +231,4 @@ if __name__ == '__main__':
     driver = openBrowser(parameters['url'])
     dataIO(driver, parameters)
     driver.close()
+
