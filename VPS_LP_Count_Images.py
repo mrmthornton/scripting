@@ -211,7 +211,7 @@ def dataIO(driver, parameters):
                 # there is a button. find it/click it/wait for page to load
                 goesStaleElement = findElementOnPage(driver, delay, parameters['buttonLocator'])
                 clicked = findAndClickButton(driver, delay, parameters)
-                pageLoaded = newPageIsLoaded(driver, 6, goesStaleElement) # Wait for page to load
+                pageLoaded = newPageIsLoaded(driver, 2, goesStaleElement) # Wait for page to load
                 # wait for next go stale element or something slow
 
     print "main: Finished parsing plate file."
@@ -222,8 +222,8 @@ if __name__ == '__main__':
     #parameters = sigmaAldrichValues()
     #parameters = hntbValues()
     #parameters = ciscoValues() # should work on production systems
-    parameters = theInternetNavigate()
-    parameters = theInternetFrames()
+    #parameters = theInternetNavigate()
+    #parameters = theInternetFrames()
     parameters = violatorSearch()
 
     print parameters['operatorMessage']
