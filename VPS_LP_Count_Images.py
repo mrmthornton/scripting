@@ -8,7 +8,7 @@
 # Author:      mthornton
 #
 # Created:     2015 AUG 01
-# Updates:     2015 DEC 14
+# Updates:     2015 DEC 21
 # Copyright:   (c) michael thornton 2015
 #-------------------------------------------------------------------------------
 
@@ -171,7 +171,7 @@ def violatorSearch():
     'resultPageTextLocator' : (By.XPATH, '//TD/H1'),
     'resultPageVerifyText' : 'Violation Search Results',
     'outputLocator' : (By.XPATH,'//BODY/P[contains(text(),"Record")]'),
-    'resultIndexParameters' : {'index' : "of ", 'selector' : 'tail'},  # head, tail, or all
+    'resultIndexParameters' : {'index' : 'Records \d+ to \d+ of \d+', 'selector' : 'tail'},  # head, tail, or all
     'dataInFileName' : 'LP_Repeats_Count.csv',
     'dataOutFileName' : 'LP_Repeats_Count_Out.txt',
     'returnOrClick' : 'return', # use Return or Click to submit form
@@ -194,8 +194,8 @@ def dataIO(driver, parameters):
             element = findElementOnPage(driver, delay, parameters['inputLocator'])
             goesStaleElement = findElementOnPage(driver, delay, parameters['staleLocator'])
             submitted = fillFormAndSubmit(driver, startWindow, element, plateString, parameters)
-            if submitted: # if nothing was submitted, don't wait for the page to load
-                pageLoaded = newPageIsLoaded(driver, 3, goesStaleElement)
+            #if submitted: # if nothing was submitted, don't wait for the page to load
+            #    pageLoaded = newPageIsLoaded(driver, 3, goesStaleElement)
                 # wait for next go stale element or something slow
             foundFrame = findAndSelectFrame(driver, delay, parameters)
             text = getTextResults(driver, delay, plateString, parameters)
@@ -212,7 +212,7 @@ def dataIO(driver, parameters):
                 goesStaleElement = findElementOnPage(driver, delay, parameters['buttonLocator'])
                 clicked = findAndClickButton(driver, delay, parameters)
                 # was 3 seconds for next line
-                pageLoaded = newPageIsLoaded(driver, 3, goesStaleElement) # Wait for page to load
+            #    pageLoaded = newPageIsLoaded(driver, 3, goesStaleElement) # Wait for page to load
 
     print "main: Finished parsing plate file."
 

@@ -5,7 +5,7 @@
 # Author:      mthornton
 #
 # Created:     2015 AUG 01
-# Updates:     2015 DEC 14
+# Updates:     2015 DEC 21
 # Copyright:   (c) michael thornton 2015
 #-------------------------------------------------------------------------------
 
@@ -101,22 +101,21 @@ def findTargetPage(driver, delay, locator, targetText=""):
 
 def getTextResults(driver, delay, plateString, parameters):
     #print "getTextResults: " + driver.current_url # for debug purposes
+    resultIndex = parameters['resultIndexParameters']['index']
+    pattern = re.compile(resultIndex)
     if parameters['outputLocator']== None: # skip finding text
         return None
     try:
-        resultElement = WebDriverWait(driver, delay).until(EC.presence_of_element_located(parameters['outputLocator']))
+        while True:
+            resultElement = WebDriverWait(driver, delay).until(EC.presence_of_element_located(parameters['outputLocator']))
+            text = resultElement.text
+            isFound = pattern.search(text)
+            if isFound:
+                return text
     except TimeoutException:
         timeout('getTextResults: text not found')
         return None
-    text = resultElement.text
-    resultIndex = parameters['resultIndexParameters']['index']
-    pattern = re.compile(resultIndex)
-    isFound = pattern.search(text)
-    if isFound != None:
-        #print "getTextResults: TEXT: '", text, "'" # for debug purposes
-        return text
-    else:
-        return None
+    return none
 
 def loadRegExPatterns():
     patterns = {
