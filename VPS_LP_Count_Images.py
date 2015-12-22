@@ -195,7 +195,7 @@ def dataIO(driver, parameters):
             goesStaleElement = findElementOnPage(driver, delay, parameters['staleLocator'])
             submitted = fillFormAndSubmit(driver, startWindow, element, plateString, parameters)
             if submitted: # if nothing was submitted, don't wait for the page to load
-                pageLoaded = newPageIsLoaded(driver, delay, goesStaleElement)
+                pageLoaded = newPageIsLoaded(driver, 3, goesStaleElement)
                 # wait for next go stale element or something slow
             foundFrame = findAndSelectFrame(driver, delay, parameters)
             text = getTextResults(driver, delay, plateString, parameters)
@@ -211,8 +211,8 @@ def dataIO(driver, parameters):
                 # there is a button. find it/click it/wait for page to load
                 goesStaleElement = findElementOnPage(driver, delay, parameters['buttonLocator'])
                 clicked = findAndClickButton(driver, delay, parameters)
-                pageLoaded = newPageIsLoaded(driver, 2, goesStaleElement) # Wait for page to load
-                # wait for next go stale element or something slow
+                # was 3 seconds for next line
+                pageLoaded = newPageIsLoaded(driver, 3, goesStaleElement) # Wait for page to load
 
     print "main: Finished parsing plate file."
 

@@ -9,6 +9,7 @@
 # Copyright:   (c) michael thornton 2015
 #-------------------------------------------------------------------------------
 
+from contextlib import contextmanager
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchFrameException
 from selenium.common.exceptions import NoSuchWindowException
