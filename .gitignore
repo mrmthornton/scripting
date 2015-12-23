@@ -1,0 +1,19 @@
+*.7z
+*.csv
+*.exe
+.git/
+*.lnk
+*.log
+*.pyc
+*.txt
+*.xlsx
+*.xlsm
+*.zip
+.metadata/
+How To Read a TXDOT.pdf
+IEDriverServer_x64_2.44.0
+Portable Python 2.7.6.1
+PortableGit
+RemoteSystemsTempFiles/
+templist
+test
