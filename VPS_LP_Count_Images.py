@@ -166,8 +166,8 @@ def violatorSearch():
     'staleLocator' : (By.XPATH,'//h1[contains(text(),"Violation Search")]'),
     'staleLocator2' : (By.XPATH,'//h1[contains(text(),"Violation Search Results")]'),
     'buttonLocator' : (By.XPATH,'//input[@value="Query"]'),
-    'frameParamters' : {'useFrames' : True, 'frameLocator' : [ (By.XPATH, '//frame[@name="fraRL"]')   ]},#,
-                                                              # (By.XPATH, '//frame[@name="fraTOP"]') ] },
+    'frameParamters' : {'useFrames' : True, 'frameLocator' : [ (By.XPATH, '//frame[@name="fraTOP"]'),
+                                                               (By.XPATH, '//frame[@name="fraRL"]')   ]},
     'resultPageTextLocator' : (By.XPATH, '//TD/H1'),
     'resultPageVerifyText' : 'Violation Search Results',
     'outputLocator' : (By.XPATH,'//BODY/P[contains(text(),"Record")]'),
@@ -194,11 +194,11 @@ def dataIO(driver, parameters):
             element = findElementOnPage(driver, delay, parameters['inputLocator'])
             goesStaleElement = findElementOnPage(driver, delay, parameters['staleLocator'])
             submitted = fillFormAndSubmit(driver, startWindow, element, plateString, parameters)
-            #if submitted: # if nothing was submitted, don't wait for the page to load
-            #    pageLoaded = newPageIsLoaded(driver, 3, goesStaleElement)
+            if submitted: # if nothing was submitted, don't wait for the page to load
+                pageLoaded = newPageIsLoaded(driver, delay, goesStaleElement)
                 # wait for next go stale element or something slow
             foundFrame = findAndSelectFrame(driver, delay, parameters)
-            text = getTextResults(driver, 15, plateString, parameters)
+            text = getTextResults(driver, delay, plateString, parameters)
             if text!= None: # if there is text, process it
                 stringSegment = parseString(text, beginPattern, numCommaPattern, "all")
                 sys.stdout.write(plateString + ", " + str(stringSegment) + '\n')
@@ -213,7 +213,6 @@ def dataIO(driver, parameters):
                 goesStaleElement = findElementOnPage(driver, delay, parameters['buttonLocator'])
                 clicked = findAndClickButton(driver, delay, parameters)
                 # was 3 seconds for next line
-            #    pageLoaded = newPageIsLoaded(driver, 3, goesStaleElement) # Wait for page to load
 
     print "main: Finished parsing plate file."
 

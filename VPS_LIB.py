@@ -56,8 +56,9 @@ def findAndSelectFrame(driver, delay, parameters):
     if parameters['frameParamters']['useFrames']:
         for locator in parameters['frameParamters']['frameLocator']:
             try:
-                foundFrame = WebDriverWait(driver, delay).until(EC.presence_of_element_located(locator))
-                driver.switch_to_frame(foundFrame)
+                for locator in parameters['frameParamters']['frameLocator']:
+                    foundFrame = WebDriverWait(driver, delay).until(EC.presence_of_element_located(locator))
+                    driver.switch_to_frame(foundFrame)
                 return True
             except TimeoutException:
                 print "findAndSelectFrame: ", locator, " not found."
