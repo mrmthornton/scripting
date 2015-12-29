@@ -166,12 +166,11 @@ def violatorSearch():
     'staleLocator' : (By.XPATH,'//h1[contains(text(),"Violation Search")]'),
     'staleLocator2' : (By.XPATH,'//h1[contains(text(),"Violation Search Results")]'),
     'buttonLocator' : (By.XPATH,'//input[@value="Query"]'),
-    'frameParamters' : {'useFrames' : True, 'frameLocator' : [ (By.XPATH, '//frame[@name="fraTOP"]'),
-                                                               (By.XPATH, '//frame[@name="fraRL"]')   ]},
+    'frameParamters' : {'useFrames' : True, 'frameLocator' : [ (By.XPATH, '//frame[@name="fraRL"]') ]},
     'resultPageTextLocator' : (By.XPATH, '//TD/H1'),
     'resultPageVerifyText' : 'Violation Search Results',
     'outputLocator' : (By.XPATH,'//BODY/P[contains(text(),"Record")]'),
-    'resultIndexParameters' : {'index' : 'Records \d+ to \d+ of \d+', 'selector' : 'tail'},  # head, tail, or all
+    'resultIndexParameters' : {'index' : 'Records (\d+) to \d+ of \d+', 'selector' : 'tail'},  # head, tail, or all
     'dataInFileName' : 'LP_Repeats_Count.csv',
     'dataOutFileName' : 'LP_Repeats_Count_Out.txt',
     'returnOrClick' : 'return', # use Return or Click to submit form
@@ -194,8 +193,8 @@ def dataIO(driver, parameters):
             element = findElementOnPage(driver, delay, parameters['inputLocator'])
             goesStaleElement = findElementOnPage(driver, delay, parameters['staleLocator'])
             submitted = fillFormAndSubmit(driver, startWindow, element, plateString, parameters)
-            if submitted: # if nothing was submitted, don't wait for the page to load
-                pageLoaded = newPageIsLoaded(driver, delay, goesStaleElement)
+            #if submitted: # if nothing was submitted, don't wait for the page to load
+            #    pageLoaded = newPageIsLoaded(driver, delay, goesStaleElement)
                 # wait for next go stale element or something slow
             foundFrame = findAndSelectFrame(driver, delay, parameters)
             text = getTextResults(driver, delay, plateString, parameters)
@@ -209,7 +208,9 @@ def dataIO(driver, parameters):
                 driver.switch_to_default_content()
             else:
                 # there is a button. find it/click it/wait for page to load
-                foundFrame = findAndSelectFrame(driver, delay, parameters)
+
+                # already at frame
+                #foundFrame = findAndSelectFrame(driver, delay, parameters)
                 goesStaleElement = findElementOnPage(driver, delay, parameters['buttonLocator'])
                 clicked = findAndClickButton(driver, delay, parameters)
                 # was 3 seconds for next line

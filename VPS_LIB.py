@@ -56,14 +56,14 @@ def findAndSelectFrame(driver, delay, parameters):
     if parameters['frameParamters']['useFrames']:
         for locator in parameters['frameParamters']['frameLocator']:
             try:
-                for locator in parameters['frameParamters']['frameLocator']:
-                    foundFrame = WebDriverWait(driver, delay).until(EC.presence_of_element_located(locator))
-                    driver.switch_to_frame(foundFrame)
-                return True
+                foundFrame = WebDriverWait(driver, delay).until(EC.presence_of_element_located(locator))
+                driver.switch_to_frame(foundFrame)
+                continue
             except TimeoutException:
                 print "findAndSelectFrame: ", locator, " not found."
                 continue
-        return False
+                return False
+        return True
 
 def findElementOnPage(driver, delay, elementLocator, window=None):
     if elementLocator == None:# skip finding the element
@@ -110,9 +110,9 @@ def getTextResults(driver, delay, plateString, parameters):
         while True:
             resultElement = WebDriverWait(driver, delay).until(EC.presence_of_element_located(parameters['outputLocator']))
             text = resultElement.text
-            isFound = pattern.search(text)
+            isFound = pattern.findall(text)
             if isFound:
-                return text
+                return [0]
     except TimeoutException:
         timeout('getTextResults: text not found')
         return None
