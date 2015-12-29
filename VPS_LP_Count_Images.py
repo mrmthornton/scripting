@@ -224,7 +224,7 @@ if __name__ == '__main__':
     #parameters = sigmaAldrichValues()
     #parameters = hntbValues()
     #parameters = ciscoValues() # should work on production systems
-    ##parameters = theInternetNavigate()
+    parameters = theInternetNavigate()
     ##parameters = theInternetFrames()
     #parameters = violatorSearch()
 
