@@ -31,8 +31,13 @@ passwordField = driver.find_element_by_name('j_password')
 passwordField.clear()
 
 #change to wait for operator ##########################################
+<<<<<<< HEAD
 userNameField.send_keys("")
 passwordField.send_keys("")
+=======
+userNameField.send_keys("mthornton")
+passwordField.send_keys("NTTA2apr04")
+>>>>>>> c4a95a9e05e29d475bb078e903c178926551f7b2
 passwordField.submit()
 
 menuItem = driver.find_element_by_xpath("//td[@id='Bar1']")
@@ -44,7 +49,11 @@ try:
     driver.maximize_window()
 except TimeoutException:
     timeout()
+<<<<<<< HEAD
 
+=======
+# assert title = "Violation Processing System"
+>>>>>>> c4a95a9e05e29d475bb078e903c178926551f7b2
 try:
     locator =(By.LINK_TEXT,"Violations")
     menuItem = WebDriverWait(driver, delay).until(EC.element_to_be_clickable(locator))
@@ -54,4 +63,8 @@ except TimeoutException:
     timeout()
 
 
+<<<<<<< HEAD
 driver.quit()
+=======
+driver.quit()
+>>>>>>> c4a95a9e05e29d475bb078e903c178926551f7b2

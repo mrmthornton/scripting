@@ -31,7 +31,11 @@ def timeout():
 
 def credentials():
     # Go to the main web page and wait while the user enters credentials
+<<<<<<< HEAD
     url = 'https://mvdinet.txdmv.govX'
+=======
+    url = 'https://mvdinet.txdmv.gov'
+>>>>>>> c4a95a9e05e29d475bb078e903c178926551f7b2
     driver.get(url)
 
 def connect():

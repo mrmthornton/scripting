@@ -8,7 +8,7 @@
 # Author:      mthornton
 #
 # Created:     2015 AUG 01
-# Updates:     2015 NOV 20
+# Updates:     2015 DEC 21
 # Copyright:   (c) michael thornton 2015
 #-------------------------------------------------------------------------------
 
@@ -157,7 +157,7 @@ def theInternetFrames():
 
 def violatorSearch():
     parameters = {
-    'delay' : 15,
+    'delay' : 5,
     'url' : 'https://lprod.scip.ntta.org/scip/jsp/SignIn.jsp', # initial URL
     'operatorMessage' : "Use debug mode, open VPS, new violator search window, and run to completion",
     'startPageTextLocator' : (By.XPATH, '//TD/H1'),
@@ -165,13 +165,12 @@ def violatorSearch():
     'inputLocator' : (By.XPATH, '//input[@id = "P_LIC_PLATE_NBR"]'),
     'staleLocator' : (By.XPATH,'//h1[contains(text(),"Violation Search")]'),
     'staleLocator2' : (By.XPATH,'//h1[contains(text(),"Violation Search Results")]'),
-    'buttonLocator' : (By.XPATH,'//button[@value="Query"]'),
-    'frameParamters' : {'useFrames' : True, 'frameLocator' : [ (By.XPATH, '//frame[@name="fraRL"]'),
-                                                               (By.XPATH, '//frame[@name="fraTOP"]') ] },
+    'buttonLocator' : (By.XPATH,'//input[@value="Query"]'),
+    'frameParamters' : {'useFrames' : True, 'frameLocator' : [ (By.XPATH, '//frame[@name="fraRL"]') ]},
     'resultPageTextLocator' : (By.XPATH, '//TD/H1'),
     'resultPageVerifyText' : 'Violation Search Results',
     'outputLocator' : (By.XPATH,'//BODY/P[contains(text(),"Record")]'),
-    'resultIndexParameters' : {'index' : "of ", 'selector' : 'tail'},  # head, tail, or all
+    'resultIndexParameters' : {'index' : 'Records (\d+) to \d+ of \d+', 'selector' : 'tail'},  # head, tail, or all
     'dataInFileName' : 'LP_Repeats_Count.csv',
     'dataOutFileName' : 'LP_Repeats_Count_Out.txt',
     'returnOrClick' : 'return', # use Return or Click to submit form
@@ -194,27 +193,30 @@ def dataIO(driver, parameters):
             element = findElementOnPage(driver, delay, parameters['inputLocator'])
             goesStaleElement = findElementOnPage(driver, delay, parameters['staleLocator'])
             submitted = fillFormAndSubmit(driver, startWindow, element, plateString, parameters)
-            if submitted: # if nothing was submitted, don't wait for the page to load
-                pageLoaded = newPageIsLoaded(driver, delay, goesStaleElement)
+            #if submitted: # if nothing was submitted, don't wait for the page to load
+            #    pageLoaded = newPageIsLoaded(driver, delay, goesStaleElement)
                 # wait for next go stale element or something slow
             foundFrame = findAndSelectFrame(driver, delay, parameters)
+            print foundFrame
             text = getTextResults(driver, delay, plateString, parameters)
-            if text!= None:
-                # if there is text, process it
-                stringSegment = parseString(text, beginPattern, numCommaPattern, "all")
-                sys.stdout.write(plateString + ", " + str(stringSegment) + '\n')
-                outfile.write(plateString + ", " + str(stringSegment) + '\n')
+            if text!= None: # if there is text, process it
+                #stringSegment = parseString(text, beginPattern, numCommaPattern, "all")
+                #sys.stdout.write(plateString + ", " + str(stringSegment) + '\n')
+                #outfile.write(plateString + ", " + str(stringSegment) + '\n')
+                sys.stdout.write(plateString + ", " + str(text) + '\n')
+                outfile.write(plateString + ", " + str(text) + '\n')
                 outfile.flush()
             # navigate to search position
-            if type(parameters['buttonLocator']) == type(None):
-                # since there is no button, start at the 'top' of the page
+            if type(parameters['buttonLocator']) == type(None): # since there is no button, start at the 'top' of the page
                 driver.switch_to_default_content()
             else:
                 # there is a button. find it/click it/wait for page to load
+
+                # already at frame
+                #foundFrame = findAndSelectFrame(driver, delay, parameters)
                 goesStaleElement = findElementOnPage(driver, delay, parameters['buttonLocator'])
                 clicked = findAndClickButton(driver, delay, parameters)
-                pageLoaded = newPageIsLoaded(driver, 6, goesStaleElement) # Wait for page to load
-                # wait for next go stale element or something slow
+                # was 3 seconds for next line
 
     print "main: Finished parsing plate file."
 
@@ -224,9 +226,9 @@ if __name__ == '__main__':
     #parameters = sigmaAldrichValues()
     #parameters = hntbValues()
     #parameters = ciscoValues() # should work on production systems
-    ##parameters = theInternetNavigate()
-    ##parameters = theInternetFrames()
-    #parameters = violatorSearch()
+    #parameters = theInternetNavigate()
+    #parameters = theInternetFrames()
+    parameters = violatorSearch()
 
     print parameters['operatorMessage']
     loadRegExPatterns()

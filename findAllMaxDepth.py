@@ -104,6 +104,7 @@ def crawl_web(seed,max_depth):
             depth = depth + 1
     return index
 
+<<<<<<< HEAD
 anIndex = crawl_web("http://www.udacity.com/cs101x/index.html",0)
 for e in anIndex:
     print e
@@ -120,3 +121,25 @@ for e in anIndex:
 #for e in anIndex:
 #    print e
 
+=======
+#anIndex = crawl_web("http://nttaintranet1/default.aspx",0)
+#for e in anIndex:
+#    print e
+
+#anIndex = crawl_web("http://www.udacity.com/cs101x/index.html",0)
+#for e in anIndex:
+#    print e
+
+#anIndex = crawl_web("http://www.udacity.com/cs101x/index.html",1)
+#for e in anIndex:
+#    print e
+
+#anIndex = crawl_web("http://www.udacity.com/cs101x/index.html",50)
+#for e in anIndex:
+#    print e
+
+anIndex = crawl_web("http://nttaintranet1/default.aspx",0)
+for e in anIndex:
+    print e
+
+>>>>>>> c4a95a9e05e29d475bb078e903c178926551f7b2

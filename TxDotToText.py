@@ -23,7 +23,11 @@ from selenium.common.exceptions import TimeoutException
 #create an instance of IE and set some options
 driver = webdriver.Ie()
 driver.maximize_window()
+<<<<<<< HEAD
 delay=10
+=======
+delay=30
+>>>>>>> c4a95a9e05e29d475bb078e903c178926551f7b2
 
 def timeout():
     print "TxDotQuery: timeout!"
@@ -31,7 +35,11 @@ def timeout():
 
 def credentials():
     # Go to the main web page and wait while the user enters credentials
+<<<<<<< HEAD
     url = 'https://mvdinet.txdmv.govX'
+=======
+    url = 'https://mvdinet.txdmv.gov'
+>>>>>>> c4a95a9e05e29d475bb078e903c178926551f7b2
     driver.get(url)
 
 def query(plate):
@@ -56,12 +64,20 @@ def query(plate):
 if __name__ == '__main__':
     credentials()
     print query("12345TX")
+<<<<<<< HEAD
     with open('dealerPlates.csv', 'r') as plateFile:
+=======
+    with open('plates.csv', 'r') as plateFile:
+>>>>>>> c4a95a9e05e29d475bb078e903c178926551f7b2
         csvInput = csv.reader(plateFile)
         plates = [row[0] for row in csvInput]
 
     with open('txdotText.txt', 'a') as outfile:
+<<<<<<< HEAD
         outfile.truncate()
+=======
+        #outfile.truncate()
+>>>>>>> c4a95a9e05e29d475bb078e903c178926551f7b2
         for plate in plates:
             fileString = query(plate)
             try:

@@ -5,6 +5,7 @@
 # close the page
 
 # works on win7, ie10
+<<<<<<< HEAD
 import io
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
@@ -15,10 +16,31 @@ driver.implicitly_wait(30)
 driver.maximize_window()
 
 url = 'http://mail.thornton.net'
+=======
+import os
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+import selenium.webdriver.support.expected_conditions as EC
+from selenium.common.exceptions import TimeoutException
+
+delay=10
+
+def timeout():
+    print "Took too much time!"
+    quit()
+
+#create an instance of IE and set some options
+driver = webdriver.Ie()
+driver.maximize_window()
+
+url = 'https://lprod.scip.ntta.org/scip'
+>>>>>>> c4a95a9e05e29d475bb078e903c178926551f7b2
 driver.get(url)
 
 #WebDriverWait(driver,10).until()
 
+<<<<<<< HEAD
 userNameField = driver.find_element_by_name('_user')
 userNameField.clear()
 userNameField.send_keys("mike@thornton.net")
@@ -33,3 +55,34 @@ selectMenuItem = driver.find_element_by_xpath('//li[@class="mailbox"]/a[contains
 selectMenuItem.click()
 #driver.quit()
 
+=======
+userNameField = driver.find_element_by_name('j_username')
+userNameField.clear()
+passwordField = driver.find_element_by_name('j_password')
+passwordField.clear()
+
+userNameField.send_keys("mthornton")
+passwordField.send_keys("NTTA2apr04")
+passwordField.submit()
+
+menuItem = driver.find_element_by_xpath("//td[@id='Bar1']")
+menuItem.click()
+try:
+    locator =(By.XPATH,"//div[@id='menuItem3']")
+    nextPage = WebDriverWait(driver, delay).until(EC.element_to_be_clickable(locator))
+    nextPage.click()
+    driver.maximize_window()
+except TimeoutException:
+    timeout()
+
+try:
+    locator =(By.XPATH,"//A[@HREF='javascript:toggle( 58,59,60,61,62,63,64)']")
+    menuItem = WebDriverWait(driver, delay).until(EC.element_to_be_clickable(locator))
+    menuItem.click()
+    driver.maximize_window()
+except TimeoutException:
+    timeout()
+
+
+driver.quit()
+>>>>>>> c4a95a9e05e29d475bb078e903c178926551f7b2

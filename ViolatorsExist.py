@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------------
-# Name:        TxDotToCSV
+# Name:        ViolatorsExist
 # Purpose:     gather output from TXDMV RTS database, parse the raw text,
 #              and save to CSV text file
 # Author:      mthornton
@@ -27,36 +27,19 @@ def main():
     #print sheet
     #data = [[sheet.cell_value(r, c) for c in range(sheet.ncols)] for r in range(sheet.nrows)]
 
-<<<<<<< HEAD
-    with open('dealerPlates.csv', 'r') as plateFile:
-=======
-    with open('plates.csv', 'r') as plateFile:
->>>>>>> c4a95a9e05e29d475bb078e903c178926551f7b2
+    with open('platesVio.csv', 'r') as plateFile:
         csvInput = csv.reader(plateFile)
         plates = [row[0] for row in csvInput]
     #print plates
 
-    with open('dataCSV.txt', 'a') as outfile, open('txdotText.txt', 'a') as rawTextFile:
+    with open('dataVioCSV.txt', 'a') as outfile:
         outfile.truncate()
-<<<<<<< HEAD
-        rawTextFile.truncate()
         for plate in plates:
-            results = query(plate)
-            for e in results:
-                rawTextFile.write(fileString)
-                rawTextFile.write('\n\n------------------------------------\n\n')
-                fileString = filter(lambda x: x in string.printable, e.text)
-                print fileString
-=======
-        #rawTextFile.truncate()
-        for plate in plates:
-            results = query(plate)
+            results = queryViolator(plate)
             for e in results:
                 fileString = filter(lambda x: x in string.printable, e.text)
                 print fileString
                 rawTextFile.write(fileString)
-                rawTextFile.write('\n\n------------------------------------\n\n')
->>>>>>> c4a95a9e05e29d475bb078e903c178926551f7b2
 
             fileString = repairLineBreaks(fileString)
             foundCurrentPlate = False
@@ -80,18 +63,14 @@ def main():
                     outfile.write(csvString)
         outfile.write('----------------\n')
         outfile.flush()
-    print "main: Finished parsing TxDot file."
+    print "main: Finished ...."
 
 
 from TxDotQuery import credentials
 from TxDotQuery import connect
 from TxDotQuery import query
 
-<<<<<<< HEAD
-# input - 'dealerPlates.csv'
-=======
 # input - 'plates.csv'
->>>>>>> c4a95a9e05e29d475bb078e903c178926551f7b2
 # output - 'dataCSV.txt'
 if __name__ == '__main__':
     credentials()

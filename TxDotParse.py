@@ -597,7 +597,11 @@ def main():
     print "main: Finished parsing TxDot file."
 
 # input - 'txdotText.txt'
+<<<<<<< HEAD
 # input - 'dealerPlates.csv'
+=======
+# input - 'plates.csv'
+>>>>>>> c4a95a9e05e29d475bb078e903c178926551f7b2
 # output - 'data.csv'
 if __name__ == '__main__':
     main()

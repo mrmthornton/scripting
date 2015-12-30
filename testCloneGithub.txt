@@ -1,0 +1,3 @@
+git@github.com:mrmthornton/scripting.git
+https://github.com/mrmthornton/scripting.git
+how to clone from a private repository

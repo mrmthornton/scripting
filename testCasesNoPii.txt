@@ -1,5 +1,10 @@
+<<<<<<< HEAD
 This file contains mock responses. 
 All Personally Identifiable information has been removed.
+=======
+Line break in ZipCode 
+Line break in state
+>>>>>>> c4a95a9e05e29d475bb078e903c178926551f7b2
 
 ------------------extra addr line and city has two words------------------------
 
@@ -23,7 +28,11 @@ All Personally Identifiable information has been removed.
   30000 LBJ FREEWAY SOUTH       
   SAN ANTONIO              TX   75001
                                     
+<<<<<<< HEAD
   CODE XYZ 12 2013 057 99999  000000   SP
+=======
+  CODE XYZ 12 2013 057 BOB 99  000000   SP
+>>>>>>> c4a95a9e05e29d475bb078e903c178926551f7b2
  
 -------------------------------------------------------------------------------- 
 
