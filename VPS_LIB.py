@@ -112,7 +112,7 @@ def getTextResults(driver, delay, plateString, parameters):
             text = resultElement.text
             isFound = pattern.findall(text)
             if isFound:
-                return [0]
+                return isFound[0]
     except TimeoutException:
         timeout('getTextResults: text not found')
         return None

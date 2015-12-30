@@ -197,11 +197,14 @@ def dataIO(driver, parameters):
             #    pageLoaded = newPageIsLoaded(driver, delay, goesStaleElement)
                 # wait for next go stale element or something slow
             foundFrame = findAndSelectFrame(driver, delay, parameters)
+            print foundFrame
             text = getTextResults(driver, delay, plateString, parameters)
             if text!= None: # if there is text, process it
-                stringSegment = parseString(text, beginPattern, numCommaPattern, "all")
-                sys.stdout.write(plateString + ", " + str(stringSegment) + '\n')
-                outfile.write(plateString + ", " + str(stringSegment) + '\n')
+                #stringSegment = parseString(text, beginPattern, numCommaPattern, "all")
+                #sys.stdout.write(plateString + ", " + str(stringSegment) + '\n')
+                #outfile.write(plateString + ", " + str(stringSegment) + '\n')
+                sys.stdout.write(plateString + ", " + str(text) + '\n')
+                outfile.write(plateString + ", " + str(text) + '\n')
                 outfile.flush()
             # navigate to search position
             if type(parameters['buttonLocator']) == type(None): # since there is no button, start at the 'top' of the page
