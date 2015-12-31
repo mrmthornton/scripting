@@ -41,7 +41,7 @@ def googleValues():
     'resultPageTextLocator' : (By.XPATH, '//TD/H1'),
     'resultPageVerifyText' : '',
     'outputLocator' : (By.XPATH, '//div[@id="resultStats"][contains(text(),"About")]'),
-    'resultIndexParameters' : {'index' : "About ", 'selector' : 'tail'},  # head, tail, or all
+    'resultIndexParameters' : {'index' : "About ([0-9,]+) results", 'selector' : 'tail'},  # head, tail, or all
     'dataInFileName' : 'google.csv',
     'dataOutFileName' : 'output.txt',
     'returnOrClick' : 'return', # use Return or Click to submit form
@@ -193,16 +193,11 @@ def dataIO(driver, parameters):
             element = findElementOnPage(driver, delay, parameters['inputLocator'])
             goesStaleElement = findElementOnPage(driver, delay, parameters['staleLocator'])
             submitted = fillFormAndSubmit(driver, startWindow, element, plateString, parameters)
-            #if submitted: # if nothing was submitted, don't wait for the page to load
-            #    pageLoaded = newPageIsLoaded(driver, delay, goesStaleElement)
-                # wait for next go stale element or something slow
             foundFrame = findAndSelectFrame(driver, delay, parameters)
             print foundFrame
             text = getTextResults(driver, delay, plateString, parameters)
             if text!= None: # if there is text, process it
-                #stringSegment = parseString(text, beginPattern, numCommaPattern, "all")
-                #sys.stdout.write(plateString + ", " + str(stringSegment) + '\n')
-                #outfile.write(plateString + ", " + str(stringSegment) + '\n')
+                text = removePunctuation(text)
                 sys.stdout.write(plateString + ", " + str(text) + '\n')
                 outfile.write(plateString + ", " + str(text) + '\n')
                 outfile.flush()
@@ -210,10 +205,6 @@ def dataIO(driver, parameters):
             if type(parameters['buttonLocator']) == type(None): # since there is no button, start at the 'top' of the page
                 driver.switch_to_default_content()
             else:
-                # there is a button. find it/click it/wait for page to load
-
-                # already at frame
-                #foundFrame = findAndSelectFrame(driver, delay, parameters)
                 goesStaleElement = findElementOnPage(driver, delay, parameters['buttonLocator'])
                 clicked = findAndClickButton(driver, delay, parameters)
                 # was 3 seconds for next line
@@ -228,7 +219,7 @@ if __name__ == '__main__':
     #parameters = ciscoValues() # should work on production systems
     #parameters = theInternetNavigate()
     #parameters = theInternetFrames()
-    parameters = violatorSearch()
+    #parameters = violatorSearch()
 
     print parameters['operatorMessage']
     loadRegExPatterns()
