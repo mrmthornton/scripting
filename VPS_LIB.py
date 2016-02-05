@@ -5,11 +5,10 @@
 # Author:      mthornton
 #
 # Created:     2015 AUG 01
-# Updates:     2015 DEC 21
+# Updates:     2015 NOV 17
 # Copyright:   (c) michael thornton 2015
 #-------------------------------------------------------------------------------
 
-from contextlib import contextmanager
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchFrameException
 from selenium.common.exceptions import NoSuchWindowException
@@ -58,12 +57,11 @@ def findAndSelectFrame(driver, delay, parameters):
             try:
                 foundFrame = WebDriverWait(driver, delay).until(EC.presence_of_element_located(locator))
                 driver.switch_to_frame(foundFrame)
-                continue
+                return True
             except TimeoutException:
                 print "findAndSelectFrame: ", locator, " not found."
                 continue
-                return False
-        return True
+        return False
 
 def findElementOnPage(driver, delay, elementLocator, window=None):
     if elementLocator == None:# skip finding the element
@@ -78,7 +76,7 @@ def findElementOnPage(driver, delay, elementLocator, window=None):
         timeout('findElementOnPage: element' + str(elementLocator) + 'not found')
         return None
 
-def findTargetPage(driver, delay, locator, targetText=""):
+def findTargetPage(driver, delay, locator):
     try:
         handle = driver.current_window_handle
     except NoSuchWindowException:
@@ -87,36 +85,43 @@ def findTargetPage(driver, delay, locator, targetText=""):
     handles = driver.window_handles
     for handle in handles:  # test each window for target
         driver.switch_to_window(handle)
-        #print "findTargetPage: Searching for '" , targetText, "' in window ", handle # for debug purposes
+        print "findTargetPage: Searching for  ", locator # for debug purposes
         try:
             elems = WebDriverWait(driver, delay).until(EC.presence_of_all_elements_located(locator))
         except TimeoutException:
             timeout('findTargetPage: locator element not found')
             continue
-        for element in elems:       # test each element for target
-            if (element.text == targetText) or (targetText == ""):
-                #print "findTargetPage: found '", element.text, "'" # for debug purposes
-                return handle, element
-    print "findTargetPage: 'target text' not found"
+        #print "findTargetPage: found '", element.text, "'" # for debug purposes
+        return handle
+    print "findTargetPage: 'target page' not found"
     return None, None
 
+
 def getTextResults(driver, delay, plateString, parameters):
-    #print "getTextResults: " + driver.current_url # for debug purposes
+    #print "getTextResults: " + driver.current_url # for debug
     resultIndex = parameters['resultIndexParameters']['index']
     pattern = re.compile(resultIndex)
-    if parameters['outputLocator']== None: # skip finding text
+    if parameters['outputLocator']is None: # skip finding text
         return None
-    try:
-        while True:
-            resultElement = WebDriverWait(driver, delay).until(EC.presence_of_element_located(parameters['outputLocator']))
-            text = resultElement.text
-            isFound = pattern.findall(text)
-            if isFound:
-                return isFound[0]
-    except TimeoutException:
-        timeout('getTextResults: text not found')
-        return None
-    return none
+    while True:
+        try: # short delay with retry loop
+            resultElement = WebDriverWait(driver, 1).until(EC.presence_of_element_located(parameters['outputLocator']))
+        except TimeoutException:
+            timeout('getTextResults: text not found')
+            driver.switch_to_default_content()
+            foundFrame = findAndSelectFrame(driver, delay, parameters)
+            continue  # why does this not find the text   #try this with the locator using rEGEX, and  why not found? no frame? pass in frame?
+        except StaleElementReferenceException:
+            print 'getTextResults: element no longer valid?'
+            return -1
+        elemText = resultElement.text
+        if elemText == 'No Records returned':
+            return 0
+        text = pattern.findall(elemText)
+        if len(text):
+            print "getTextResults", text # for debug
+            return text[0]
+    return None
 
 def loadRegExPatterns():
     patterns = {
@@ -130,6 +135,33 @@ def loadRegExPatterns():
     'datePattern' : re.compile('[0-9]{2,2}/[0-9]{2,2}/[0-9]{4,4}'), # mo/day/year
     'dateYearFirstPattern' : re.compile(r'\d{4,4}/\d{2,2}/\d{2,2}'), # year/mo/day
     }
+
+def newPageElementFound(driver, delay, frameLocator, elementlocator):
+    if elementlocator is None: # skip finding text
+        return None
+    # move the loop outside of the try/except
+    if frameLocator is not None:
+        try:
+            foundFrame = WebDriverWait(driver, delay).until(EC.presence_of_element_located(frameLocator))
+            if foundFrame is not None:
+                driver.switch_to_frame(foundFrame)
+            else:
+                return False
+        except TimeoutException:
+            print "newPageElementFound/findAndSelectFrame: ", frameLocator, " not found."
+            return False
+    try:
+        while True:
+            try:
+                resultElement = WebDriverWait(driver, 1).until(EC.presence_of_element_located(elementlocator))
+                driver.switch_to_default_content()
+                return True
+            except TimeoutException:
+                print 'newPageElementFound: ',elementlocator, 'element not found'
+                continue
+    except TimeoutException:
+            return None
+    return None
 
 def newPageIsLoaded(driver, delay, currentElement):
     def isStale(self):
