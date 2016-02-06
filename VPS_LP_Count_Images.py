@@ -8,8 +8,8 @@
 # Author:      mthornton
 #
 # Created:     2015 AUG 01
-# Updates:     2015 NOV 20
-# Copyright:   (c) michael thornton 2015
+# Updates:     2016 FEB 05
+# Copyright:   (c) michael thornton 2015,2016
 #-------------------------------------------------------------------------------
 
 from selenium import webdriver
@@ -36,13 +36,13 @@ def googleValues():
     'inputLocator' : (By.XPATH,'//input[@name="q"]'),
     'staleLocator' : None,
     'staleLocator2' : None,
-    'buttonLocator' : None,
+    #'buttonLocator' : None,
     'buttonLocator' : (By.XPATH,'//button[@value="Search"]'),
     'frameParamters' : {'useFrames' : False},
     'resultPageTextLocator' : (By.XPATH, '//TD/H1'),
     'resultPageVerifyText' : '',
     'outputLocator' : (By.XPATH, '//div[@id="resultStats"][contains(text(),"About")]'),
-    'resultIndexParameters' : {'index' : "About ", 'selector' : 'tail'},  # head, tail, or all
+    'resultIndexParameters' : {'regex' : "About ([0-9,]+) ", 'selector' : 'tail'},  # head, tail, or all
     'dataInFileName' : 'google.csv',
     'dataOutFileName' : 'output.txt',
     'returnOrClick' : 'return', # use Return or Click to submit form
@@ -85,7 +85,7 @@ def hntbValues():
     'resultPageTextLocator' : (By.XPATH, '//TITLE'),
     'resultPageVerifyText' : 'Search Result',
     'outputLocator' : (By.ID, "resultStats"),
-    'resultIndexParameters' : {'index' : " Results", 'selector' : 'tail'},  # head, tail, or all
+    'resultIndexParameters' : {'regex' : " Results", 'selector' : 'tail'},  # head, tail, or all
     'dataInFileName' : 'plates.csv',
     'dataOutFileName' : 'platesOut.txt',
     'returnOrClick' : 'return', # use Return or Click to submit form
@@ -172,7 +172,7 @@ def violatorSearch():
     'resultPageTextLocator' : (By.XPATH, '//TD/H1'),
     'resultPageVerifyText' : 'Violation Search Results',
     'outputLocator' : (By.XPATH,'//BODY/P[contains(text(),"Record")]'),
-    'resultIndexParameters' : {'index' : "Records \d+ to \d+ of (\d+)", 'selector' : 'tail'},  # head, tail, or all
+    'resultIndexParameters' : {'regex' : "Records \d+ to \d+ of (\d+)", 'selector' : 'tail'},  # head, tail, or all
     #'dataInFileName' : 'LP_Repeats_Count_short.csv',
     'dataInFileName' : 'LP_Repeats_Count.csv',
     'dataOutFileName' : 'LP_Repeats_Count_Out.txt',
@@ -181,8 +181,6 @@ def violatorSearch():
     return parameters
 
 def dataIO(driver, parameters):
-    beginPattern = re.compile(parameters['resultIndexParameters']['index'])
-    numCommaPattern = re.compile('[0-9,]+')
     delay = parameters['delay']
     # needs a way to detect window not found condition.
     startWindow = findTargetPage(driver, findStartWindowDelay, parameters['startPageTextLocator'])
@@ -193,36 +191,26 @@ def dataIO(driver, parameters):
         outfile.truncate()
         csvInput = csv.reader(infile)
         for row in csvInput:
-            print 'start of loop' # for debug purposes
             rawString = row[0]
             if rawString == "" or rawString == 0:  #end when input does not exist
                 break
             plateString = cleanUpLicensePlateString(rawString)
             element = findElementOnPage(driver, delay, parameters['inputLocator'])
             submitted = fillFormAndSubmit(driver, startWindow, element, plateString, parameters) # why so slow?
-            if parameters['staleLocator2'] is not None:
-                pageLoaded = newPageElementFound(driver, delay, (By.XPATH, '//frame[@name="fraTOP"]'), parameters['staleLocator2'])
-            print 'passed newPageElementFound' # for debug purposes
+            pageLoaded = newPageElementFound(driver, delay, (By.XPATH, '//frame[@name="fraTOP"]'), parameters['staleLocator2'])
             foundFrame = findAndSelectFrame(driver, delay, parameters)
-#text may not be there yet!
+            #text may not be there yet!
             text = getTextResults(driver, delay, plateString, parameters)
-            if text!= None:
-                # if there is text, process it
-                ##stringSegment = parseString(text, beginPattern, numCommaPattern, "all")
+            if text is not None: # if there is text, process it
                 sys.stdout.write(plateString + ", " + str(text) + '\n')
                 outfile.write(plateString + ", " + str(text) + '\n')
                 outfile.flush()
             # navigate to search position
-            if type(parameters['buttonLocator']) == type(None):
-                # since there is no button, start at the 'top' of the page
+            if type(parameters['buttonLocator']) is None: # no button, start at 'top' of the page
                 driver.switch_to_default_content()
-            else:
-                # there is a button. find it/click it/wait for page to load
+            else: # there is a button. find it/click it/wait for page to load
                 clicked = findAndClickButton(driver, delay, parameters)
-                print 'before testing for query page ' # for debug purposes
-                if parameters['staleLocator'] is not None:
-                    pageLoaded = newPageElementFound(driver, delay, None, parameters['staleLocator'])
-                print 'after checking query page ' # for debug purposes
+                pageLoaded = newPageElementFound(driver, delay, None, parameters['staleLocator'])
 
     print "main: Finished parsing plate file."
 
@@ -238,7 +226,7 @@ if __name__ == '__main__':
 
     findStartWindowDelay = 3
     print parameters['operatorMessage']
-    loadRegExPatterns()
+    regexPattens = loadRegExPatterns()
     driver = openBrowser(parameters['url'])
     dataIO(driver, parameters)
     driver.close()
