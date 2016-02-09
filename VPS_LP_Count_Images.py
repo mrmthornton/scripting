@@ -216,13 +216,13 @@ def dataIO(driver, parameters):
 
 if __name__ == '__main__':
 
-    parameters = googleValues()
+    parameters = googleValues()# can't google from production.
     #parameters = sigmaAldrichValues()
     #parameters = hntbValues()
     #parameters = ciscoValues() # should work on production systems
     #parameters = theInternetNavigate()
     #parameters = theInternetFrames()
-    #parameters = violatorSearch()
+    parameters = violatorSearch()
 
     findStartWindowDelay = 3
     print parameters['operatorMessage']
