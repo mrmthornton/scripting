@@ -107,8 +107,8 @@ def getTextResults(driver, delay, plateString, parameters):
             # short delay with retry loop
             resultElement = WebDriverWait(driver, 0.1).until(EC.presence_of_element_located(parameters['outputLocator']))
         except TimeoutException:
-            timeout('getTextResults: text not found')
-            driver.switch_to_default_content()
+            timeout('getTextResults: text not found, trying again...')
+            #driver.switch_to_default_content()
             foundFrame = findAndSelectFrame(driver, delay, parameters)
             continue  # why does this not find the text
                         #try this with the locator using rEGEX, and  why not found? no frame? pass in frame?

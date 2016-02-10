@@ -1,13 +1,16 @@
 *.7z
+*.csv
 *.exe
 .git/
 *.lnk
 *.log
+*.msg
 *.pyc
 *.txt
 *.xlsx
 *.xlsm
 *.zip
+.idea/
 .metadata/
 How To Read a TXDOT.pdf
 IEDriverServer_x64_2.44.0
