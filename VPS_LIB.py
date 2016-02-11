@@ -81,7 +81,7 @@ def findTargetPage(driver, delay, locator):
         handle = driver.current_window_handle
     except NoSuchWindowException:
         print "findTargetPage: nothing to process, all windows finished?"
-        return None, None
+        return None
     handles = driver.window_handles
     for handle in handles:  # test each window for target
         driver.switch_to_window(handle)
@@ -94,7 +94,7 @@ def findTargetPage(driver, delay, locator):
         #print "findTargetPage: found '", element.text, "'" # for debug purposes
         return handle
     print "findTargetPage: 'target page' not found"
-    return None, None
+    return None
 
 def getTextResults(driver, delay, plateString, parameters):
     #print "getTextResults: " + driver.current_url # for debug
@@ -167,7 +167,7 @@ def newPageElementFound(driver, delay, frameLocator, elementlocator):
             return None
     return None
 
-def newPageIsLoaded(driver, delay, currentElement):
+def newPageIsLoaded(driver, delay, currentElement): # depricated ?
     def isStale(self):
         if type(currentElement) == type(None):# when there is no element to check,
             return True          # quit immediately
