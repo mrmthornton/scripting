@@ -4,8 +4,8 @@
 #              and save to CSV text file
 # Author:      mthornton
 #
-# Created:     24/11/2014
-# Updates:     24/06/2015
+# Created:     2014 NOV 24
+# Updates:     2016 FEB 11
 # Copyright:   (c) mthornton 2014, 2015
 #-------------------------------------------------------------------------------
 
@@ -14,11 +14,7 @@ import io
 import csv
 import string
 
-from TxDotParse import repairLineBreaks
-from TxDotParse import findResponseType
-from TxDotParse import parseRecord
-from TxDotParse import csvStringFromList
-
+from TxDot_LIB import *
 
 def main():
 
@@ -27,27 +23,14 @@ def main():
     #print sheet
     #data = [[sheet.cell_value(r, c) for c in range(sheet.ncols)] for r in range(sheet.nrows)]
 
-<<<<<<< HEAD
-    with open('dealerPlates.csv', 'r') as plateFile:
-=======
-    with open('plates.csv', 'r') as plateFile:
->>>>>>> c4a95a9e05e29d475bb078e903c178926551f7b2
+    # dealerPlates.csv, plates.csv
+    with open('SOMENAME.csv', 'r') as plateFile:
         csvInput = csv.reader(plateFile)
         plates = [row[0] for row in csvInput]
     #print plates
 
     with open('dataCSV.txt', 'a') as outfile, open('txdotText.txt', 'a') as rawTextFile:
         outfile.truncate()
-<<<<<<< HEAD
-        rawTextFile.truncate()
-        for plate in plates:
-            results = query(plate)
-            for e in results:
-                rawTextFile.write(fileString)
-                rawTextFile.write('\n\n------------------------------------\n\n')
-                fileString = filter(lambda x: x in string.printable, e.text)
-                print fileString
-=======
         #rawTextFile.truncate()
         for plate in plates:
             results = query(plate)
@@ -56,7 +39,6 @@ def main():
                 print fileString
                 rawTextFile.write(fileString)
                 rawTextFile.write('\n\n------------------------------------\n\n')
->>>>>>> c4a95a9e05e29d475bb078e903c178926551f7b2
 
             fileString = repairLineBreaks(fileString)
             foundCurrentPlate = False
@@ -87,11 +69,8 @@ from TxDotQuery import credentials
 from TxDotQuery import connect
 from TxDotQuery import query
 
-<<<<<<< HEAD
 # input - 'dealerPlates.csv'
-=======
 # input - 'plates.csv'
->>>>>>> c4a95a9e05e29d475bb078e903c178926551f7b2
 # output - 'dataCSV.txt'
 if __name__ == '__main__':
     credentials()
