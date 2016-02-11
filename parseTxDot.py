@@ -1,6 +1,5 @@
 #-------------------------------------------------------------------------------
 # Name:        parseTxDot
-<<<<<<< HEAD
 # Purpose:     test parse modules
 #
 # Author:      mthornton
@@ -8,10 +7,6 @@
 # Created:     25/06/2015
 # Copyright:   (c) mthornton 2015
 #-------------------------------------------------------------------------------
-
-import io
-import csv
-
 from TxDotParse import repairLineBreaks
 from TxDotParse import findResponseType
 from TxDotParse import parseRecord
@@ -23,7 +18,7 @@ def main():
         csvInput = csv.reader(plateFile)
         plates = [row[0] for row in csvInput]
         #print plates
-=======
+==
 # Purpose:     read text output from the TxDot DMV database lookup
 #
 # Author:      mthornton

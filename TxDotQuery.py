@@ -23,7 +23,7 @@ from selenium.common.exceptions import TimeoutException
 #create an instance of IE and set some options
 driver = webdriver.Ie()
 driver.maximize_window()
-delay=30
+delay=15
 
 def timeout():
     print "TxDotQuery: timeout!"
@@ -31,11 +31,7 @@ def timeout():
 
 def credentials():
     # Go to the main web page and wait while the user enters credentials
-<<<<<<< HEAD
     url = 'https://mvdinet.txdmv.govX'
-=======
-    url = 'https://mvdinet.txdmv.gov'
->>>>>>> c4a95a9e05e29d475bb078e903c178926551f7b2
     driver.get(url)
 
 def connect():
