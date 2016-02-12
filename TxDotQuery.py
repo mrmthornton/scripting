@@ -20,47 +20,16 @@ from selenium.webdriver.support.ui import WebDriverWait
 import selenium.webdriver.support.expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 
-
-
-def timeout():
-    print "TxDotQuery: timeout!"
-    quit()
-
-def credentials():
-    # Go to the main web page and wait while the user enters credentials
-    url = 'https://mvdinet.txdmv.govX'
-    driver.get(url)
-
-def connect():
-    try:
-        locator =(By.NAME,'plate_1')
-        plateField = WebDriverWait(driver, delay,20).until(EC.presence_of_element_located(locator))
-    except TimeoutException:
-        timeout()
-
-def query(plate):
-    try:
-        locator =(By.NAME,'plate_1')
-        plateField = WebDriverWait(driver, delay,2).until(EC.presence_of_element_located(locator))
-        plateField.clear()
-        plateField.send_keys(plate)
-        plateField.submit()
-    except TimeoutException:
-        timeout()
-
-    try:
-        locator = (By.XPATH, '//pre')
-        results = WebDriverWait(driver, delay).until(EC.presence_of_all_elements_located(locator))
-    except TimeoutException:
-        timeout()
-
-    return results
-
+from TxDot_LIB_1 import *
+from VPS_LIB import *
 
 if __name__ == '__main__':
     #create an instance of IE and set some options
     driver = webdriver.Ie()
     delay = 15
-    credentials()
-    connect()
-    print query("12345TX")
+    #url = 'https://github.com'
+    url = 'https://mvinet.txdmv.gov'
+    driver.get(url)
+    locator =(By.NAME,'plate_1')
+    findElementOnPage(driver, delay, locator)
+    print query(driver, "12345TX")
