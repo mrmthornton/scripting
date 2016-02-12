@@ -20,10 +20,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 import selenium.webdriver.support.expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 
-#create an instance of IE and set some options
-driver = webdriver.Ie()
-driver.maximize_window()
-delay=15
+
 
 def timeout():
     print "TxDotQuery: timeout!"
@@ -61,6 +58,9 @@ def query(plate):
 
 
 if __name__ == '__main__':
+    #create an instance of IE and set some options
+    driver = webdriver.Ie()
+    delay = 15
     credentials()
     connect()
     print query("12345TX")
