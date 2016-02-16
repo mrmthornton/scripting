@@ -182,7 +182,7 @@ def violatorSearch():
 
 def dataIO(driver, parameters):
     delay = parameters['delay']
-    # needs a way to detect window not found condition.
+    # pause on next line for entry of credentials, and window navigation.
     startWindow = findTargetPage(driver, findStartWindowDelay, parameters['startPageTextLocator'])
     if startWindow is None:
         print "Start Page not found."

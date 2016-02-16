@@ -20,16 +20,22 @@ from selenium.webdriver.support.ui import WebDriverWait
 import selenium.webdriver.support.expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 
-from TxDot_LIB_1 import *
+from TxDot_LIB import *
 from VPS_LIB import *
 
 if __name__ == '__main__':
     #create an instance of IE and set some options
     driver = webdriver.Ie()
     delay = 15
-    #url = 'https://github.com'
+    findStartWindowDelay = 5
     url = 'https://mvinet.txdmv.gov'
     driver.get(url)
-    locator =(By.NAME,'plate_1')
+    #startPageLocator = (By.XPATH,'//H3[contains(text(),"VTR Inquiry")]')
+    startPageLocator = (By.XPATH,'//title[contains(text(),"Vehicle")]')
+    startPageHandle = startWindow = findTargetPage(driver, findStartWindowDelay, startPageLocator)
+
+    locator =(By.CLASS_NAME, "v-textfield v-widget iw-child v-textfield-iw-child iw-mandatory v-textfield-iw-mandatory v-has-width")
     findElementOnPage(driver, delay, locator)
-    print query(driver, "12345TX")
+    element.clear()
+    element.send_keys(textForForm)
+    element.send_keys('\n')
