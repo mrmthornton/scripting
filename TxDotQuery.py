@@ -33,9 +33,10 @@ if __name__ == '__main__':
     #startPageLocator = (By.XPATH,'//H3[contains(text(),"VTR Inquiry")]')
     startPageLocator = (By.XPATH,'//title[contains(text(),"Vehicle")]')
     startPageHandle = startWindow = findTargetPage(driver, findStartWindowDelay, startPageLocator)
-
-    locator =(By.CLASS_NAME, "v-textfield v-widget iw-child v-textfield-iw-child iw-mandatory v-textfield-iw-mandatory v-has-width")
-    findElementOnPage(driver, delay, locator)
+    #   "v-textfield v-widget iw-child v-textfield-iw-child iw-mandatory v-textfield-iw-mandatory v-has-width"
+    inputFieldLocator =(By.XPATH, '//nobr[contains(text(), "Enter Plate Number")]')
+    element = findElementOnPage(driver, delay, inputFieldLocator)
+    print element.text
     element.clear()
     element.send_keys(textForForm)
     element.send_keys('\n')

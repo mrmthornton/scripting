@@ -59,9 +59,9 @@ if __name__ == '__main__':
     print parameters['operatorMessage']
     regexPattens = loadRegExPatterns()
     driver = openBrowser(parameters['url'])
-locator = (By.XPATH, '//td[text(), contains("Application")]')
+    locator = (By.XPATH, '//td[text(), contains("Application")]')
+    print 'start'
     while True:
-        print 'start'
         time.sleep(480)
         print 'open'
 
