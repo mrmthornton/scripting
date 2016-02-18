@@ -34,11 +34,13 @@ if __name__ == '__main__':
     #startPageLocator = (By.XPATH,'//H3[contains(text(),"VTR Inquiry")]')
     startPageLocator = (By.XPATH,'//title[contains(text(),"Vehicle")]')
     startPageHandle = startWindow = findTargetPage(driver, findStartWindowDelay, startPageLocator)
-    #   "v-textfield v-widget iw-child v-textfield-iw-child iw-mandatory v-textfield-iw-mandatory v-has-width"
-    cousinLocator =(By.XPATH, '//nobr[contains(text(), "Enter Plate Number")]')
-    cousinElement = findElementOnPage(driver, delay, cousinLocator)
-    print cousinElement.text
-    plateSubmitElement = findElementOnPage(driver, delay, (By.XPATH, '/div[parent]') )
+    #cousinLocator =(By.XPATH, '//nobr[contains(text(), "Enter Plate Number")]')
+    #cousinElement = findElementOnPage(driver, delay, cousinLocator)
+    #print cousinElement.text
+
+    plateSubmitLocator = (By.XPATH, '//input[@class="v-textfield v-widget iw-child v-textfield-iw-child iw-mandatory v-textfield-iw-mandatory v-has-width"]')
+    plateSubmitElement = findElementOnPage(driver, delay, plateSubmitLocator)
     plateSubmitElement.clear()
-    plateSubmitElement.send_keys(textForForm)
+    plateSubmitElement.send_keys('1234567')
     plateSubmitElement.send_keys('\n')
+    driver.close()
