@@ -21,14 +21,14 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 import re
 
-def cleanUpLicensePlateString(plateString):
-    plateString = plateString.replace(' ' , '') # remove any spaces
-    plateString = plateString.replace('"' , '') # remove any double quotes
-    plateString = plateString.replace('\t' , '') # remove any tabs
-    plateString = plateString.replace(',' , '\n') # replace comma with \n
+def cleanUpString(messyString):
+    cleanString = messyString.replace(' ' , '') # remove any spaces
+    cleanString = cleanString.replace('"' , '') # remove any double quotes
+    cleanString = cleanString.replace('\t' , '') # remove any tabs
+    cleanString = cleanString.replace(',' , '\n') # replace comma with \n
     for n in range(10):            # replace multiple newlines with a single \n
-        plateString = plateString.replace('\n\n' , '\n')
-    return plateString
+        cleanString = cleanString.replace('\n\n' , '\n')
+    return cleanString
 
 def fillFormAndSubmit(driver, window, element, textForForm, parameters):
     if type(element) == type(None): # skip the form submission
