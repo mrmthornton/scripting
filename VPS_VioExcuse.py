@@ -69,9 +69,12 @@ def excuse_violation(driver, parameters):
             #check for excusal page found
             pageLoaded = newPageElementFound(driver, delay, (By.XPATH, '//frame[@name="fraTOP"]'), parameters['staleLocator'])
             foundFrame = findAndSelectFrame(driver, delay, parameters)
+
             #select from drop down menu
+            # # select name="P_L_EXR_EXCUSED_REAS_DESCR"
 
             #click excuse button
+            # # input value="Excuse"
 
             #navigate to search page
             # navigate to search position
