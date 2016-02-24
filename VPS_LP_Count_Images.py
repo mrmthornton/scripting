@@ -8,7 +8,7 @@
 # Author:      mthornton
 #
 # Created:     2015 AUG 01
-# Updates:     2016 FEB 05
+# Updates:     2016 FEB 23
 # Copyright:   (c) michael thornton 2015,2016
 #-------------------------------------------------------------------------------
 
@@ -25,6 +25,7 @@ import io
 import csv
 import sys
 import string
+import time
 
 def googleValues():
     parameters = {
@@ -194,12 +195,12 @@ def dataIO(driver, parameters):
             rawString = row[0]
             if rawString == "" or rawString == 0:  #end when input does not exist
                 break
-            plateString = cleanUpLicensePlateString(rawString)
+            plateString = cleanUpString(rawString)
             element = findElementOnPage(driver, delay, parameters['inputLocator'])
             submitted = fillFormAndSubmit(driver, startWindow, element, plateString, parameters) # why so slow?
             pageLoaded = newPageElementFound(driver, delay, (By.XPATH, '//frame[@name="fraTOP"]'), parameters['staleLocator2'])
             foundFrame = findAndSelectFrame(driver, delay, parameters)
-            #text may not be there yet!
+            time.sleep(1)  #text may not be there yet!  how long to wait?
             text = getTextResults(driver, delay, plateString, parameters)
             if text is not None: # if there is text, process it
                 sys.stdout.write(plateString + ", " + str(text) + '\n')
