@@ -13,9 +13,10 @@
 #-------------------------------------------------------------------------------
 
 from selenium import webdriver
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.select import Select
+from selenium.webdriver.support.ui import WebDriverWait
 import selenium.webdriver.support.expected_conditions as EC
 
 from VPS_LIB import *
@@ -35,8 +36,8 @@ def violationExcusal():
     'startPageTextLocator' : (By.XPATH, '//TD/H1[contains(text(),"Violation Excusal")]'),
     'inputLocator' : (By.XPATH, '//input[@id = "P_VIOLATION_ID"]'),
     'staleLocator' : (By.XPATH,'//h1[contains(text(),"Violation Excusal")]'),
-    'buttonLocator' : (By.XPATH,'//input[@name="Z_CHK"]'),
-    'frameParamters' : {'useFrames' : True, 'frameLocator' : [ (By.XPATH, '//frame[@name="fraRL"]'),
+    'buttonLocator' : (By.XPATH,'//input[@value="Excuse"]'),
+    'frameParamters' : {'useFrames' : True, 'frameLocator' : [ (By.XPATH, '//frame[@name="fraVF"]'),
                                                                (By.XPATH, '//frame[@name="fraTOP"]') ] },
     'resultPageTextLocator' : (By.XPATH, '//TD/H1'),
     'resultPageVerifyText' : 'Violation Search Results',
@@ -68,21 +69,26 @@ def excuse_violation(driver, parameters):
             submitted = fillFormAndSubmit(driver, startWindow, element, inputString, parameters)
             #check for excusal page found
             pageLoaded = newPageElementFound(driver, delay, (By.XPATH, '//frame[@name="fraTOP"]'), parameters['staleLocator'])
+            #move to the correct frame
             foundFrame = findAndSelectFrame(driver, delay, parameters)
 
             #select from drop down menu
-            # # select name="P_L_EXR_EXCUSED_REAS_DESCR"
+            # if the menu is missing check for reason excused
+            menuLocator = (By.XPATH, '//select[@name="P_L_EXR_EXCUSED_REAS_DESCR"]')
+            menuElement = findElementOnPage(driver, delay, menuLocator)
+            Selector = Select(menuElement)
+            Selector.select_by_visible_text("Bankruptcy") # does this need to be instanciated each time?
 
             #click excuse button
-            # # input value="Excuse"
+            # 'buttonLocator' : (By.XPATH,'//input[@value="Excuse"]'),
+            clicked = findAndClickButton(driver, delay, parameters)
+            pageLoaded = newPageElementFound(driver, delay, (By.XPATH, '//frame[@name="fraTOP"]'), parameters['staleLocator'])
 
             #navigate to search page
             # navigate to search position
-            if type(parameters['buttonLocator']) is None: # no button, start at 'top' of the page
-                driver.switch_to_default_content()
-            else: # there is a button. find it/click it/wait for page to load
-                clicked = findAndClickButton(driver, delay, parameters)
-                pageLoaded = newPageElementFound(driver, delay, None, parameters['staleLocator'])
+
+            clicked = findAndClickButton(driver, delay, parameters)
+            pageLoaded = newPageElementFound(driver, delay, None, parameters['staleLocator'])
 
     print "main: Finished parsing plate file."
 
