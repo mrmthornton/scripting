@@ -51,8 +51,9 @@ def findAndClickButton(driver, delay, parameters):
     button.click()
     return True
 
-def findAndSelectFrame(driver, delay, parameters):
-    if parameters['frameParamters']['useFrames']:
+def findAndSelectFrame(driver, delay, parameters, frameName=None):
+    if parameters['frameParamters']['useFrames'] and frameName is None:
+        #make locator, and locator list, only one try except
         for locator in parameters['frameParamters']['frameLocator']:
             try:
                 foundFrame = WebDriverWait(driver, delay).until(EC.presence_of_element_located(locator))
@@ -62,6 +63,14 @@ def findAndSelectFrame(driver, delay, parameters):
                 print "findAndSelectFrame: ", locator, " not found."
                 continue
         return False
+    else:
+        (By.XPATH, '//frame[@name="' + frameName + '"]' )
+        try:
+            foundFrame = WebDriverWait(driver, delay).until(EC.presence_of_element_located(locator))
+            driver.switch_to_frame(foundFrame)
+            return True
+        except TimeoutException:
+            print "findAndSelectFrame: ", locator, " not found."
 
 def findElementOnPage(driver, delay, elementLocator, window=None):
     if elementLocator == None:# skip finding the element

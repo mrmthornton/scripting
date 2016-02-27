@@ -37,7 +37,8 @@ def violationExcusal():
     'inputLocator' : (By.XPATH, '//input[@id = "P_VIOLATION_ID"]'),
     'staleLocator' : (By.XPATH,'//h1[contains(text(),"Violation Excusal")]'),
     'buttonLocator' : (By.XPATH,'//input[@value="Excuse"]'),
-    'frameParamters' : {'useFrames' : True, 'frameLocator' : [ (By.XPATH, '//frame[@name="fraVF"]'),
+    'frameParamters' : {'useFrames' : True, 'frameLocator' : [ (By.XPATH, '//frame[@name="fraVF"]' ),
+                                                               (By.XPATH, '//frame[@name="fraRL"]' ),
                                                                (By.XPATH, '//frame[@name="fraTOP"]') ] },
     'resultPageTextLocator' : (By.XPATH, '//TD/H1'),
     'resultPageVerifyText' : 'Violation Search Results',
@@ -80,17 +81,18 @@ def excuse_violation(driver, parameters):
             Selector.select_by_visible_text("Bankruptcy") # does this need to be instanciated each time?
 
             #click excuse button
-            # 'buttonLocator' : (By.XPATH,'//input[@value="Excuse"]'),
+            parameters['buttonLocator'] = (By.XPATH,'//input[@value="Excuse"]')
             clicked = findAndClickButton(driver, delay, parameters)
             pageLoaded = newPageElementFound(driver, delay, (By.XPATH, '//frame[@name="fraTOP"]'), parameters['staleLocator'])
 
             #navigate to search page
             # navigate to search position
-
+            foundFrame = findAndSelectFrame(driver, delay, parameters)
+            parameters['buttonLocator'] = (By.XPATH,'//input[@value="Query"]')
             clicked = findAndClickButton(driver, delay, parameters)
             pageLoaded = newPageElementFound(driver, delay, None, parameters['staleLocator'])
 
-    print "main: Finished parsing plate file."
+    print "main: Finished individual violation excusal."
 
 if __name__ == '__main__':
 
