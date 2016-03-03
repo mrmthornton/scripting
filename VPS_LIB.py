@@ -51,6 +51,12 @@ def findAndClickButton(driver, delay, parameters):
     button.click()
     return True
 
+''' 	recursive frame search
+(A) find all top frames at current level
+(B) check for target /done
+(C) add to list / no more
+foreach repeat (AB) until target found
+'''
 def findAndSelectFrame(driver, delay, parameters, frameName=None):
     if parameters['frameParamters']['useFrames'] and frameName is None:
         #make locator, and locator list, only one try except
