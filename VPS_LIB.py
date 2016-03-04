@@ -52,31 +52,37 @@ def findAndClickButton(driver, delay, parameters):
     return True
 
 ''' 	recursive frame search
-(A) find all top frames at current level
-(B) check for target /done
-(C) add to list / no more
-foreach repeat (AB) until target found
+(A) search for target at current content
+(B) if not found
+        append all frames to list
+(C) pop from list, select and recurse; if list empty error
 '''
 def findAndSelectFrame(driver, delay, parameters, frameName=None):
+    frameList = []
+    targetLocator = None
+
+    if frameName is not None:   # build the target locator from the argument
+        locatorText = '//frame[@name="' + frameName + '"]'
+        print locatorText
+        targetLocator =  (By.XPATH, '//frame[@name="' + frameName + '"]' )
+        print targetLocator
+
+    # use the target locator in the parameters dictionary
     if parameters['frameParamters']['useFrames'] and frameName is None:
-        #make locator, and locator list, only one try except
-        for locator in parameters['frameParamters']['frameLocator']:
-            try:
-                foundFrame = WebDriverWait(driver, delay).until(EC.presence_of_element_located(locator))
-                driver.switch_to_frame(foundFrame)
-                return True
-            except TimeoutException:
-                print "findAndSelectFrame: ", locator, " not found."
-                continue
-        return False
-    else:
-        (By.XPATH, '//frame[@name="' + frameName + '"]' )
+        targetLocator = parameters['frameParamters']['frameLocator']
+        print targetLocator
+
+    if targetLocator is not None:
         try:
-            foundFrame = WebDriverWait(driver, delay).until(EC.presence_of_element_located(locator))
+            foundFrame = WebDriverWait(driver, delay).until(EC.presence_of_element_located(targetLocator))
             driver.switch_to_frame(foundFrame)
             return True
         except TimeoutException:
-            print "findAndSelectFrame: ", locator, " not found."
+            frames = WebDriverWait(driver, delay).until(EC.presence_of_all_elements_located((By.XPATH, '//frame' )))
+            for frame in frames:
+                frameList.append(frame)
+            print frameList
+            print "findAndSelectFrame: ", targetLocator, " not found."
 
 def findElementOnPage(driver, delay, elementLocator, window=None):
     if elementLocator == None:# skip finding the element
@@ -111,7 +117,7 @@ def findTargetPage(driver, delay, locator):
     print "findTargetPage: 'target page' not found"
     return None
 
-def getTextResults(driver, delay, plateString, parameters):
+def getTextResults(driver, delay, plateString, parameters, frameName=None):
     #print "getTextResults: " + driver.current_url # for debug
     text_regex = parameters['resultIndexParameters']['regex']
     pattern = re.compile(text_regex)
@@ -124,7 +130,7 @@ def getTextResults(driver, delay, plateString, parameters):
         except TimeoutException:
             timeout('getTextResults: text not found, trying again...')
             #driver.switch_to_default_content()
-            foundFrame = findAndSelectFrame(driver, delay, parameters)
+            foundFrame = findAndSelectFrame(driver, delay, parameters, frameName)
             continue  # why does this not find the text
                         #try this with the locator using rEGEX, and  why not found? no frame? pass in frame?
         try:

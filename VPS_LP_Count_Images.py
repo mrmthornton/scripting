@@ -168,8 +168,7 @@ def violatorSearch():
     'staleLocator' : (By.XPATH,'//h1[contains(text(),"Violation Search")]'),
     'staleLocator2' : (By.XPATH,'//h1[contains(text(),"Violation Search Result")]'),
     'buttonLocator' : (By.XPATH,'//input[@value="Query"]'),
-    'frameParamters' : {'useFrames' : True, 'frameLocator' : [ (By.XPATH, '//frame[@name="fraRL"]'),
-                                                               (By.XPATH, '//frame[@name="fraTOP"]') ] },
+    'frameParamters' : {'useFrames' : True, 'frameLocator' : (By.XPATH, '//frame[@name="fraRxL"]') },
     'resultPageTextLocator' : (By.XPATH, '//TD/H1'),
     'resultPageVerifyText' : 'Violation Search Results',
     'outputLocator' : (By.XPATH,'//BODY/P[contains(text(),"Record")]'),
@@ -199,9 +198,9 @@ def dataIO(driver, parameters):
             element = findElementOnPage(driver, delay, parameters['inputLocator'])
             submitted = fillFormAndSubmit(driver, startWindow, element, plateString, parameters) # why so slow?
             pageLoaded = newPageElementFound(driver, delay, (By.XPATH, '//frame[@name="fraTOP"]'), parameters['staleLocator2'])
-            foundFrame = findAndSelectFrame(driver, delay, parameters)
+            foundFrame = findAndSelectFrame(driver, delay, parameters, "fraRL")
             time.sleep(1)  #text may not be there yet!  how long to wait?
-            text = getTextResults(driver, delay, plateString, parameters)
+            text = getTextResults(driver, delay, plateString, parameters, "fraRL")
             if text is not None: # if there is text, process it
                 sys.stdout.write(plateString + ", " + str(text) + '\n')
                 outfile.write(plateString + ", " + str(text) + '\n')
