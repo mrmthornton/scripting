@@ -63,14 +63,14 @@ def findAndSelectFrame(driver, delay, parameters, frameName=None):
 
     if frameName is not None:   # build the target locator from the argument
         locatorText = '//frame[@name="' + frameName + '"]'
-        print locatorText
+        # print locatorText
         targetLocator =  (By.XPATH, '//frame[@name="' + frameName + '"]' )
-        print targetLocator
+        # print targetLocator
 
     # use the target locator in the parameters dictionary
     if parameters['frameParamters']['useFrames'] and frameName is None:
         targetLocator = parameters['frameParamters']['frameLocator']
-        print targetLocator
+        # print targetLocator
 
     if targetLocator is not None:
         try:
@@ -81,7 +81,7 @@ def findAndSelectFrame(driver, delay, parameters, frameName=None):
             frames = WebDriverWait(driver, delay).until(EC.presence_of_all_elements_located((By.XPATH, '//frame' )))
             for frame in frames:
                 frameList.append(frame)
-            print frameList
+            print "findAndSelectFrame: creating framelist: ", frameList
             print "findAndSelectFrame: ", targetLocator, " not found."
 
 def findElementOnPage(driver, delay, elementLocator, window=None):
@@ -137,9 +137,11 @@ def getTextResults(driver, delay, plateString, parameters, frameName=None):
             elemText = resultElement.text
         except StaleElementReferenceException:
             print "getTextResults: stale text element"
-            elemText = ""
+            elemText = ""  # reset the element text and continue
+
         if elemText == 'No Records returned':
             return 0
+
         text = pattern.findall(elemText)
         if len(text):
             #print "getTextResults", text # for debug
@@ -249,7 +251,7 @@ if __name__ == '__main__':
     delay = 1
 
     # test library components
-    assert(cleanUpLicensePlateString('123 45   6,,"\n\n') == '123456\n')
+    assert(cleanUpString('123 45   6,,"\n\n') == '123456\n')
     driver = openBrowser(url)
     window = findTargetPage(driver, delay, elementLocator) # no window, why?
     #returnOrClick()
