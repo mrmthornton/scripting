@@ -69,9 +69,11 @@ def findAndSelectFrame(driver, delay, parameters, frameName=None):
         frameDelay = 1
         #if targetLocator is not None:
         try:
+            time.sleep(10)
             foundFrame = WebDriverWait(driver, frameDelay).until(EC.presence_of_element_located(targetLocator))
+            foundFrameName = foundFrame.get_attribute("name")
             driver.switch_to_frame(foundFrame)
-            print "walkFrames: found target frame ", foundFrame # for debug purposes
+            print "walkFrames: found target frame ", foundFrameName  # for debug purposes
             return True
         except TimeoutException:
             try:
@@ -84,8 +86,9 @@ def findAndSelectFrame(driver, delay, parameters, frameName=None):
             while True:
                 try:
                     nextParentFrame = frameList.pop()
+                    nextParentFrameName = nextParentFrame.get_attribute("name")
                     driver.switch_to_frame(nextParentFrame)
-                    print "walkFrames: next parent is ", nextParentFrame
+                    print "walkFrames: next parent is ", nextParentFrameName
                     if walkFrames(targetLocator, nextParentFrame):
                         return True
                     if parentFrame is None:
