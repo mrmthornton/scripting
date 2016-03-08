@@ -69,7 +69,6 @@ def findAndSelectFrame(driver, delay, parameters, frameName=None):
         frameDelay = 1
         #if targetLocator is not None:
         try:
-            time.sleep(10)
             foundFrame = WebDriverWait(driver, frameDelay).until(EC.presence_of_element_located(targetLocator))
             foundFrameName = foundFrame.get_attribute("name")
             driver.switch_to_frame(foundFrame)
@@ -280,8 +279,8 @@ if __name__ == '__main__':
     parameters = {
         'frameParamters' : {'useFrames' : True, 'frameLocator' : (By.XPATH, '//frame[@name="frame-middle"]')}
     }
-    ##url = 'file://C:/Users/IEUser/Documents/scripting/testPage.html'
-    url = 'http://the-internet.herokuapp.com/nested_frames'
+    url = 'file://C:/Users/IEUser/Documents/scripts/frames/nested_frames.html'
+    #url = 'http://the-internet.herokuapp.com/nested_frames'
     ##url = 'http://the-internet.herokuapp.com/iframe'
     elementLocator = (By.XPATH, '//div[contains(text(),"MIDDLE")]')
     window = None
