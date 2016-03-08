@@ -43,4 +43,11 @@ if __name__ == '__main__':
     plateSubmitElement.clear()
     plateSubmitElement.send_keys('1234567')
     plateSubmitElement.send_keys('\n')
+
+    textLocator =  (By.XPATH, '//div[@style="font-family: Courier New;"]')
+    #font-family: Courier New;"
+    textElement = findElementOnPage(driver, delay, textLocator)
+    uText = textElement.text
+    print str(uText)
+
     driver.close()
