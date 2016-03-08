@@ -9,9 +9,20 @@
 # Copyright:   (c) mthornton 2014, 2015
 #-------------------------------------------------------------------------------
 
+from selenium import webdriver
+from selenium.common.exceptions import NoSuchFrameException
+from selenium.common.exceptions import NoSuchWindowException
+from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import StaleElementReferenceException
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
+
 import re
 import io
 import csv
+from VPS_LIB import *
 
 linePattern = re.compile('^.+')
 wordPattern = re.compile('\w+')
@@ -560,21 +571,19 @@ def timeout():
     quit()
 
 
-def query(driver, plate):
-    try:
-        locator =(By.NAME,'plate_1')
-        plateField = WebDriverWait(driver, delay,2).until(EC.presence_of_element_located(locator))
-        plateField.clear()
-        plateField.send_keys(plate)
-        plateField.submit()
-    except TimeoutException:
-        timeout()
+def query(driver, delay, plate):
+    plateSubmitLocator = (By.XPATH, '//input[@class="v-textfield v-widget iw-child v-textfield-iw-child iw-mandatory v-textfield-iw-mandatory v-has-width"]')
+    plateSubmitElement = findElementOnPage(driver, delay, plateSubmitLocator)
+    if plateSubmitElement is None:
+        print "query: plate submission element not found on page"
+        return None
+    plateSubmitElement.clear()
+    plateSubmitElement.send_keys(plate)
+    plateSubmitElement.send_keys('\n')
 
-    try:
-        locator = (By.XPATH, '//pre')
-        results = WebDriverWait(driver, delay).until(EC.presence_of_all_elements_located(locator))
-    except TimeoutException:
-        timeout()
+    textLocator =  (By.XPATH, '//div[@style="font-family: Courier New;"]')
+    textElement = findElementOnPage(driver, delay, textLocator)
+    uText = textElement.text
 
-    return results
+    return str(uText)
 
