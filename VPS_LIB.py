@@ -279,8 +279,8 @@ if __name__ == '__main__':
     parameters = {
         'frameParamters' : {'useFrames' : True, 'frameLocator' : (By.XPATH, '//frame[@name="frame-middle"]')}
     }
-    url = 'file://C:/Users/IEUser/Documents/scripts/frames/nested_frames.html'
-    #url = 'http://the-internet.herokuapp.com/nested_frames'
+    #url = 'file://C:/Users/IEUser/Documents/scripts/frames/nested_frames.html'
+    url = 'http://the-internet.herokuapp.com/nested_frames'
     ##url = 'http://the-internet.herokuapp.com/iframe'
     elementLocator = (By.XPATH, '//div[contains(text(),"MIDDLE")]')
     window = None
