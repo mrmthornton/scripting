@@ -53,7 +53,7 @@ def findAndClickButton(driver, delay, parameters):
     return True
 
 
-def findAndSelectFrame(driver, delay, parameters, frameName=None):
+def findAndSelectFrame(driver, delay, frameName):
     ''' 	recursive frame search
     (A) search for target at current content
     (B1) if found return True
@@ -107,11 +107,6 @@ def findAndSelectFrame(driver, delay, parameters, frameName=None):
         targetLocator =  (By.XPATH, '//frame[@name="' + frameName + '"]' )
         # print targetLocator
 
-    # use the target locator in the parameters dictionary
-    if parameters['frameParamters']['useFrames'] and frameName is None:
-        targetLocator = parameters['frameParamters']['frameLocator']
-        # print targetLocator
-
     return walkFrames(targetLocator, None)
 
 
@@ -128,7 +123,7 @@ def findElementOnPage(driver, delay, elementLocator, window=None):
         timeout('findElementOnPage: element' + str(elementLocator) + 'not found')
         return None
 
-def findTargetPage(driver, delay, locator):
+def findTargetPage(driver, delay, locator, frameName=None):
     try:
         handle = driver.current_window_handle
     except NoSuchWindowException:
@@ -137,6 +132,7 @@ def findTargetPage(driver, delay, locator):
     handles = driver.window_handles
     for handle in handles:  # test each window for target
         driver.switch_to_window(handle)
+        foundFrame = findAndSelectFrame(driver, delay, None, frameName)
         print "findTargetPage: Searching for  ", locator # for debug purposes
         try:
             elems = WebDriverWait(driver, delay).until(EC.presence_of_all_elements_located(locator))

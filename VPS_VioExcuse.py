@@ -52,7 +52,7 @@ def violationExcusal():
 def excuse_violation(driver, parameters):
     delay = parameters['delay']
     # pause on next line for entry of credentials, and window navigation.
-    startWindow = findTargetPage(driver, findStartWindowDelay, parameters['startPageTextLocator'])
+    startWindow = findTargetPage(driver, findStartWindowDelay, parameters['startPageTextLocator'], "framename")
     if startWindow is None:
         print "Start Page not found."
         return None
@@ -66,7 +66,7 @@ def excuse_violation(driver, parameters):
             inputString = cleanUpString(rawString)
 
             # check for Violation Excusal page
-            # # foundFrame = findAndSelectFrame(driver, delay, parameters, "mainframe")
+            # # foundFrame = findAndSelectFrame(driver, delay, "mainframe")
             headerElement = findElementOnPage(driver, delay, (By.XPATH, '//H1[contains(text(), "Violation Excusal")]'))
             element = findElementOnPage(driver, delay, parameters['inputLocator'])
             submitted = fillFormAndSubmit(driver, startWindow, element, inputString, parameters)
@@ -75,7 +75,7 @@ def excuse_violation(driver, parameters):
             driver.switch_to_default_content()
             pageLoaded = newPageElementFound(driver, delay, (By.XPATH, '//frame[@name="fraTOP"]'), parameters['headerLocator'])
             #move to the correct frame
-            foundFrame = findAndSelectFrame(driver, delay, parameters, "fraVF")
+            foundFrame = findAndSelectFrame(driver, delay, "fraVF")
 
             #select from drop down menu
             # if the menu is missing check for reason excused
@@ -91,9 +91,8 @@ def excuse_violation(driver, parameters):
             driver.switch_to_default_content()
             pageLoaded = newPageElementFound(driver, delay, (By.XPATH, '//frame[@name="fraTOP"]'), parameters['headerLocator'])
 
-            #navigate to search page
-            # navigate to search position
-            foundFrame = findAndSelectFrame(driver, delay, parameters)
+            #navigate to search page / frame position
+            foundFrame = findAndSelectFrame(driver, delay, "fraRL")
             parameters['buttonLocator'] = (By.XPATH,'//input[@value="Query"]')
             clicked = findAndClickButton(driver, delay, parameters)
             time.sleep(1)
