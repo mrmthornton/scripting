@@ -163,7 +163,6 @@ def violatorSearch():
     'delay' : 15,
     'url' : 'https://lprod.scip.ntta.org/scip/jsp/SignIn.jsp', # initial URL
     'operatorMessage' : "Use debug mode, open VPS, new violator search window, and run to completion",
-    'startPageTextLocator' : (By.XPATH, '//TD/H1[contains(text(),"Violation Search")]'),
     'inputLocator' : (By.XPATH, '//input[@id = "P_LIC_PLATE_NBR"]'),
     'staleLocator' : (By.XPATH,'//h1[contains(text(),"Violation Search")]'),
     'staleLocator2' : (By.XPATH,'//h1[contains(text(),"Violation Search Result")]'),
@@ -182,8 +181,9 @@ def violatorSearch():
 
 def dataIO(driver, parameters):
     delay = parameters['delay']
+    startPageTextLocator = (By.XPATH, '//TD/H1[contains(text(),"Violation Search")]')
     # pause on next line for entry of credentials, and window navigation.
-    startWindow = findTargetPage(driver, findStartWindowDelay, parameters['startPageTextLocator'])
+    startWindow = findTargetPage(driver, findStartWindowDelay, startPageTextLocator, "mainframe")
     if startWindow is None:
         print "Start Page not found."
         return None

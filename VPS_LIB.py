@@ -101,13 +101,15 @@ def findAndSelectFrame(driver, delay, frameName):
     targetLocator = None
 
     # build the target locator from the argument
-    if frameName is not None:
-        locatorText = '//frame[@name="' + frameName + '"]'
-        # print locatorText
-        targetLocator =  (By.XPATH, '//frame[@name="' + frameName + '"]' )
-        # print targetLocator
+    if frameName is None: return False
+
+    locatorText = '//frame[@name="' + frameName + '"]'
+    # print locatorText
+    targetLocator =  (By.XPATH, '//frame[@name="' + frameName + '"]' )
+    # print targetLocator
 
     return walkFrames(targetLocator, None)
+
 
 
 def findElementOnPage(driver, delay, elementLocator, window=None):
@@ -132,7 +134,7 @@ def findTargetPage(driver, delay, locator, frameName=None):
     handles = driver.window_handles
     for handle in handles:  # test each window for target
         driver.switch_to_window(handle)
-        foundFrame = findAndSelectFrame(driver, delay, None, frameName)
+        foundFrame = findAndSelectFrame(driver, delay, frameName)
         print "findTargetPage: Searching for  ", locator # for debug purposes
         try:
             elems = WebDriverWait(driver, delay).until(EC.presence_of_all_elements_located(locator))
@@ -285,7 +287,7 @@ if __name__ == '__main__':
     # test library components
     assert(cleanUpString('123 45   6,,"\n\n') == '123456\n')
     driver = openBrowser(url)
-    findAndSelectFrame(driver, delay, parameters, 'frame-middle')
+    findAndSelectFrame(driver, delay, 'frame-middle')
     #time.sleep(10)
     #window = findTargetPage(driver, delay, elementLocator) # no window, why?
     #returnOrClick()
