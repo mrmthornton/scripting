@@ -159,7 +159,7 @@ def getTextResults(driver, delay, plateString, parameters, frameName=None):
         except TimeoutException:
             timeout('getTextResults: text not found, trying again...')
             #driver.switch_to_default_content()
-            foundFrame = findAndSelectFrame(driver, delay, parameters, frameName)
+            foundFrame = findAndSelectFrame(driver, delay, frameName)
             continue  # why does this not find the text
                         #try this with the locator using rEGEX, and  why not found? no frame? pass in frame?
         try:
