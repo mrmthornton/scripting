@@ -31,7 +31,8 @@ def holdOpen():
     parameters = {
     'delay' : 15,
     #'url' : 'https://lprod.scip.ntta.org/scip/jsp/SignIn.jsp', # initial URL
-    'url' : 'https://google.com', # initial URL
+    #'url' : 'https://google.com', # initial URL
+    'url' : 'http://intranet/SitePages', # initial URL
     'operatorMessage' : "Use debug mode, enter credentials and run to completion",
     'startPageTextLocator' : (By.XPATH, '//TD/H1[contains(text(),"Violation Search")]'),
     'inputLocator' : (By.XPATH, '//input[@id = "P_LIC_PLATE_NBR"]'),
@@ -55,7 +56,6 @@ def holdOpen():
 if __name__ == '__main__':
 
     parameters = holdOpen()
-    url = 'https://google.com'
     findStartWindowDelay = 3
     print parameters['operatorMessage']
     regexPattens = loadRegExPatterns()
@@ -69,5 +69,5 @@ if __name__ == '__main__':
         count -=1
 
         #touch vps and tagstore
-    driver.close
+    driver.close()
 
