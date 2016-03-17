@@ -59,7 +59,7 @@ def excuse_violation(driver, parameters):
     with open(parameters['dataInFileName'], 'r') as infile, open(parameters['dataOutFileName'], 'a') as outfile:
         outfile.truncate()
         csvInput = csv.reader(infile)
-        for row in csvInput:
+        for row in csvInput:   # find a way to detect last row or no new row.
             rawString = row[0]
             if rawString == "" or rawString == 0:  #end when input does not exist
                 break

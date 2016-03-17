@@ -174,7 +174,8 @@ def violatorSearch():
     'outputLocator' : (By.XPATH,'//BODY/P[contains(text(),"Record")]'),
     'resultIndexParameters' : {'regex' : "Records \d+ to \d+ of (\d+)", 'selector' : 'tail'},  # head, tail, or all
     #'dataInFileName' : 'LP_Repeats_Count_short.csv',
-    'dataInFileName' : 'LP_Repeats_Count.csv',
+    #'dataInFileName' : 'LP_Repeats_Count.csv',
+    'dataInFileName' : 'LP_Repeats_Count_200.csv',
     'dataOutFileName' : 'LP_Repeats_Count_Out.txt',
     'returnOrClick' : 'return', # use Return or Click to submit form
     }
