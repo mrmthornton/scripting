@@ -35,7 +35,7 @@ def violationExcusal():
     'operatorMessage' : "Use debug mode, open VPS, new violation excusal window, and run to completion",
     'startPageTextLocator' : (By.XPATH, '//TD/H1[contains(text(),"Violation Excusal")]'),
     'inputLocator' : (By.XPATH, '//input[@id = "P_VIOLATION_ID"]'),
-    'staleLocator' : (By.XPATH,'//h1[contains(text(),"Violation Excusal")]'),
+    'headerLocator' : (By.XPATH,'//h1[contains(text(),"Violation Excusal")]'),
     'buttonLocator' : (By.XPATH,'//input[@value="Excuse"]'),
     'frameParamters' : {'useFrames' : True, 'frameLocator' : (By.XPATH, '//frame[@name="fraRL"]' ) },
     'resultPageTextLocator' : (By.XPATH, '//TD/H1'),
@@ -52,24 +52,30 @@ def violationExcusal():
 def excuse_violation(driver, parameters):
     delay = parameters['delay']
     # pause on next line for entry of credentials, and window navigation.
-    startWindow = findTargetPage(driver, findStartWindowDelay, parameters['startPageTextLocator'])
+    startWindow = findTargetPage(driver, findStartWindowDelay, parameters['startPageTextLocator'], "framename")
     if startWindow is None:
         print "Start Page not found."
         return None
     with open(parameters['dataInFileName'], 'r') as infile, open(parameters['dataOutFileName'], 'a') as outfile:
         outfile.truncate()
         csvInput = csv.reader(infile)
-        for row in csvInput:
+        for row in csvInput:   # find a way to detect last row or no new row.
             rawString = row[0]
             if rawString == "" or rawString == 0:  #end when input does not exist
                 break
             inputString = cleanUpString(rawString)
+
+            # check for Violation Excusal page
+            # # foundFrame = findAndSelectFrame(driver, delay, "mainframe")
+            headerElement = findElementOnPage(driver, delay, (By.XPATH, '//H1[contains(text(), "Violation Excusal")]'))
             element = findElementOnPage(driver, delay, parameters['inputLocator'])
             submitted = fillFormAndSubmit(driver, startWindow, element, inputString, parameters)
-            #check for excusal page found
-            pageLoaded = newPageElementFound(driver, delay, (By.XPATH, '//frame[@name="fraTOP"]'), parameters['staleLocator'])
+            #check for excusal page found  ????
+            time.sleep(1)
+            driver.switch_to_default_content()
+            pageLoaded = newPageElementFound(driver, delay, (By.XPATH, '//frame[@name="fraTOP"]'), parameters['headerLocator'])
             #move to the correct frame
-            foundFrame = findAndSelectFrame(driver, delay, parameters)
+            foundFrame = findAndSelectFrame(driver, delay, "fraVF")
 
             #select from drop down menu
             # if the menu is missing check for reason excused
@@ -81,14 +87,16 @@ def excuse_violation(driver, parameters):
             #click excuse button
             parameters['buttonLocator'] = (By.XPATH,'//input[@value="Excuse"]')
             clicked = findAndClickButton(driver, delay, parameters)
-            pageLoaded = newPageElementFound(driver, delay, (By.XPATH, '//frame[@name="fraTOP"]'), parameters['staleLocator'])
+            time.sleep(1)
+            driver.switch_to_default_content()
+            pageLoaded = newPageElementFound(driver, delay, (By.XPATH, '//frame[@name="fraTOP"]'), parameters['headerLocator'])
 
-            #navigate to search page
-            # navigate to search position
-            foundFrame = findAndSelectFrame(driver, delay, parameters)
+            #navigate to search page / frame position
+            foundFrame = findAndSelectFrame(driver, delay, "fraRL")
             parameters['buttonLocator'] = (By.XPATH,'//input[@value="Query"]')
             clicked = findAndClickButton(driver, delay, parameters)
-            pageLoaded = newPageElementFound(driver, delay, None, parameters['staleLocator'])
+            time.sleep(1)
+            pageLoaded = newPageElementFound(driver, delay, None, parameters['headerLocator'])
 
     print "main: Finished individual violation excusal."
 

@@ -30,7 +30,9 @@ import time
 def holdOpen():
     parameters = {
     'delay' : 15,
-    'url' : 'https://lprod.scip.ntta.org/scip/jsp/SignIn.jsp', # initial URL
+    #'url' : 'https://lprod.scip.ntta.org/scip/jsp/SignIn.jsp', # initial URL
+    #'url' : 'https://google.com', # initial URL
+    'url' : 'http://intranet/SitePages', # initial URL
     'operatorMessage' : "Use debug mode, enter credentials and run to completion",
     'startPageTextLocator' : (By.XPATH, '//TD/H1[contains(text(),"Violation Search")]'),
     'inputLocator' : (By.XPATH, '//input[@id = "P_LIC_PLATE_NBR"]'),
@@ -54,16 +56,17 @@ def holdOpen():
 if __name__ == '__main__':
 
     parameters = holdOpen()
-
     findStartWindowDelay = 3
     print parameters['operatorMessage']
     regexPattens = loadRegExPatterns()
     driver = openBrowser(parameters['url'])
-    locator = (By.XPATH, '//td[text(), contains("Application")]')
+    #locator = (By.XPATH, '//td[text(), contains("Application")]')
     print 'start'
-    while True:
-        time.sleep(480)
-        print 'open'
+    count = 10
+    while count>0:
+        print count
+        time.sleep(1)
+        count -=1
 
         #touch vps and tagstore
     driver.close()

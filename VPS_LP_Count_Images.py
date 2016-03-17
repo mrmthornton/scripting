@@ -161,9 +161,9 @@ def theInternetFrames():
 def violatorSearch():
     parameters = {
     'delay' : 15,
-    'url' : 'https://lprod.scip.ntta.org/scip/jsp/SignIn.jsp', # initial URL
+    #'url' : 'https://lprod.scip.ntta.org/scip/jsp/SignIn.jsp', # initial URL
+    'url' : 'http://intranet/SitePages', # initial URL
     'operatorMessage' : "Use debug mode, open VPS, new violator search window, and run to completion",
-    'startPageTextLocator' : (By.XPATH, '//TD/H1[contains(text(),"Violation Search")]'),
     'inputLocator' : (By.XPATH, '//input[@id = "P_LIC_PLATE_NBR"]'),
     'staleLocator' : (By.XPATH,'//h1[contains(text(),"Violation Search")]'),
     'staleLocator2' : (By.XPATH,'//h1[contains(text(),"Violation Search Result")]'),
@@ -174,7 +174,8 @@ def violatorSearch():
     'outputLocator' : (By.XPATH,'//BODY/P[contains(text(),"Record")]'),
     'resultIndexParameters' : {'regex' : "Records \d+ to \d+ of (\d+)", 'selector' : 'tail'},  # head, tail, or all
     #'dataInFileName' : 'LP_Repeats_Count_short.csv',
-    'dataInFileName' : 'LP_Repeats_Count.csv',
+    #'dataInFileName' : 'LP_Repeats_Count.csv',
+    'dataInFileName' : 'LP_Repeats_Count_200.csv',
     'dataOutFileName' : 'LP_Repeats_Count_Out.txt',
     'returnOrClick' : 'return', # use Return or Click to submit form
     }
@@ -182,8 +183,10 @@ def violatorSearch():
 
 def dataIO(driver, parameters):
     delay = parameters['delay']
+    startPageTextLocator = (By.XPATH, '//TD/H1[contains(text(),"Violation Search")]')
     # pause on next line for entry of credentials, and window navigation.
-    startWindow = findTargetPage(driver, findStartWindowDelay, parameters['startPageTextLocator'])
+    # #startWindow = findTargetPage(driver, findStartWindowDelay, startPageTextLocator, "mainframe")
+    startWindow = findTargetPage(driver, findStartWindowDelay, startPageTextLocator)
     if startWindow is None:
         print "Start Page not found."
         return None
@@ -199,7 +202,7 @@ def dataIO(driver, parameters):
             submitted = fillFormAndSubmit(driver, startWindow, element, plateString, parameters) # why so slow?
             time.sleep(1)  #page may not be there yet!  how long to wait?
             pageLoaded = newPageElementFound(driver, delay, (By.XPATH, '//frame[@name="fraTOP"]'), parameters['staleLocator2'])
-            foundFrame = findAndSelectFrame(driver, delay, parameters, "fraRL")
+            foundFrame = findAndSelectFrame(driver, delay, "fraRL")
             #time.sleep(1)  #text may not be there yet!  how long to wait?
             text = getTextResults(driver, delay, plateString, parameters, "fraRL")
             if text is not None: # if there is text, process it
