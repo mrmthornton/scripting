@@ -61,6 +61,8 @@ if __name__ == '__main__':
     regexPattens = loadRegExPatterns()
     driver = openBrowser(parameters['url'])
     #locator = (By.XPATH, '//td[text(), contains("Application")]')
+    handles = driver.window_handles
+    print len(handles)
     print 'start'
     count = 10
     while count>0:
