@@ -161,8 +161,8 @@ def theInternetFrames():
 def violatorSearch():
     parameters = {
     'delay' : 15,
-    #'url' : 'https://lprod.scip.ntta.org/scip/jsp/SignIn.jsp', # initial URL
-    'url' : 'http://intranet/SitePages', # initial URL
+    'url' : 'https://lprod.scip.ntta.org/scip/jsp/SignIn.jsp', # initial URL
+    #'url' : 'http://intranet/SitePages', # initial URL
     'operatorMessage' : "Use debug mode, open VPS, new violator search window, and run to completion",
     'inputLocator' : (By.XPATH, '//input[@id = "P_LIC_PLATE_NBR"]'),
     'staleLocator' : (By.XPATH,'//h1[contains(text(),"Violation Search")]'),
