@@ -52,70 +52,6 @@ def findAndClickButton(driver, delay, parameters):
     button.click()
     return True
 
-<<<<<<< HEAD
-
-def findAndSelectFrame(driver, delay, parameters, frameName=None):
-    ''' 	recursive frame search
-    (A) search for target at current content
-    (B1) if found return True
-    (B2) if not found append all frames to local list
-    (C) loop until list is empty
-        (C1) pop from list
-        (C2) select frame and recurse,
-        (C3) end loop if recuse returns True
-        (C4) if list empty return False (not found)
-    '''
-    def walkFrames(targetLocator, parentFrame):
-        frameList = []
-        frameDelay = 1
-        #if targetLocator is not None:
-        try:
-            foundFrame = WebDriverWait(driver, frameDelay).until(EC.presence_of_element_located(targetLocator))
-            foundFrameName = foundFrame.get_attribute("name")
-            driver.switch_to_frame(foundFrame)
-            print "walkFrames: found target frame ", foundFrameName  # for debug purposes
-            return True
-        except TimeoutException:
-            try:
-                frames = WebDriverWait(driver, frameDelay).until(EC.presence_of_all_elements_located((By.XPATH, '//frame' )))
-            except TimeoutException:
-                return False
-            for frame in frames:
-                frameList.append(frame)
-            print "findAndSelectFrame: creating framelist: length of ", len(frameList)
-            while True:
-                try:
-                    nextParentFrame = frameList.pop()
-                    nextParentFrameName = nextParentFrame.get_attribute("name")
-                    driver.switch_to_frame(nextParentFrame)
-                    print "walkFrames: next parent is ", nextParentFrameName
-                    if walkFrames(targetLocator, nextParentFrame):
-                        return True
-                    if parentFrame is None:
-                        driver.switch_to_default_content()
-                    else:
-                        driver.switch_to_frame(parentFrame)
-                except IndexError :
-                    print "findAndSelectFrame: ", targetLocator, " not found."
-                    return False
-
-    targetLocator = None
-
-    # build the target locator from the argument
-    if frameName is not None:
-        locatorText = '//frame[@name="' + frameName + '"]'
-        # print locatorText
-        targetLocator =  (By.XPATH, '//frame[@name="' + frameName + '"]' )
-        # print targetLocator
-
-    # use the target locator in the parameters dictionary
-    if parameters['frameParamters']['useFrames'] and frameName is None:
-        targetLocator = parameters['frameParamters']['frameLocator']
-        # print targetLocator
-
-    return walkFrames(targetLocator, None)
-
-=======
 
 def findAndSelectFrame(driver, delay, frameName):
     ''' 	recursive frame search
@@ -174,8 +110,6 @@ def findAndSelectFrame(driver, delay, frameName):
 
     return walkFrames(targetLocator, None)
 
-
->>>>>>> useFramesInsideLib
 
 def findElementOnPage(driver, delay, elementLocator, window=None):
     if elementLocator == None:# skip finding the element
@@ -352,11 +286,7 @@ if __name__ == '__main__':
     # test library components
     assert(cleanUpString('123 45   6,,"\n\n') == '123456\n')
     driver = openBrowser(url)
-<<<<<<< HEAD
-    findAndSelectFrame(driver, delay, parameters, 'frame-middle')
-=======
     findAndSelectFrame(driver, delay, 'frame-middle')
->>>>>>> useFramesInsideLib
     #time.sleep(10)
     #window = findTargetPage(driver, delay, elementLocator) # no window, why?
     #returnOrClick()
@@ -367,10 +297,6 @@ if __name__ == '__main__':
 
     #findElementOnPage(driver, delay, elementLocator)
     #getTextResults()
-<<<<<<< HEAD
-    driver.close()
-=======
     #driver.close()
     driver.quit()
->>>>>>> useFramesInsideLib
     print "FINISHED"
