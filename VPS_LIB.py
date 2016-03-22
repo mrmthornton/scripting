@@ -239,10 +239,10 @@ def newPageIsLoaded(driver, delay, currentElement): # depricated ?
 def openBrowser(url):
     driver = webdriver.Ie()
     #driver.maximize_window()
-    pyseldriver.get(url)
-    return pyseldriver
-    #driver.get(url)
-    #return driver
+    #pyseldriver.get(url)
+    #return pyseldriver
+    driver.get(url)
+    return driver
 
 def parseString(inputString,indexPattern, targetPattern, segment="all"): # segment may be start, end, or all
     # the iterator is used to search for all possible target pattern instances

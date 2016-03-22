@@ -87,7 +87,7 @@ def excuse_violation(driver, parameters):
             #click excuse button
             parameters['buttonLocator'] = (By.XPATH,'//input[@value="Excuse"]')
             clicked = findAndClickButton(driver, delay, parameters)
-            time.sleep(1)
+            # #time.sleep(1)
             driver.switch_to_default_content()
             pageLoaded = newPageElementFound(driver, delay, (By.XPATH, '//frame[@name="fraTOP"]'), parameters['headerLocator'])
 
@@ -95,7 +95,7 @@ def excuse_violation(driver, parameters):
             foundFrame = findAndSelectFrame(driver, delay, "fraRL")
             parameters['buttonLocator'] = (By.XPATH,'//input[@value="Query"]')
             clicked = findAndClickButton(driver, delay, parameters)
-            time.sleep(1)
+            # #time.sleep(1)
             pageLoaded = newPageElementFound(driver, delay, None, parameters['headerLocator'])
 
     print "main: Finished individual violation excusal."
