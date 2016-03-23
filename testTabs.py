@@ -50,19 +50,23 @@ if __name__ == '__main__':
 
     delay = 3
     #url - 'https://lprod.scip.ntta.org/scip/jsp/SignIn.jsp'
-    url = 'https://www.google.com'
-    #url = 'http://intranet/SitePages'
+    #url = 'https://www.google.com'
+    url = 'http://intranet/SitePages'
     regexPattens = loadRegExPatterns()
     driver = openBrowser(url)
     handles = driver.window_handles
+    print handles
     print len(handles)
-    foundElem = findElementOnPage(driver, delay, (By.XPATH, '//title'))
+    elementLocator = (By.XPATH, '//input[@title="Search Everything"]')
+    foundElem = findElementOnPage(driver, delay, elementLocator)
     foundElem.send_keys(Keys.CONTROL + 't')
+    print driver.current_window_handle
+
 
     handles = driver.window_handles
     print len(handles)
     print 'start'
-    count = 10
+    count = 5
     while count>0:
         print count
         time.sleep(1)
