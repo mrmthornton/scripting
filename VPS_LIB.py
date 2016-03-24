@@ -213,6 +213,7 @@ def newPageElementFound(driver, delay, frameLocator, elementlocator):
                 return True
             except TimeoutException:
                 print 'newPageElementFound: ',elementlocator, 'element not found'
+                # select the proper frame before the 'continue'
                 continue
     except TimeoutException:
             return None
