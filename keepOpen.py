@@ -59,17 +59,20 @@ if __name__ == '__main__':
     findStartWindowDelay = 3
     print parameters['operatorMessage']
     regexPattens = loadRegExPatterns()
-    driver = openBrowser(parameters['url'])
-    #locator = (By.XPATH, '//td[text(), contains("Application")]')
-    handles = driver.window_handles
-    print len(handles)
-    print 'start'
-    count = 10
-    while count>0:
-        print count
-        time.sleep(1)
-        count -=1
+    delay = parameters['delay']
 
-        #touch vps and tagstore
+    driver = openBrowser(parameters['url'])
+    firstWindow = driver.current_window_handle
+    #locator = (By.XPATH, '//label[@id="UserName"]')
+    locator = (By.XPATH, '//img[@src="images/home.gif"]')
+    time.sleep(1)
+    while True:
+        handles = driver.window_handles
+        print len(handles)
+        time.sleep(550)
+        driver.switch_to_window(firstWindow)
+        found = findElementOnPage(driver, delay, locator)
+        found.click()
+
     driver.close()
 
