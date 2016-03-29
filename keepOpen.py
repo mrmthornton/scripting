@@ -30,9 +30,9 @@ import time
 def holdOpen():
     parameters = {
     'delay' : 15,
-    #'url' : 'https://lprod.scip.ntta.org/scip/jsp/SignIn.jsp', # initial URL
+    'url' : 'https://lprod.scip.ntta.org/scip/jsp/SignIn.jsp', # initial URL
     #'url' : 'https://google.com', # initial URL
-    'url' : 'http://intranet/SitePages', # initial URL
+    #'url' : 'http://intranet/SitePages', # initial URL
     'operatorMessage' : "Use debug mode, enter credentials and run to completion",
     'startPageTextLocator' : (By.XPATH, '//TD/H1[contains(text(),"Violation Search")]'),
     'inputLocator' : (By.XPATH, '//input[@id = "P_LIC_PLATE_NBR"]'),
@@ -62,17 +62,27 @@ if __name__ == '__main__':
     delay = parameters['delay']
 
     driver = openBrowser(parameters['url'])
-    firstWindow = driver.current_window_handle
+    #firstWindow = driver.current_window_handle
     #locator = (By.XPATH, '//label[@id="UserName"]')
-    locator = (By.XPATH, '//img[@src="images/home.gif"]')
+    #locator = (By.XPATH, '//img[@src="images/home.gif"]')
     time.sleep(1)
     while True:
+        currentWindow = driver.current_window_handle
         handles = driver.window_handles
+        for handle in handles:
+            driver.switch_to_window(handle)
+            driver.switch_to.default_content()
+        driver.switch_to_window(currentWindow)
+        driver.switch_to.default_content()
         print len(handles)
-        time.sleep(550)
-        driver.switch_to_window(firstWindow)
-        found = findElementOnPage(driver, delay, locator)
-        found.click()
+        count = 8
+        while count > 0:
+            count -= 1
+            print count
+            time.sleep(15)
+        #driver.switch_to_window(firstWindow)
+        #found = findElementOnPage(driver, delay, locator)
+        #found.click()
 
     driver.close()
 
