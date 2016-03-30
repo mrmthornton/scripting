@@ -74,11 +74,11 @@ if __name__ == '__main__':
             driver.switch_to.default_content()
         driver.switch_to_window(currentWindow)
         driver.switch_to.default_content()
-        print len(handles)
-        count = 8
+        print "windows", len(handles)
+        count = 2
         while count > 0:
             count -= 1
-            print count
+            print "count", count
             time.sleep(15)
         #driver.switch_to_window(firstWindow)
         #found = findElementOnPage(driver, delay, locator)
