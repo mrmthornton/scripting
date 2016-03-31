@@ -75,7 +75,7 @@ if __name__ == '__main__':
         driver.switch_to_window(currentWindow)
         driver.switch_to.default_content()
         print "windows", len(handles)
-        count = 2
+        count = 4
         while count > 0:
             count -= 1
             print "count", count
