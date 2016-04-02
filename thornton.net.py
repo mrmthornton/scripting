@@ -27,7 +27,7 @@ driver.get(url)
 try:
     locator = (By.NAME, "_user")
     element = WebDriverWait(driver, delay).until(EC.presence_of_element_located(locator))
-    #element.send_keys("mike@thornton.net")
+    #element.send_keys("")
     #element.submit()
 except TimeoutException:
     timeout()
@@ -35,7 +35,7 @@ except TimeoutException:
 try:
     locator = (By.NAME, "_pass")
     element = WebDriverWait(driver, delay).until(EC.presence_of_element_located(locator))
-    #element.send_keys("randomaccess")
+    #element.send_keys("")
     #element.submit()
 except TimeoutException:
     timeout()

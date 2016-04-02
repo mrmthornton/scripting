@@ -61,12 +61,25 @@ if __name__ == '__main__':
     regexPattens = loadRegExPatterns()
     delay = parameters['delay']
 
+    #from getpass import getpass
+    #localUser = raw_input()
+    #localPassword = getpass()
     driver = openBrowser(parameters['url'])
-    #firstWindow = driver.current_window_handle
+
+
+    firstWindow = driver.current_window_handle
+    menuLocator = (By.XPATH, '//tr/td[@id="Bar4"]')
+    foundElem = findElementOnPage(driver, delay, menuLocator)
+    menuLocator.select()
+    menuLocator = (By.XPATH, '//div/div[@id="menuItem5"]')
+    foundElem = findElementOnPage(driver, delay, menuLocator)
+    foundElem.click()
+
     #locator = (By.XPATH, '//label[@id="UserName"]')
     #locator = (By.XPATH, '//img[@src="images/home.gif"]')
     time.sleep(1)
     while True:
+        #first window , Shift/Open
         currentWindow = driver.current_window_handle
         handles = driver.window_handles
         for handle in handles:

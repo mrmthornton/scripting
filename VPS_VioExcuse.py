@@ -81,7 +81,13 @@ def excuse_violation(driver, parameters):
             # if the menu is missing check for reason excused
             menuLocator = (By.XPATH, '//select[@name="P_L_EXR_EXCUSED_REAS_DESCR"]')
             menuElement = findElementOnPage(driver, delay, menuLocator)
+            # menu select is sometimes None, why ?
             Selector = Select(menuElement)
+            count = 0
+            while Selector is None:
+                count = count + 1
+                print "retrying excusal menu selection. Count: ", count
+                Selector = Select(menuElement)
             Selector.select_by_visible_text("Bankruptcy") # does this need to be instanciated each time?
 
             #click excuse button
