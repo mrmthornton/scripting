@@ -33,7 +33,6 @@ def violatorSearch():
     'url' : 'https://lprod.scip.ntta.org/scip/jsp/SignIn.jsp', # initial URL
     #'url' : 'http://intranet/SitePages', # initial URL
     'operatorMessage' : "Use debug mode, open VPS, new violator search window, and run to completion",
-    'inputLocator' : (By.XPATH, '//input[@id = "P_LIC_PLATE_NBR"]'),
     'staleLocator' : (By.XPATH,'//h1[contains(text(),"Violation Search")]'),
     'staleLocator2' : (By.XPATH,'//h1[contains(text(),"Violation Search Result")]'),
     'buttonLocator' : (By.XPATH,'//input[@value="Query"]'),
@@ -52,10 +51,9 @@ def violatorSearch():
 
 def dataIO(driver, parameters):
     delay = parameters['delay']
-    startPageTextLocator = (By.XPATH, '//TD/H1[contains(text(),"Violator Maintenance")]')
+    vioPageTextLocator = (By.XPATH, '//TD/H1[contains(text(),"Violator Maintenance")]')
     # pause on next line for entry of credentials, and window navigation.
-    # #startWindow = findTargetPage(driver, findStartWindowDelay, startPageTextLocator, "mainframe")
-    startWindow = findTargetPage(driver, findStartWindowDelay, startPageTextLocator)
+    startWindow = findTargetPage(driver, findStartWindowDelay, vioPageTextLocator)
     if startWindow is None:
         print "Start Page not found."
         return None
@@ -67,13 +65,14 @@ def dataIO(driver, parameters):
             if rawString == "" or rawString == 0:  #end when input does not exist
                 break
             plateString = cleanUpString(rawString)
-            element = findElementOnPage(driver, delay, parameters['inputLocator'])
+            inputLocator = (By.XPATH, '//input[@id = "P_LIC_PLATE_NBR"]')
+            element = findElementOnPage(driver, delay, inputLocator)
             submitted = fillFormAndSubmit(driver, startWindow, element, plateString, parameters) # why so slow?
             time.sleep(1)  #page may not be there yet!  how long to wait?
-            pageLoaded = newPageElementFound(driver, delay, (By.XPATH, '//frame[@name="fraTOP"]'), parameters['staleLocator2'])
+            pageLoaded = newPageElementFound(driver, delay, (By.XPATH, '//frame[@name="fraTOP"]'), vioPageTextLocator)
             foundFrame = findAndSelectFrame(driver, delay, "fraRL")
             #time.sleep(1)  #text may not be there yet!  how long to wait?
-            text = getTextResults(driver, delay, plateString, parameters, "fraRL")
+  #lost here          text = getTextResults(driver, delay, plateString, parameters, "fraRL")
             if text is not None: # if there is text, process it
                 sys.stdout.write(plateString + ", " + str(text) + '\n')
                 outfile.write(plateString + ", " + str(text) + '\n')
@@ -89,12 +88,6 @@ def dataIO(driver, parameters):
 
 if __name__ == '__main__':
 
-    parameters = googleValues()# can't google from production.
-    #parameters = sigmaAldrichValues()
-    #parameters = hntbValues()
-    #parameters = ciscoValues() # should work on production systems
-    #parameters = theInternetNavigate()
-    #parameters = theInternetFrames()
     parameters = violatorSearch()
 
     findStartWindowDelay = 3
