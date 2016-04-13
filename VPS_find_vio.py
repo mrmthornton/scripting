@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------------
-# Name:        VPS_LP_Count_Images.py
+# Name:        VPS_find_vio.py
 # Purpose:     Examine web pages until the VPS Violation Search page is found.
 #              enter a licence plate in the search box
 #              find the text number of images
@@ -33,17 +33,16 @@ def violatorSearch():
     'url' : 'https://lprod.scip.ntta.org/scip/jsp/SignIn.jsp', # initial URL
     #'url' : 'http://intranet/SitePages', # initial URL
     'operatorMessage' : "Use debug mode, open VPS, new violator search window, and run to completion",
-    'staleLocator' : (By.XPATH,'//h1[contains(text(),"Violation Search")]'),
-    'staleLocator2' : (By.XPATH,'//h1[contains(text(),"Violation Search Result")]'),
+    'staleLocator' : (By.XPATH,'//h1[contains(text(),"Violator Maintenance")]'),
     'buttonLocator' : (By.XPATH,'//input[@value="Query"]'),
     'frameParamters' : {'useFrames' : True, 'frameLocator' : (By.XPATH, '//frame[@name="fraRxL"]') },
     'resultPageTextLocator' : (By.XPATH, '//TD/H1'),
     'resultPageVerifyText' : 'Violation Search Results',
     'outputLocator' : (By.XPATH,'//BODY/P[contains(text(),"Record")]'),
     'resultIndexParameters' : {'regex' : "Records \d+ to \d+ of (\d+)", 'selector' : 'tail'},  # head, tail, or all
-    'dataInFileName' : 'LP_Repeats_Count_short.csv',
+    #'dataInFileName' : 'LP_Repeats_Count_short.csv',
     #'dataInFileName' : 'LP_Repeats_Count.csv',
-    #'dataInFileName' : 'LP_Repeats_Count_200.csv',
+    'dataInFileName' : 'LP_Repeats_Count_200.csv',
     'dataOutFileName' : 'vps_find_vio_by_lp.csv',
     'returnOrClick' : 'return', # use Return or Click to submit form
     }
@@ -72,7 +71,7 @@ def dataIO(driver, parameters):
             pageLoaded = newPageElementFound(driver, delay, (By.XPATH, '//frame[@name="fraTOP"]'), vioPageTextLocator)
             foundFrame = findAndSelectFrame(driver, delay, "fraRL")
             #time.sleep(1)  #text may not be there yet!  how long to wait?
-  #lost here          text = getTextResults(driver, delay, plateString, parameters, "fraRL")
+            text = getTextResults(driver, delay, plateString, parameters, "fraRL")
             if text is not None: # if there is text, process it
                 sys.stdout.write(plateString + ", " + str(text) + '\n')
                 outfile.write(plateString + ", " + str(text) + '\n')

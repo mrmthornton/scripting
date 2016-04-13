@@ -169,7 +169,8 @@ def getTextResults(driver, delay, plateString, parameters, frameName=None):
 
         if elemText == 'No Records returned':
             return 0
-
+        if elemText == 'Record 1 of 1':
+            return elemText
         text = pattern.findall(elemText)
         if len(text):
             #print "getTextResults", text # for debug
