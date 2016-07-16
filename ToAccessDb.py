@@ -179,6 +179,8 @@ class S7SC3:
     def Process(self, cursor):
         """
         Inserts a record in to the Access database
+        (PLATE, PLATE_ST, COMBINED NAME, ADDRESS, CITY, ZIPCODE, STATE,
+         TITLE DATE, START DATE, END DATE, VEHICLE MAKE, VEHICLE MODEL, VEHICLE BODY)
         """
         sql = "INSERT INTO SC3 (BEGIN, P1OT, P2OT, CHANGES, SUCCESSFUL, INCIDENTS, FAILED, EMERGENCY) VALUES\
             (#{}#, {}, {}, {}, {}, {}, {}, {})"\
@@ -187,96 +189,121 @@ class S7SC3:
 
 def ConnectToAccessFile():
         """
-        Prompts the user for an Access database file, connects, creates a cursor,
-        cleans out the tables which are to be replaced, gets a hash of the facilities
-        table keyed on facility name returning facility id
+        Prompt the user for an Access database file, connect, create a cursor,
+        get a hash of the facilities table keyed on facility name returning facility id
         """
         # Prompts the user to select which Access DB file he wants to use and then attempts to connect
         root = Tk()
-        dbname = tkFileDialog.askopenfilename(parent=root, title="Select output database", filetypes=[('Access db', '*.accdb'), ('Access locked', '*.accde')])
+        dbname = tkFileDialog.askopenfilename(parent=root, title="Select output database",
+                    filetypes=[('Access locked', '*.accde'), ('Access db', '*.accdb')])
         root.destroy()
         # Connect to the Access (new) database and clean its existing incidents etc. tables out as
         # these will be replaced with the new data
-        dbcxn = pyodbc.connect("Driver={Microsoft Access Driver (*.mdb, *.accdb)};DBQ="+dbname+";")
-        dbcursor=dbcxn.cursor()
+        dbTXDOT = pyodbc.connect("Driver={Microsoft Access Driver (*.mdb, *.accdb)};DBQ="+dbname+";")
+        dbcursor=dbTXDOT.cursor()
         print("Connected to {}".format(dbname))
-        for table in ["PLATE", "PLATE_ST", "combined name", "address", "city", "zipCode", "state", "title date"]:
-            print("Clearing table {}...".format(table))
-            dbcursor.execute("DELETE * FROM {}".format(table))
-            # Get the list of facilities from the Access database...
-            dbcursor.execute("SELECT id, facility FROM facilities")
-            rows = dbcursor.fetchall()
-            dbfacilities = {unicode(row[1]):row[0] for row in rows}
-            return dbcxn, dbcursor, dbfacilities
+
+        dbcursor.execute("SELECT Plate FROM Sheet1")
+        rowcount = 0
+        #while True:
+        #    row = dbcursor.fetchone()
+        #    pyodbc.Cursor.fetchone.__get__
+        #    if row is None:
+        #        break
+        #    rowcount += 1
+        #    print (u"Plate {0}".format(row[0]))
+        #    #print ("Plate {0}".format(row.get("Plate")))
+        #print rowcount
+
+        #for table in ["US STATE"]:
+        #    #print("Clearing table {}...".format(table))
+        #    #dbcursor.execute("DELETE * FROM {}".format(table))
+        #    # Get the list of facilities from the Access database...
+        #    dbcursor.execute("SELECT id, facility FROM facilities")
+        #    rows = dbcursor.fetchall()
+        #    dbfacilities = {unicode(row[1]):row[0] for row in rows}
+        return dbTXDOT, dbcursor
 
 # Entry point
 
 incre = re.compile("INC\d{12}[A-Z]?") # Regex that matches incident references
 
 try:
-    dbcxn, dbcursor, dbfacilities = ConnectToAccessFile()
-    # Connect to the MySQL S7 (old) database and read the incidents and ad1 tables
-    s7cxn = pyodbc.connect("DRIVER={MySQL ODBC 3.51 Driver}; SERVER=localhost;DATABASE=s7; UID=root; PASSWORD=********; OPTION=3")
-    print("Connected to MySQL S7 database")
-    s7cursor = s7cxn.cursor()
-    s7cursor.execute("""
-    SELECT id_incident, priority, begin, acknowledge,
-    diagnose, workaround, fix, handoff, lro, nlro,
-    facility, ctas, summary, raised, code FROM INCIDENTS""")
-    rows = s7cursor.fetchall()
-    # Discard any incidents which don't have a reference of the form INC... as they are ancient
-    print("Fetching incidents")
-    s7incidents = {unicode(row[0]):S7Incident(*row) for row in rows if incre.match(row[0])}
+    dbTXDOT, dbcursor = ConnectToAccessFile()
 
-    # Get the list of productions from the S7 database to replace the one we've just deleted ...
+    dbcursor.execute("SELECT Plate FROM Sheet1")
+    rowcount = 0
+    while True:
+        row = dbcursor.fetchone()
+        pyodbc.Cursor.fetchone.__get__
+        if row is None:
+            break
+        rowcount += 1
+        print (u"Plate {0}".format(row[0]))
+        #print ("Plate {0}".format(row.get("Plate")))
+    print rowcount
+    ## Connect to the MySQL S7 (old) database and read the incidents and ad1 tables
+    #s7cxn = pyodbc.connect("DRIVER={MySQL ODBC 3.51 Driver}; SERVER=localhost;DATABASE=s7; UID=root; PASSWORD=********; OPTION=3")
+    #print("Connected to MySQL S7 database")
+    #s7cursor = s7cxn.cursor()
+    #s7cursor.execute("""
+    #    SELECT id_incident, priority, begin, acknowledge,
+    #    diagnose, workaround, fix, handoff, lro, nlro,
+    #    facility, ctas, summary, raised, code FROM INCIDENTS""")
+    #rows = s7cursor.fetchall()
+    ## Discard any incidents which don't have a reference of the form INC... as they are ancient
+    #print("Fetching incidents")
+    #s7incidents = {unicode(row[0]):S7Incident(*row) for row in rows if incre.match(row[0])}
 
-    print("Fetching productions")
-    s7cursor.execute("SELECT DISTINCT RAISED FROM INCIDENTS")
-    rows = s7cursor.fetchall()
-    s7productions = [r[0] for r in rows]
+    ## Get the list of productions from the S7 database to replace the one we've just deleted ...
 
-    # ... now get the AD1s ...
+    #print("Fetching productions")
+    #s7cursor.execute("SELECT DISTINCT RAISED FROM INCIDENTS")
+    #rows = s7cursor.fetchall()
+    #s7productions = [r[0] for r in rows]
 
-    print("Fetching AD1s")
-    s7cursor.execute("SELECT id_ad1, date, ref, commentary, adjustment from AD1")
-    rows = s7cursor.fetchall()
-    s7ad1s = [S7AD1(*row) for row in rows]
+    ## ... now get the AD1s ...
 
-    # ... and the financial records ...
+    #print("Fetching AD1s")
+    #s7cursor.execute("SELECT id_ad1, date, ref, commentary, adjustment from AD1")
+    #rows = s7cursor.fetchall()
+    #s7ad1s = [S7AD1(*row) for row in rows]
 
-    print("Fetching Financials")
-    s7cursor.execute("SELECT month, year, gco, cta, support, sc1, sc2, sc3, ad1 FROM Financials")
-    rows = s7cursor.fetchall()
-    s7financials = [S7Financial(*row) for row in rows]
-    print("Writing financials ({})".format(len(s7financials)))
-    [p.Process(dbcursor) for p in s7financials]
+    ## ... and the financial records ...
 
-    # ... and the SC3s.
+    #print("Fetching Financials")
+    #s7cursor.execute("SELECT month, year, gco, cta, support, sc1, sc2, sc3, ad1 FROM Financials")
+    #rows = s7cursor.fetchall()
+    #s7financials = [S7Financial(*row) for row in rows]
+    #print("Writing financials ({})".format(len(s7financials)))
+    #[p.Process(dbcursor) for p in s7financials]
 
-    print("Fetching SC3s")
-    s7cursor.execute("SELECT begin, month, year, p1ot, p2ot, totchg, succhg, chgwithinc, fldchg, egcychg from SC3")
-    rows = s7cursor.fetchall()
-    s7sc3s = [S7SC3(*row) for row in rows]
-    print("Writing SC3s ({})".format(len(s7sc3s)))
-    [p.Process(dbcursor) for p in s7sc3s]
+    ## ... and the SC3s.
+
+    #print("Fetching SC3s")
+    #s7cursor.execute("SELECT begin, month, year, p1ot, p2ot, totchg, succhg, chgwithinc, fldchg, egcychg from SC3")
+    #rows = s7cursor.fetchall()
+    #s7sc3s = [S7SC3(*row) for row in rows]
+    #print("Writing SC3s ({})".format(len(s7sc3s)))
+    #[p.Process(dbcursor) for p in s7sc3s]
 
     # Re-create the productions table in the new database. Note we refer to production
     # by number in the incidents table so need to do the SELECT @@IDENTITY to give us the
     # autonumber index. To make sure everything is case-insensitive convert the
     # hash keys to UPPERCASE.
 
-    dbproductions = {}
-    print("Writing productions ({})".format(len(s7productions)))
-    for p in sorted(s7productions):
-        dbcursor.execute("INSERT INTO PRODUCTIONS (PRODUCTION) VALUES ('{}')".format(p))
-        dbcursor.execute("SELECT @@IDENTITY")
-        dbproductions[p.upper()] = dbcursor.fetchone()[0]
+    #dbproductions = {}
+    #print("Writing productions ({})".format(len(s7productions)))
+    #for p in sorted(s7productions):
+    #    dbcursor.execute("INSERT INTO PRODUCTIONS (PRODUCTION) VALUES ('{}')".format(p))
+    #    dbcursor.execute("SELECT @@IDENTITY")
+    #    dbproductions[p.upper()] = dbcursor.fetchone()[0]
 
 
-    # Now process the incidents etc. that we have retrieved from the S7 database
-
-    print("Writing incidents ({})".format(len(s7incidents)))
-    [s7incidents[k].ProcessIncident(dbcursor, dbfacilities, dbproductions) for k in sorted(s7incidents)]
+    ## Now process the incidents etc. that we have retrieved from the S7 database
+    #
+    #print("Writing incidents ({})".format(len(s7incidents)))
+    #[s7incidents[k].ProcessIncident(dbcursor, dbfacilities, dbproductions) for k in sorted(s7incidents)]
 
     # Match the new parent incident IDs in the AD1s and then write to the new table. Some
     # really old AD1s don't have the parent incident reference in the REF field, it is just
@@ -284,22 +311,20 @@ try:
     # re.search (not re.match!) for it. It isn't essential to match these older AD1s with
     # their parent incident, but it is quite useful (and tidy).
 
-    print("Matching and writing AD1s".format(len(s7ad1s)))
-    for a in s7ad1s:
-        if a.ref in s7incidents:
-            a.SetPID(s7incidents[a.ref].dbid)
-            a.SetProduction(s7incidents[a.ref].production)
-        else:
-            z=incre.search(a.commentary)
-            if z and z.group() in s7incidents:
-                a.SetPID(s7incidents[z.group()].dbid)
-                a.SetProduction(s7incidents[z.group()].production)
-
-        a.Process(dbcursor)
+    #print("Matching and writing AD1s".format(len(s7ad1s)))
+    #for a in s7ad1s:
+    #    if a.ref in s7incidents:
+    #        a.SetPID(s7incidents[a.ref].dbid)
+    #        a.SetProduction(s7incidents[a.ref].production)
+    #    else:
+    #        z=incre.search(a.commentary)
+    #        if z and z.group() in s7incidents:
+    #            a.SetPID(s7incidents[z.group()].dbid)
+    #            a.SetProduction(s7incidents[z.group()].production)
+    #    a.Process(dbcursor)
 
     print("Comitting changes")
     dbcursor.commit()
 finally:
     print("Closing databases")
-    dbcxn.close()
-    s7cxn.close()
+    dbTXDOT.close()
