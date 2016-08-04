@@ -108,7 +108,7 @@ def findResponseType(plate, fileString):
 
     # NO RECORD
     targetType = 'NORECORD'
-    startPattern = re.compile('REG 00' + '[\s]+' + plate)
+    startPattern = re.compile('PLATE:' + '[\s]+' + plate)
     endPattern = re.compile('NO RECORD IN RTS DATABASE')
     startNum, endNum = findStartEnd(fileString,startPattern, endPattern)
     if startNum != None:
@@ -154,7 +154,7 @@ def findResponseType(plate, fileString):
     # TEMPORARY
     targetType = 'TEMPORARY'
     startPattern = re.compile(r'SELECTION REQUEST:\s+TEMPORARY TAG\s+' + plate)
-    endPattern = re.compile(r',\w{2,2},\d{5,5}')  #ZipPlus
+    endPattern = re.compile(r',\w{2,2},\d{5,5}')  # ,ST,Zip
     startNum, endNum = findStartEnd(fileString,startPattern, endPattern)
     if startNum != None:
         print  'findResponseType:', targetType, plate
@@ -228,7 +228,7 @@ def parseRecord(responseType, typeString):
     return None
 
 def parseNoRecord(responseType, typeString):
-    noRecordPattern = re.compile('REG 00 ')
+    noRecordPattern = re.compile('PLATE: ')
     header = noRecordPattern.search(typeString)
     typeString = typeString[header.end():]
     nextWord = wordPattern.search(typeString)
@@ -572,8 +572,11 @@ def timeout():
 
 
 def query(driver, delay, plate):
-    plateSubmitLocator = (By.XPATH, '//input[@class="v-textfield v-widget iw-child v-textfield-iw-child iw-mandatory v-textfield-iw-mandatory v-has-width"]')
+    # the input field is uniquely defined by the MANDATORY class attributes
+    # class="v-textfield v-widget v-has-width iw-child v-textfield-iw-child iw-mandatory v-textfield-iw-mandatory"
+    plateSubmitLocator = (By.XPATH, '//input[contains(@class,"v-textfield-iw-mandatory")]')
     plateSubmitElement = findElementOnPage(driver, delay, plateSubmitLocator)
+
     if plateSubmitElement is None:
         print "query: plate submission element not found on page"
         return None
@@ -582,8 +585,11 @@ def query(driver, delay, plate):
     plateSubmitElement.send_keys('\n')
 
     textLocator =  (By.XPATH, '//div[@style="font-family: Courier New;"]')
+    #wait until text element contains 'plate'
+    WebDriverWait(driver, delay).until(EC.text_to_be_present_in_element(textLocator, plate))
     textElement = findElementOnPage(driver, delay, textLocator)
     uText = textElement.text
+    plateSubmitElement.clear() # does this need to be cleaned to be found?
 
     return str(uText)
 

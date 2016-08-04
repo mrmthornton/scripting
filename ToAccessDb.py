@@ -231,7 +231,9 @@ incre = re.compile("INC\d{12}[A-Z]?") # Regex that matches incident references
 try:
     dbTXDOT, dbcursor = ConnectToAccessFile()
 
-    dbcursor.execute("SELECT Plate FROM Sheet1")
+    #dbcursor.execute("SELECT Plate, Plate_St FROM Sheet1")
+    dbcursor.execute("SELECT PLATE, PLATE_ST, COMBINED NAME, ADDRESS, CITY, ZIPCODE, STATE FROM Sheet1")
+    #, TITLE DATE, START DATE, END DATE, VEHICLE MAKE, VEHICLE MODEL, VEHICLE BODY")
     rowcount = 0
     while True:
         row = dbcursor.fetchone()
@@ -239,8 +241,8 @@ try:
         if row is None:
             break
         rowcount += 1
-        print (u"Plate {0}".format(row[0]))
-        #print ("Plate {0}".format(row.get("Plate")))
+        print (u"Plate {0} {1}".format(row[0], row[1]))
+        print row
     print rowcount
     ## Connect to the MySQL S7 (old) database and read the incidents and ad1 tables
     #s7cxn = pyodbc.connect("DRIVER={MySQL ODBC 3.51 Driver}; SERVER=localhost;DATABASE=s7; UID=root; PASSWORD=********; OPTION=3")

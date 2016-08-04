@@ -6,7 +6,9 @@
 #
 # Created:     2014 NOV 24
 # Updates:     2016 FEB 11
-# Copyright:   (c) mthornton 2014, 2015
+# Copyright:   (c) mthornton 2014, 2015, 2016
+# input(s)
+# output(s)
 #-------------------------------------------------------------------------------
 
 import re
@@ -23,24 +25,21 @@ def main():
     #print sheet
     #data = [[sheet.cell_value(r, c) for c in range(sheet.ncols)] for r in range(sheet.nrows)]
 
-    # dealerPlates.csv, plates.csv
-    with open('SOMENAME.csv', 'r') as plateFile:
+    with open('plates.csv', 'r') as plateFile:
         csvInput = csv.reader(plateFile)
         plates = [row[0] for row in csvInput]
     #print plates
 
     with open('dataCSV.txt', 'a') as outfile, open('txdotText.txt', 'a') as rawTextFile:
         outfile.truncate()
-        #rawTextFile.truncate()
+        rawTextFile.truncate()
         for plate in plates:
-            results = query(plate)
-            for e in results:
-                fileString = filter(lambda x: x in string.printable, e.text)
-                print fileString
-                rawTextFile.write(fileString)
+            results = query(driver, delay, plate)
+            if results is not None:
+                print results # for debug
+                rawTextFile.write(results)
                 rawTextFile.write('\n\n------------------------------------\n\n')
-
-            fileString = repairLineBreaks(fileString)
+                fileString = repairLineBreaks(results)
             foundCurrentPlate = False
             while True:
                 try:
@@ -63,16 +62,13 @@ def main():
         outfile.write('----------------\n')
         outfile.flush()
     print "main: Finished parsing TxDot file."
+    driver.close()
 
 
-from TxDotQuery import credentials
-from TxDotQuery import connect
-from TxDotQuery import query
-
-# input - 'dealerPlates.csv'
-# input - 'plates.csv'
-# output - 'dataCSV.txt'
 if __name__ == '__main__':
-    credentials()
-    connect()
+    #create an instance of IE and set some options
+    driver = webdriver.Ie()
+    delay=10
+    url = 'https://mvinet.txdmv.gov'
+    driver.get(url)
     main()

@@ -32,7 +32,7 @@ def violatorSearch():
     'delay' : 15,
     'url' : 'https://lprod.scip.ntta.org/scip/jsp/SignIn.jsp', # initial URL
     #'url' : 'http://intranet/SitePages', # initial URL
-    'operatorMessage' : "Use debug mode, open VPS, new violator search window, and run to completion",
+    'operatorMessage' : "Use debug mode, open VPS, new VIOLATION SEARCH window, and run to completion",
     'staleLocator' : (By.XPATH,'//h1[contains(text(),"Violator Maintenance")]'),
     'buttonLocator' : (By.XPATH,'//input[@value="Query"]'),
     'frameParamters' : {'useFrames' : True, 'frameLocator' : (By.XPATH, '//frame[@name="fraRxL"]') },

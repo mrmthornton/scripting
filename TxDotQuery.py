@@ -1,6 +1,6 @@
 #-------------------------------------------------------------------------------
 # Name:        TxDotQuery
-# Purpose:     establish connection to TXDMV RTS database
+# Purpose:     establish  and test a connection to TXDMV RTS database
 #
 # Author:      mthornton
 #
@@ -13,7 +13,7 @@
 # scrape the results
 # close the page
 
-# works on win7, ie10
+# works on win7, ie10, IEDriverServer 32bit
 import os
 from selenium import webdriver
 from selenium.webdriver.common.by import By
