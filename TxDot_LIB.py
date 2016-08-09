@@ -204,8 +204,10 @@ def findResponseType(plate, fileString):
         return [targetType, startNum, endNum]
     return None
 
-# parse<RESPONSETYPE>() return a list of strings as follows
+# parseRecord() calls the appropriate 'parse<RESPONSETYPE>()',
+# which returns a list of strings as follows:
 # ['response type', 'plate', 'name', 'addr', 'apt', 'city', 'state', 'zip', 'owned']
+# Other than 'response type' and 'plate', the strings may be empty.
 def parseRecord(responseType, typeString):
     if responseType == 'NORECORD':
         return parseNoRecord(responseType, typeString)
@@ -464,10 +466,15 @@ def parseTemporary(responseType, typeString):
     # get plate
     nextWord = wordPattern.search(typeString)
     plate = nextWord.group()
-    # find valid date string, and convert to issued date
+    # find valid date string, and convert to Start Date
     validDate = dateYearFirstPattern.search(typeString)
     dateYearFirst = validDate.group()
-    issued = dateYearFirst[5:] + '/' + dateYearFirst[0:4]
+    startDate = dateYearFirst[5:] + '/' + dateYearFirst[0:4]
+    typeString = typeString[validDate.end():]
+    # find valid date string, and convert to End Date
+    validDate = dateYearFirstPattern.search(typeString) # why doesn't this work?
+    dateYearFirst = validDate.group()
+    endDate = dateYearFirst[5:] + '/' + dateYearFirst[0:4]
     typeString = typeString[validDate.end():]
     # find name and address, remove everything up to that point
     tempNamePattern = re.compile(r'NAME:\s+')
@@ -500,7 +507,7 @@ def parseTemporary(responseType, typeString):
     # get zip
     nextWord = wordPattern.search(typeString)
     zip = nextWord.group()
-    return [responseType, plate.strip(), name.strip(), addr.strip(), '', city.strip(), state.strip(), zip, issued]
+    return [responseType, plate.strip(), name.strip(), addr.strip(), '', city.strip(), state.strip(), zip, startDate, endDate]
 
     # SPECIAL
 def parseSpecial(responseType, typeString):
@@ -586,10 +593,13 @@ def query(driver, delay, plate):
 
     textLocator =  (By.XPATH, '//div[@style="font-family: Courier New;"]')
     #wait until text element contains 'plate'
-    WebDriverWait(driver, delay).until(EC.text_to_be_present_in_element(textLocator, plate))
-    textElement = findElementOnPage(driver, delay, textLocator)
-    uText = textElement.text
-    plateSubmitElement.clear() # does this need to be cleaned to be found?
-
+    try:
+        WebDriverWait(driver, delay).until(EC.text_to_be_present_in_element(textLocator, plate))
+        textElement = findElementOnPage(driver, delay, textLocator)
+        uText = textElement.text
+    except TimeoutException:
+        print "ERROR: record LP may not match input LP"
+        return None
+     #plateSubmitElement.clear() # does this need to be cleaned to be found?
     return str(uText)
 

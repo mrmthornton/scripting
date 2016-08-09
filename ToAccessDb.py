@@ -1,3 +1,4 @@
+# -*- coding: UTF-8 -*-
 """
 Routine to migrate the S7 data from MySQL to the new Access
 database.
@@ -230,9 +231,31 @@ incre = re.compile("INC\d{12}[A-Z]?") # Regex that matches incident references
 
 try:
     dbTXDOT, dbcursor = ConnectToAccessFile()
+    for row in dbcursor.columns(table='Sheet1'):
+        print row.column_name
+    #dbcursor.execute("SELECT * FROM Sheet1")
+    dbcursor.execute("SELECT plate FROM [list of plate 9 without matching sheet1]")
+    #dbcursor.execute("SELECT Plate, Plate_St, [Combined Name], Address, City, State, ZipCode, \
+    #    [Title Date], [Start Date], [End Date], [Vehicle Make], [Vehicle Model], [Vehicle Body], [Vehicle Year], \
+    #    [Total Image Reviewed], [Total Image corrected], Reason, [Time Stamp], [Agent Initial] \
+    #    FROM Sheet1")
+    """
+    dict = {
+    plate: , plate_st: , combined_name: , address: , city, state, zip, title_date,
+    start_date, end_date, make, model, body, vehicle_year,
+    images_reviewed, images_corrected, reason, time_stamp, agent,
 
-    #dbcursor.execute("SELECT Plate, Plate_St FROM Sheet1")
-    dbcursor.execute("SELECT PLATE, PLATE_ST, COMBINED NAME, ADDRESS, CITY, ZIPCODE, STATE FROM Sheet1")
+    Title_Month
+    Title_Day
+    Title_Year
+    [Sent to Collections Agency]
+    Multiple
+    Unassign
+    [Completed: Yes / No Record]
+    [E-Tags (Temporary Plates)]
+    [Dealer Plates]
+    """
+    #dbcursor.execute("SELECT PLATE, PLATE_ST, COMBINED NAME, ADDRESS, CITY, ZIPCODE, STATE FROM Sheet1")
     #, TITLE DATE, START DATE, END DATE, VEHICLE MAKE, VEHICLE MODEL, VEHICLE BODY")
     rowcount = 0
     while True:
@@ -241,7 +264,7 @@ try:
         if row is None:
             break
         rowcount += 1
-        print (u"Plate {0} {1}".format(row[0], row[1]))
+        #print (u"Plate {0} {1}".format(row[0], row[1]))
         print row
     print rowcount
     ## Connect to the MySQL S7 (old) database and read the incidents and ad1 tables

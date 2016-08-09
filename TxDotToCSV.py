@@ -20,15 +20,9 @@ from TxDot_LIB import *
 
 def main():
 
-    #workbook = xlrd.open_workbook('plates.xlsx')
-    #sheet = workbook.sheet_by_index(0)
-    #print sheet
-    #data = [[sheet.cell_value(r, c) for c in range(sheet.ncols)] for r in range(sheet.nrows)]
-
     with open('plates.csv', 'r') as plateFile:
         csvInput = csv.reader(plateFile)
         plates = [row[0] for row in csvInput]
-    #print plates
 
     with open('dataCSV.txt', 'a') as outfile, open('txdotText.txt', 'a') as rawTextFile:
         outfile.truncate()
@@ -62,7 +56,6 @@ def main():
         outfile.write('----------------\n')
         outfile.flush()
     print "main: Finished parsing TxDot file."
-    driver.close()
 
 
 if __name__ == '__main__':
@@ -72,3 +65,4 @@ if __name__ == '__main__':
     url = 'https://mvinet.txdmv.gov'
     driver.get(url)
     main()
+    driver.close()

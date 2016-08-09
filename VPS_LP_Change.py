@@ -31,7 +31,7 @@ import string
 import time
 
 
-def violatorSearch():
+def violationSearch():
     parameters = {
     'delay' : 15,
     'url' : 'https://lprod.scip.ntta.org/scip/jsp/SignIn.jsp', # initial URL
@@ -54,7 +54,7 @@ def violatorSearch():
     }
     return parameters
 
-def dataIO(driver, parameters):
+def vps_body(driver, parameters):
     delay = parameters['delay']
     startPageTextLocator = (By.XPATH, '//TD/H1[contains(text(),"Violation Search")]')
     # pause on next line for entry of credentials, and window navigation.
@@ -124,12 +124,12 @@ def dataIO(driver, parameters):
 
 if __name__ == '__main__':
 
-    parameters = violatorSearch()
+    parameters = violationSearch()
 
     findStartWindowDelay = 3
     print parameters['operatorMessage']
     regexPattens = loadRegExPatterns()
     driver = openBrowser(parameters['url'])
-    dataIO(driver, parameters)
+    vps_body(driver, parameters)
     driver.close()
 
