@@ -234,7 +234,7 @@ try:
     for row in dbcursor.columns(table='Sheet1'):
         print row.column_name
     #dbcursor.execute("SELECT * FROM Sheet1")
-    dbcursor.execute("SELECT plate FROM [list of plate 9 without matching sheet1]")
+    dbcursor.execute("SELECT plate FROM [list of plate 11 without matching sheet1]")
     #dbcursor.execute("SELECT Plate, Plate_St, [Combined Name], Address, City, State, ZipCode, \
     #    [Title Date], [Start Date], [End Date], [Vehicle Make], [Vehicle Model], [Vehicle Body], [Vehicle Year], \
     #    [Total Image Reviewed], [Total Image corrected], Reason, [Time Stamp], [Agent Initial] \
@@ -276,43 +276,13 @@ try:
     #    diagnose, workaround, fix, handoff, lro, nlro,
     #    facility, ctas, summary, raised, code FROM INCIDENTS""")
     #rows = s7cursor.fetchall()
-    ## Discard any incidents which don't have a reference of the form INC... as they are ancient
-    #print("Fetching incidents")
     #s7incidents = {unicode(row[0]):S7Incident(*row) for row in rows if incre.match(row[0])}
-
-    ## Get the list of productions from the S7 database to replace the one we've just deleted ...
-
-    #print("Fetching productions")
     #s7cursor.execute("SELECT DISTINCT RAISED FROM INCIDENTS")
-    #rows = s7cursor.fetchall()
     #s7productions = [r[0] for r in rows]
-
-    ## ... now get the AD1s ...
-
-    #print("Fetching AD1s")
-    #s7cursor.execute("SELECT id_ad1, date, ref, commentary, adjustment from AD1")
-    #rows = s7cursor.fetchall()
     #s7ad1s = [S7AD1(*row) for row in rows]
-
-    ## ... and the financial records ...
-
-    #print("Fetching Financials")
-    #s7cursor.execute("SELECT month, year, gco, cta, support, sc1, sc2, sc3, ad1 FROM Financials")
-    #rows = s7cursor.fetchall()
-    #s7financials = [S7Financial(*row) for row in rows]
-    #print("Writing financials ({})".format(len(s7financials)))
     #[p.Process(dbcursor) for p in s7financials]
-
-    ## ... and the SC3s.
-
-    #print("Fetching SC3s")
-    #s7cursor.execute("SELECT begin, month, year, p1ot, p2ot, totchg, succhg, chgwithinc, fldchg, egcychg from SC3")
-    #rows = s7cursor.fetchall()
     #s7sc3s = [S7SC3(*row) for row in rows]
     #print("Writing SC3s ({})".format(len(s7sc3s)))
-    #[p.Process(dbcursor) for p in s7sc3s]
-
-    # Re-create the productions table in the new database. Note we refer to production
     # by number in the incidents table so need to do the SELECT @@IDENTITY to give us the
     # autonumber index. To make sure everything is case-insensitive convert the
     # hash keys to UPPERCASE.
