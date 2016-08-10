@@ -52,7 +52,7 @@ def credentials():
     url = 'https://mvinet.txdmv.gov'
     driver.get(url)
 
-def vps_body(driver, parameters):
+def txdotGetRecord(driver, parameters):
     delay = parameters['delay']
     startPageTextLocator = (By.XPATH, '//TD/H1[contains(text(),"Violation Search")]')
     # pause on next line for entry of credentials, and window navigation.
@@ -145,7 +145,7 @@ if __name__ == '__main__':
         for lp in plates:
             # NEED a common data structure for these types of data: txdot , vps, database
             # dictionary ?
-            txdot_info_csv = txdot_body(driver, delay, lp, outfile, rawTextFile) #TXDOT PROCESSING
+            txdot_info_csv = txdotGetRecord(driver, delay, lp, outfile, rawTextFile) #TXDOT PROCESSING
             violationSearch()
             vps_info = vps_body(driver,delay, lp) #VPS PROCESSING
             #db_body(driver, delay, lp) #DATABASE PROCESSING

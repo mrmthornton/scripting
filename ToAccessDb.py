@@ -188,94 +188,74 @@ class S7SC3:
               .format(self.begin, self.p1ot, self.p2ot, self.changes, self.successful, self.incidents, self.failed, self.emergency)
         cursor.execute(sql)
 
+
 def ConnectToAccessFile():
         """
-        Prompt the user for an Access database file, connect, create a cursor,
-        get a hash of the facilities table keyed on facility name returning facility id
+        Prompt the user for an Access database file,
+        create a connection and a cursor.
         """
         # Prompts the user to select which Access DB file he wants to use and then attempts to connect
         root = Tk()
         dbname = tkFileDialog.askopenfilename(parent=root, title="Select output database",
                     filetypes=[('Access locked', '*.accde'), ('Access db', '*.accdb')])
         root.destroy()
-        # Connect to the Access (new) database and clean its existing incidents etc. tables out as
-        # these will be replaced with the new data
-        dbTXDOT = pyodbc.connect("Driver={Microsoft Access Driver (*.mdb, *.accdb)};DBQ="+dbname+";")
-        dbcursor=dbTXDOT.cursor()
-        print("Connected to {}".format(dbname))
+        # Connect to the Access database
+        connectedDB = pyodbc.connect("Driver={Microsoft Access Driver (*.mdb, *.accdb)};DBQ="+dbname+";")
+        dbcursor=connectedDB.cursor()
+        print("ConnectToAccessFile: Connected to {}".format(dbname))
+        return connectedDB, dbcursor
 
-        dbcursor.execute("SELECT Plate FROM Sheet1")
-        rowcount = 0
-        #while True:
-        #    row = dbcursor.fetchone()
-        #    pyodbc.Cursor.fetchone.__get__
-        #    if row is None:
-        #        break
-        #    rowcount += 1
-        #    print (u"Plate {0}".format(row[0]))
-        #    #print ("Plate {0}".format(row.get("Plate")))
-        #print rowcount
-
-        #for table in ["US STATE"]:
-        #    #print("Clearing table {}...".format(table))
-        #    #dbcursor.execute("DELETE * FROM {}".format(table))
-        #    # Get the list of facilities from the Access database...
-        #    dbcursor.execute("SELECT id, facility FROM facilities")
-        #    rows = dbcursor.fetchall()
-        #    dbfacilities = {unicode(row[1]):row[0] for row in rows}
-        return dbTXDOT, dbcursor
 
 # Entry point
 
 incre = re.compile("INC\d{12}[A-Z]?") # Regex that matches incident references
 
 try:
-    dbTXDOT, dbcursor = ConnectToAccessFile()
+    dbConnect, dbcursor = ConnectToAccessFile()
     for row in dbcursor.columns(table='Sheet1'):
         print row.column_name
     #dbcursor.execute("SELECT * FROM Sheet1")
     dbcursor.execute("SELECT plate FROM [list of plate 11 without matching sheet1]")
-    #dbcursor.execute("SELECT Plate, Plate_St, [Combined Name], Address, City, State, ZipCode, \
+    #dbcursor.execute('''SELECT Plate, Plate_St, [Combined Name], Address, City, State, ZipCode, \
     #    [Title Date], [Start Date], [End Date], [Vehicle Make], [Vehicle Model], [Vehicle Body], [Vehicle Year], \
     #    [Total Image Reviewed], [Total Image corrected], Reason, [Time Stamp], [Agent Initial] \
-    #    FROM Sheet1")
-    """
-    dict = {
-    plate: , plate_st: , combined_name: , address: , city, state, zip, title_date,
-    start_date, end_date, make, model, body, vehicle_year,
-    images_reviewed, images_corrected, reason, time_stamp, agent,
+    #    FROM Sheet1''')
 
-    Title_Month
-    Title_Day
-    Title_Year
-    [Sent to Collections Agency]
-    Multiple
-    Unassign
-    [Completed: Yes / No Record]
-    [E-Tags (Temporary Plates)]
-    [Dealer Plates]
-    """
-    #dbcursor.execute("SELECT PLATE, PLATE_ST, COMBINED NAME, ADDRESS, CITY, ZIPCODE, STATE FROM Sheet1")
-    #, TITLE DATE, START DATE, END DATE, VEHICLE MAKE, VEHICLE MODEL, VEHICLE BODY")
+    #    Title_Month, Title_Day, Title_Year, [Sent to Collections Agency],
+    #    Multiple, Unassign, [Completed: Yes / No Record],
+    #   [E-Tags (Temporary Plates)], [Dealer Plates]
+    recordDictionary = {"plate":'', "plate_st":'', "combined_name":'', "address":'', "city":'', "state":'', "zip":'', \
+        "title_date":'', "start_date":'', "end_date":'' , "make":'' , "model":'' , "body":'' , "vehicle_year":'' , \
+        "images_reviewed":'' , "images_corrected":'', "reason":'', "time_stamp":'', "agent":'', \
+        "title_month":'', "title_day":'', "title_year":'', "collections":'', \
+        "multiple":'', "unassign":'', "completed":'', \
+        "temp_plate":'', "dealer_plate":'' \
+        }
+
     rowcount = 0
     while True:
         row = dbcursor.fetchone()
-        pyodbc.Cursor.fetchone.__get__
         if row is None:
             break
         rowcount += 1
-        #print (u"Plate {0} {1}".format(row[0], row[1]))
-        print row
+        print "Plate {}".format(row[0])
+        #print "entire row -->", row
     print rowcount
-    ## Connect to the MySQL S7 (old) database and read the incidents and ad1 tables
-    #s7cxn = pyodbc.connect("DRIVER={MySQL ODBC 3.51 Driver}; SERVER=localhost;DATABASE=s7; UID=root; PASSWORD=********; OPTION=3")
-    #print("Connected to MySQL S7 database")
-    #s7cursor = s7cxn.cursor()
-    #s7cursor.execute("""
-    #    SELECT id_incident, priority, begin, acknowledge,
-    #    diagnose, workaround, fix, handoff, lro, nlro,
-    #    facility, ctas, summary, raised, code FROM INCIDENTS""")
-    #rows = s7cursor.fetchall()
+
+    for column in dbcursor.columns(table='US State'):
+        print column.column_name
+    dbcursor.execute('''SELECT Field1
+                        FROM [US State]''')
+    while True:
+        row = dbcursor.fetchone()
+        if row is None:
+            break
+        print "entire row -->{}".format(row[0])
+
+        #dbcursor.execute("DELETE * FROM {}".format(table))
+        #rows = dbcursor.fetchall()
+        #dbfacilities = {unicode(row[1]):row[0] for row in rows}
+
     #s7incidents = {unicode(row[0]):S7Incident(*row) for row in rows if incre.match(row[0])}
     #s7cursor.execute("SELECT DISTINCT RAISED FROM INCIDENTS")
     #s7productions = [r[0] for r in rows]
@@ -283,12 +263,10 @@ try:
     #[p.Process(dbcursor) for p in s7financials]
     #s7sc3s = [S7SC3(*row) for row in rows]
     #print("Writing SC3s ({})".format(len(s7sc3s)))
-    # by number in the incidents table so need to do the SELECT @@IDENTITY to give us the
-    # autonumber index. To make sure everything is case-insensitive convert the
-    # hash keys to UPPERCASE.
 
-    #dbproductions = {}
-    #print("Writing productions ({})".format(len(s7productions)))
+    # do the SELECT @@IDENTITY to give us the autonumber index.
+    # To make sure everything is case-insensitive convert the hash keys to UPPERCASE.
+
     #for p in sorted(s7productions):
     #    dbcursor.execute("INSERT INTO PRODUCTIONS (PRODUCTION) VALUES ('{}')".format(p))
     #    dbcursor.execute("SELECT @@IDENTITY")
@@ -322,4 +300,4 @@ try:
     dbcursor.commit()
 finally:
     print("Closing databases")
-    dbTXDOT.close()
+    dbConnect.close()
