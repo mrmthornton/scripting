@@ -188,6 +188,16 @@ class S7SC3:
               .format(self.begin, self.p1ot, self.p2ot, self.changes, self.successful, self.incidents, self.failed, self.emergency)
         cursor.execute(sql)
 
+def insertRecord(cursor, table):
+    """
+    Inserts a record in to the Access database
+    (PLATE, PLATE_ST, COMBINED NAME, ADDRESS, CITY, ZIPCODE, STATE,
+     TITLE DATE, START DATE, END DATE, VEHICLE MAKE, VEHICLE MODEL, VEHICLE BODY)
+    """
+    sql = "INSERT INTO "+table+" (BEGIN, P1OT, P2OT, CHANGES, SUCCESSFUL, INCIDENTS, FAILED, EMERGENCY) VALUES\
+        (#{}#, {}, {}, {}, {}, {}, {}, {})"\
+          .format(self.begin, self.p1ot, self.p2ot, self.changes, self.successful, self.incidents, self.failed, self.emergency)
+    cursor.execute(sql)
 
 def ConnectToAccessFile():
         """
@@ -231,7 +241,13 @@ try:
         "multiple":'', "unassign":'', "completed":'', \
         "temp_plate":'', "dealer_plate":'' \
         }
+    while True:
+        row = dbcursor.fetchone()
+        if row is None:
+            break
+        plate = row[0]
 
+    """
     rowcount = 0
     while True:
         row = dbcursor.fetchone()
@@ -241,7 +257,8 @@ try:
         print "Plate {}".format(row[0])
         #print "entire row -->", row
     print rowcount
-
+    """
+    """
     for column in dbcursor.columns(table='US State'):
         print column.column_name
     dbcursor.execute('''SELECT Field1
@@ -251,7 +268,10 @@ try:
         if row is None:
             break
         print "entire row -->{}".format(row[0])
+    """
 
+    print("Comitting changes")
+    dbcursor.commit()
         #dbcursor.execute("DELETE * FROM {}".format(table))
         #rows = dbcursor.fetchall()
         #dbfacilities = {unicode(row[1]):row[0] for row in rows}
@@ -296,8 +316,6 @@ try:
     #            a.SetProduction(s7incidents[z.group()].production)
     #    a.Process(dbcursor)
 
-    print("Comitting changes")
-    dbcursor.commit()
 finally:
     print("Closing databases")
     dbConnect.close()
