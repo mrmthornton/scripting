@@ -217,13 +217,20 @@ def ConnectToAccessFile():
 
 
 # Entry point
+from TxDot_LIB import *
+
+# move these to the library
+driver = webdriver.Ie()
+delay=10
+url = 'https://mvinet.txdmv.gov'
+driver.get(url)
 
 incre = re.compile("INC\d{12}[A-Z]?") # Regex that matches incident references
 
 try:
     dbConnect, dbcursor = ConnectToAccessFile()
-    for row in dbcursor.columns(table='Sheet1'):
-        print row.column_name
+    #for row in dbcursor.columns(table='Sheet1'): # debug
+    #    print row.column_name                    # debug
     #dbcursor.execute("SELECT * FROM Sheet1")
     dbcursor.execute("SELECT plate FROM [list of plate 11 without matching sheet1]")
     #dbcursor.execute('''SELECT Plate, Plate_St, [Combined Name], Address, City, State, ZipCode, \
@@ -246,6 +253,43 @@ try:
         if row is None:
             break
         plate = row[0]
+        if plate == '057B0392':
+            break
+        results = query(driver, delay, plate)
+        if results is not None:
+            print results # for debug
+            fileString = repairLineBreaks(results)
+        foundCurrentPlate = False
+        csvStringList = []
+        while True:
+            try:
+                responseType, startNum, endNum = findResponseType(plate, fileString)
+            except:
+                responseType = None
+                if foundCurrentPlate == False:
+                    print "\n", plate, ' Plate/Pattern not found'
+                break
+            if responseType != None: # there must be a valid text record to process
+                foundCurrentPlate = True
+                #print 'main:', responseType, startNum, endNum
+                typeString = fileString[startNum:endNum + 1]
+                #print typeString
+                fileString = fileString[:startNum] + fileString[endNum + 1:]
+                listData = parseRecord(responseType, typeString)
+                csvString = csvStringFromList(listData)
+                csvStringList.append(csvString)
+    for csvRecord in csvStringList:
+            """
+            Inserts a record in to the Access database
+            (PLATE, PLATE_ST, COMBINED NAME, ADDRESS, CITY, ZIPCODE, STATE,
+            TITLE DATE, START DATE, END DATE, VEHICLE MAKE, VEHICLE MODEL, VEHICLE BODY)
+            """
+            sql = "INSERT INTO Sheet1 \
+                (PLATE, PLATE_ST, COMBINED NAME, ADDRESS, CITY, ZIPCODE, STATE, \
+                 TITLE DATE, START DATE, END DATE, VEHICLE MAKE, VEHICLE MODEL, VEHICLE BODY) \
+                 VALUES (#{}#, {}, {}, {}, {}, {}, {}, {})"\
+                 .format(csvRecord[0:7] )
+            cursor.execute(sql)
 
     """
     rowcount = 0
