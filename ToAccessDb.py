@@ -248,6 +248,7 @@ try:
         "multiple":'', "unassign":'', "completed":'', \
         "temp_plate":'', "dealer_plate":'' \
         }
+    recordList = []
     while True:
         row = dbcursor.fetchone()
         if row is None:
@@ -260,7 +261,6 @@ try:
             print results # for debug
             fileString = repairLineBreaks(results)
         foundCurrentPlate = False
-        csvStringList = []
         while True:
             try:
                 responseType, startNum, endNum = findResponseType(plate, fileString)
@@ -276,20 +276,29 @@ try:
                 #print typeString
                 fileString = fileString[:startNum] + fileString[endNum + 1:]
                 listData = parseRecord(responseType, typeString)
-                csvString = csvStringFromList(listData)
-                csvStringList.append(csvString)
-    for csvRecord in csvStringList:
+                #csvString = csvStringFromList(listData)
+                recordList.append(listData)
+    for csvRecord in recordList:
+
             """
             Inserts a record in to the Access database
             (PLATE, PLATE_ST, COMBINED NAME, ADDRESS, CITY, ZIPCODE, STATE,
             TITLE DATE, START DATE, END DATE, VEHICLE MAKE, VEHICLE MODEL, VEHICLE BODY)
             """
+            plate = recordDictionary["plate"]= csvRecord[0]
+            plate_st = recordDictionary["plate_st"]= csvRecord[1]
+            combined_name = recordDictionary["combined_name"]= csvRecord[2]
+            """   {"plate":'', "plate_st":'', "combined_name":'', "address":'', "city":'', "state":'', "zip":'', \
+            "title_date":'', "start_date":'', "end_date":'' , "make":'' , "model":'' , "body":'' , "vehicle_year":'' , \
+            "images_reviewed":'' , "images_corrected":'', "reason":'', "time_stamp":'', "agent":'', \
+            "title_month":'', "title_day":'', "title_year":'', "collections":'', \
+            "multiple":'', "unassign":'', "completed":'', \
+            "temp_plate":'', "dealer_plate":'' \
+            }
+            """
             sql = "INSERT INTO Sheet1 \
-                (PLATE, PLATE_ST, COMBINED NAME, ADDRESS, CITY, ZIPCODE, STATE, \
-                 TITLE DATE, START DATE, END DATE, VEHICLE MAKE, VEHICLE MODEL, VEHICLE BODY) \
-                 VALUES (#{}#, {}, {}, {}, {}, {}, {}, {})"\
-                 .format(csvRecord[0:7] )
-            cursor.execute(sql)
+             (PLATE, PLATE_ST, [COMBINED NAME]) VALUES (#{}#, {}, {} )".format(plate, plate_st, combined_name )
+            dbcursor.execute(sql)
 
     """
     rowcount = 0
