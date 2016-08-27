@@ -1,4 +1,6 @@
 *.7z
+*.accdb
+*.accde
 *.csv
 *.exe
 *.laccdb

@@ -600,6 +600,6 @@ def query(driver, delay, plate):
     except TimeoutException:
         print "ERROR: record LP may not match input LP"
         return None
-     #plateSubmitElement.clear() # does this need to be cleaned to be found?
+    plateSubmitElement.clear() # does this need to be cleaned to be found?
     return str(uText)
 

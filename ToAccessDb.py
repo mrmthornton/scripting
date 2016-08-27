@@ -14,9 +14,10 @@ the libraries with the 32-bit version.
 Tim Greening-Jackson 08 May 2013 (timATgreening-jackson.com)
 """
 
+import datetime
 import pyodbc
 import re
-import datetime
+import string
 import tkFileDialog
 from Tkinter import *
 
@@ -86,21 +87,6 @@ class S7Incident:
             self.ProcessCTAS(cursor, facilities[self.facility], self.ctas)
 
         return self.dbid
-
-    def ProcessLRO(self, cursor, facility):
-        sql = "INSERT INTO LRO (PID, DURATION, FACILITY) VALUES ({}, {}, {})"\
-              .format(self.dbid, self.workaround, facility)
-        cursor.execute(sql)
-
-    def ProcessNLRO(self, cursor, facility):
-        sql = "INSERT INTO NLRO (PID, DURATION, FACILITY) VALUES ({}, {}, {})"\
-              .format(self.dbid, self.workaround, facility)
-        cursor.execute(sql)
-
-    def ProcessCTAS(self, cursor, facility, code):
-        sql = "INSERT INTO CTAS (PID, DURATION, FACILITY, CODE) VALUES ({}, {}, {}, {})"\
-              .format(self.dbid, self.workaround, facility, self.ctas)
-        cursor.execute(sql)
 
 
 class S7AD1:
@@ -216,14 +202,46 @@ def ConnectToAccessFile():
         return connectedDB, dbcursor
 
 
+def recordInit():
+    recordDictionary = {
+        "plate":'',
+        "plate_st":'',
+        "combined_name":'',
+        "address":'',
+        "city":'',
+        "state":'',
+        "zip":'',
+        "title_date":'',
+        "start_date":'',
+        "end_date":'' ,
+        "make":'' ,
+        "model":'' ,
+        "body":'' ,
+        "vehicle_year":'' ,
+        "images_reviewed":'',
+        "images_corrected":'',
+        "reason":'',
+        "time_stamp":'',
+        "agent":'',
+        "title_month":'',
+        "title_day":'',
+        "title_year":'',
+        "collections":'',
+        "multiple":'',
+        "unassign":'',
+        "completed":'',
+        "temp_plate":'',
+        "dealer_plate":''
+        }
+    return recordDictionary
+
+
 # Entry point
 from TxDot_LIB import *
 
-# move these to the library
-driver = webdriver.Ie()
 delay=10
 url = 'https://mvinet.txdmv.gov'
-driver.get(url)
+driver = openBrowser(url)
 
 incre = re.compile("INC\d{12}[A-Z]?") # Regex that matches incident references
 
@@ -233,33 +251,22 @@ try:
     #    print row.column_name                    # debug
     #dbcursor.execute("SELECT * FROM Sheet1")
     dbcursor.execute("SELECT plate FROM [list of plate 11 without matching sheet1]")
-    #dbcursor.execute('''SELECT Plate, Plate_St, [Combined Name], Address, City, State, ZipCode, \
-    #    [Title Date], [Start Date], [End Date], [Vehicle Make], [Vehicle Model], [Vehicle Body], [Vehicle Year], \
-    #    [Total Image Reviewed], [Total Image corrected], Reason, [Time Stamp], [Agent Initial] \
-    #    FROM Sheet1''')
 
-    #    Title_Month, Title_Day, Title_Year, [Sent to Collections Agency],
-    #    Multiple, Unassign, [Completed: Yes / No Record],
-    #   [E-Tags (Temporary Plates)], [Dealer Plates]
-    recordDictionary = {"plate":'', "plate_st":'', "combined_name":'', "address":'', "city":'', "state":'', "zip":'', \
-        "title_date":'', "start_date":'', "end_date":'' , "make":'' , "model":'' , "body":'' , "vehicle_year":'' , \
-        "images_reviewed":'' , "images_corrected":'', "reason":'', "time_stamp":'', "agent":'', \
-        "title_month":'', "title_day":'', "title_year":'', "collections":'', \
-        "multiple":'', "unassign":'', "completed":'', \
-        "temp_plate":'', "dealer_plate":'' \
-        }
     recordList = []
-    while True:
+    #while True:
+    count = 1  # test loop
+    if count < 3: # test loop
         row = dbcursor.fetchone()
-        if row is None:
-            break
+        #if row is None: # test loop
+            #break # test loop
         plate = row[0]
-        if plate == '057B0392':
-            break
         results = query(driver, delay, plate)
         if results is not None:
             print results # for debug
             fileString = repairLineBreaks(results)
+            #remove non-ascii
+            fileString = "".join(filter(lambda x:x in string.printable, fileString))
+        count += 1 # test loop
         foundCurrentPlate = False
         while True:
             try:
@@ -271,34 +278,93 @@ try:
                 break
             if responseType != None: # there must be a valid text record to process
                 foundCurrentPlate = True
-                #print 'main:', responseType, startNum, endNum
+                #print 'main:', responseType, startNum, endNum # for debug
                 typeString = fileString[startNum:endNum + 1]
-                #print typeString
+                #print typeString # for debug
                 fileString = fileString[:startNum] + fileString[endNum + 1:]
                 listData = parseRecord(responseType, typeString)
                 #csvString = csvStringFromList(listData)
                 recordList.append(listData)
     for csvRecord in recordList:
+        recordDictionary = recordInit()
+#       0          1     2     3    4   5      6     7      8         9
+# responseType, plate, name, addr, '', city, state, zip, startDate, endDate
+        recordDictionary["plate"]= csvRecord[1]
+        recordDictionary["plate_st"]= 'TX'
+        recordDictionary["combined_name"] = csvRecord[2]
+        recordDictionary["address"]= csvRecord[3]
+        recordDictionary["city"]= csvRecord[5]
+        recordDictionary["state"]= csvRecord[6]
+        recordDictionary["zip"]= csvRecord[7]
+        recordDictionary["start_date"]= csvRecord[8]
+        recordDictionary["end_date"]= csvRecord[9]
+        '''
+        recordDictionary["plate"]= csvRecord[1]
+        recordDictionary["plate_st"]= 'TX'
+        recordDictionary["combined_name"]
+        recordDictionary["address"]= csvRecord[1]
+        recordDictionary["city"]= csvRecord[1]
+        recordDictionary["state"]= csvRecord[1]
+        recordDictionary["zip"]= csvRecord[1]
+        recordDictionary["title_date"]= csvRecord[1]
+        recordDictionary["start_date"]= csvRecord[1]
+        recordDictionary["end_date"]= csvRecord[1]
+        recordDictionary["make"]= csvRecord[1]
+        recordDictionary["model"]= csvRecord[1]
+        recordDictionary["body"]= csvRecord[1]
+        recordDictionary["vehicle_year"]= csvRecord[1]
+        recordDictionary["images_reviewed"]= csvRecord[1]
+        recordDictionary["images_corrected"]= csvRecord[1]
+        recordDictionary["reason"]= csvRecord[1]
+        recordDictionary["time_stamp"]= csvRecord[1]
+        recordDictionary["agent"]= csvRecord[1]
+        recordDictionary["title_month"]= csvRecord[1]
+        recordDictionary["title_day"]= csvRecord[1]
+        recordDictionary["title_year"]= csvRecord[1]
+        recordDictionary["collections"]= csvRecord[1]
+        recordDictionary["multiple"]= csvRecord[1]
+        recordDictionary["unassign"]= csvRecord[1]
+        recordDictionary["completed"]= csvRecord[1]
+        recordDictionary["temp_plate"]= csvRecord[1]
+        recordDictionary["dealer_plate"]= csvRecord[1]
+        '''
+        """
+        {"plate":'', "plate_st":'', "combined_name":'', "address":'', "city":'', "state":'', "zip":'', \
+        "title_date":'', "start_date":'', "end_date":'' , "make":'' , "model":'' , "body":'' , "vehicle_year":'' , \
+        "images_reviewed":'' , "images_corrected":'', "reason":'', "time_stamp":'', "agent":'', \
+        "title_month":'', "title_day":'', "title_year":'', "collections":'', \
+        "multiple":'', "unassign":'', "completed":'', \
+        "temp_plate":'', "dealer_plate":'' \
+        }
+        """
+        """
+        Inserts a record in to the Access database
+        (PLATE, PLATE_ST, [COMBINED NAME], ADDRESS, CITY, ZIPCODE, STATE,
+        [TITLE DATE], [START DATE], [END DATE], [VEHICLE MAKE], [VEHICLE MODEL], [VEHICLE BODY])
+        """
+        #dbcursor.execute('''SELECT Plate, Plate_St, [Combined Name], Address, City, State, ZipCode, \
+        #    [Title Date], [Start Date], [End Date], [Vehicle Make], [Vehicle Model], [Vehicle Body], [Vehicle Year], \
+        #    [Total Image Reviewed], [Total Image corrected], Reason, [Time Stamp], [Agent Initial] \
+        #    FROM Sheet1''')
 
-            """
-            Inserts a record in to the Access database
-            (PLATE, PLATE_ST, COMBINED NAME, ADDRESS, CITY, ZIPCODE, STATE,
-            TITLE DATE, START DATE, END DATE, VEHICLE MAKE, VEHICLE MODEL, VEHICLE BODY)
-            """
-            plate = recordDictionary["plate"]= csvRecord[0]
-            plate_st = recordDictionary["plate_st"]= csvRecord[1]
-            combined_name = recordDictionary["combined_name"]= csvRecord[2]
-            """   {"plate":'', "plate_st":'', "combined_name":'', "address":'', "city":'', "state":'', "zip":'', \
-            "title_date":'', "start_date":'', "end_date":'' , "make":'' , "model":'' , "body":'' , "vehicle_year":'' , \
-            "images_reviewed":'' , "images_corrected":'', "reason":'', "time_stamp":'', "agent":'', \
-            "title_month":'', "title_day":'', "title_year":'', "collections":'', \
-            "multiple":'', "unassign":'', "completed":'', \
-            "temp_plate":'', "dealer_plate":'' \
-            }
-            """
-            sql = "INSERT INTO Sheet1 \
-             (PLATE, PLATE_ST, [COMBINED NAME]) VALUES (#{}#, {}, {} )".format(plate, plate_st, combined_name )
-            dbcursor.execute(sql)
+        #    Title_Month, Title_Day, Title_Year, [Sent to Collections Agency],
+        #    Multiple, Unassign, [Completed: Yes / No Record],
+        #   [E-Tags (Temporary Plates)], [Dealer Plates]
+        sql = "INSERT INTO Sheet1 (Plate, Plate_St, [Combined Name], \
+                        Address, City, State, ZipCode,[Start Date], [End Date]) \
+                    VALUES ('{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}')"\
+                    .format(recordDictionary["plate"], \
+                            recordDictionary["plate_st"], \
+                            recordDictionary["combined_name"], \
+                            recordDictionary["address"], \
+                            recordDictionary["city"], \
+                            recordDictionary["state"], \
+                            recordDictionary["zip"], \
+                            recordDictionary["start_date"], \
+                            recordDictionary["end_date"] )
+        #sql = "INSERT INTO Sheet1 (PLATE, [COMBINED NAME]) \
+        #    VALUES ('{}', '{}')".format(plate, combined_name )
+        dbcursor.execute(sql)
 
     """
     rowcount = 0
@@ -372,3 +438,20 @@ try:
 finally:
     print("Closing databases")
     dbConnect.close()
+
+'''
+import string
+
+params = [filter(lambda x: x in string.printable, item.text)
+          for item in row.find_all('td')]
+'''
+
+#Iterating over strings is unfortunately rather slow in Python.
+#Regular expressions are over an order of magnitude faster.
+'''
+control_chars = ''.join(map(unichr, range(0,32) + range(127,160)))
+control_char_re = re.compile('[%s]' % re.escape(control_chars))
+
+def remove_control_chars(s):
+    return control_char_re.sub('', s)
+'''

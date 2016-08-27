@@ -38,28 +38,29 @@ import sys
 import string
 import time
 
-def VPSdataFill(VPSdata, row):
-    VPSdata["comment"] = row[0]
-    VPSdata["type"] = row[1]
-    VPSdata["VID"] = row[2]
-    VPSdata["LP"] = row[3]
-    VPSdata["LP_ST"] = row[4]
-    VPSdata["lessor"] = row[5]
-    VPSdata["lessee"] = row[6]
-    VPSdata["address"] = row[7]
-    VPSdata["address2"] = row[8]
-    VPSdata["city"] = row[9]
-    VPSdata["state"] = row[10]
-    VPSdata["zip"] = row[11]
-    VPSdata["startDate"] = row[12]
-    VPSdata["startTime"] = row[13]
-    VPSdata["endDate"] = row[14]
-    VPSdata["endTime"] = row[15]
-    VPSdata["make"] = row[16]
-    VPSdata["model"] = row[17]
-    VPSdata["body"] = row[18]
-    VPSdata["year"] = row[19]
-    VPSdata["name2"] = row[20]
+def VPSdataFill(VPSdata, record):
+    VPSdata["comment"] = record[0]
+    VPSdata["type"] = record[1]
+    VPSdata["VID"] = record[2]
+    VPSdata["LP"] = record[3]
+    VPSdata["LP_ST"] = record[4]
+    VPSdata["lessor"] = record[5]
+    VPSdata["lessee"] = record[6]
+    VPSdata["address"] = record[7]
+    VPSdata["address2"] = record[8]
+    VPSdata["city"] = record[9]
+    VPSdata["state"] = record[10]
+    VPSdata["zip"] = record[11]
+    VPSdata["startDate"] = record[12]
+    VPSdata["startTime"] = record[13]
+    VPSdata["endDate"] = record[14]
+    VPSdata["endTime"] = record[15]
+    VPSdata["make"] = record[16]
+    VPSdata["model"] = record[17]
+    VPSdata["body"] = record[18]
+    VPSdata["year"] = record[19]
+    VPSdata["name2"] = record[20]
+    VPSdata["leaseDate"] = record[21]
     return VPSdata
 
 def VPSdataInit():
@@ -84,7 +85,8 @@ def VPSdataInit():
     "model" : "",
     "body" : "",
     "year" : "",
-    "name2" : ""
+    "name2" : "",
+    "leaseDate" : ""
     }
     return VPSdata
 
@@ -111,12 +113,13 @@ def violationSearch():
     return parameters
 
 
-def processInput(inputDict):
+def processInput(fileName):
     dataList = []
-    with open(parameters['dataInFileName'], 'r') as infile:
+    VPSdataInit()
+    with open(fileName, 'r') as infile:
         csvInput = csv.reader(infile)
         for row in csvInput:
-            VPSdataFill(inputDict, row) # fill the shared data structure
+            inputDict = VPSdataFill(VPSdataInit(), row) # fill the shared data structure
             if inputDict["comment"] == "#":   #input is a comment, continue with next row
                 continue
             if inputDict["type"] == "" or inputDict["type"] == 0:  #end -> when first input does not exist
@@ -132,16 +135,9 @@ def vps_body(driver, parameters, fromVPSdata):
     if startWindow is None:
         print "Start Page not found."
         return None
-    with open(parameters['dataInFileName'], 'r') as infile, open(parameters['dataOutFileName'], 'a') as outfile:
+    with open(parameters['dataOutFileName'], 'a') as outfile:
         outfile.truncate()
-        csvInput = csv.reader(infile)
-        for row in csvInput:
-            VPSdataFill(fromVPSdata, row) # get data structure filled
-            if fromVPSdata["comment"] == "#":   #input is a comment, continue with next row
-                continue
-            if fromVPSdata["type"] == "" or fromVPSdata["type"] == 0:  #end when first input does not exist
-                break
-            fromVPSdata["LP"] = cleanUpString(fromVPSdata["LP"])
+        for row in fromVPSdata:
 
             #Find the VID
             #   find, fill and submit: Violator ID "P_VIOLATOR_ID"
@@ -219,17 +215,19 @@ def vps_body(driver, parameters, fromVPSdata):
 
     print "main: Finished with LP_correction file."
 
-if __name__ == '__main__':
 
+if __name__ == '__main__':
     parameters = violationSearch()
-    globalData = VPSdataInit()
     findStartWindowDelay = 3
     print parameters['operatorMessage']
     regexPattens = loadRegExPatterns()
-    inputList = processInput(globalData)
-    for x in inputList:
-        print x            # for debug
+    dataFileName = parameters['dataInFileName']
+    inputList = processInput(dataFileName) # add parameters when working
+    for dataDict in inputList:
+        print dataDict['lessee'], '\t',  dataDict['address']
+#        for key,value in dataDict.iteritems():
+#            print value
     driver = openBrowser(parameters['url'])
-    #vps_body(driver, parameters, inputList)
+    vps_body(driver, parameters, inputList)
     driver.close()
 
