@@ -48,11 +48,11 @@ def violationSearch():
     'resultPageVerifyText' : 'Violation Search Results',
     'outputLocator' : (By.XPATH,'//BODY/P[contains(text(),"Record")]'),
     'resultIndexParameters' : {'regex' : "Records \d+ to \d+ of (\d+)", 'selector' : 'tail'},  # head, tail, or all
-    'dataInFileName' : 'LP_correction.csv',
-    'dataOutFileName' : 'LP_correction.txt',
+    'dataInFileName' : 'VPS_LP_Change_list.csv',
     'returnOrClick' : 'return', # use Return or Click to submit form
     }
     return parameters
+
 
 def vps_body(driver, parameters):
     delay = parameters['delay']
@@ -62,8 +62,7 @@ def vps_body(driver, parameters):
     if startWindow is None:
         print "Start Page not found."
         return None
-    with open(parameters['dataInFileName'], 'r') as infile, open(parameters['dataOutFileName'], 'a') as outfile:
-        outfile.truncate()
+    with open(parameters['dataInFileName'], 'r') as infile:
         csvInput = csv.reader(infile)
         for row in csvInput:
             rawString = row[0]
@@ -122,10 +121,9 @@ def vps_body(driver, parameters):
 
     print "main: Finished with LP_correction file."
 
+
 if __name__ == '__main__':
-
     parameters = violationSearch()
-
     findStartWindowDelay = 3
     print parameters['operatorMessage']
     regexPattens = loadRegExPatterns()

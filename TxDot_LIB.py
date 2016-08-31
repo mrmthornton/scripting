@@ -235,7 +235,7 @@ def parseNoRecord(responseType, typeString):
     typeString = typeString[header.end():]
     nextWord = wordPattern.search(typeString)
     plate = nextWord.group()
-    return [responseType, plate, '', '', '', '', '', '', '']
+    return [responseType, plate, '', '', '', '', '', '', '', '', '', '']
 
 def parsePlacard(responseType, typeString):
     headerPattern = re.compile(r'SELECTION REQUEST:\s+PLACARD\s+')
@@ -245,7 +245,7 @@ def parsePlacard(responseType, typeString):
         nextWord = wordPattern.search(typeString)
         if nextWord != None:
             plate = nextWord.group()
-    return [responseType, plate.strip(), '', '', '', '', '', '', '']
+    return [responseType, plate.strip(), '', '', '', '', '', '', '', '', '', '']
 
 def parseDealer(responseType, typeString):
     dealerPattern = re.compile('DEALER' + '[\s]+')
@@ -378,7 +378,7 @@ def parseStandard(responseType, typeString):
             state = Rstate
             zip = Rzip
     #print [responseType, plate, reg_dt, name, name2, addr, addr2, city, state, zip, ownedStartDate]
-    return [responseType, plate.strip(), name.strip(), addr.strip(), addr2.strip(), city.strip(), state.strip(), zip, ownedStartDate]
+    return [responseType, plate.strip(), name.strip(), addr.strip(), addr2.strip(), city.strip(), state.strip(), zip, ownedStartDate, '', '', '']
 
 def parseTxirp(responseType, typeString):
     #remove first word and get plate
@@ -412,7 +412,7 @@ def parseTxirp(responseType, typeString):
     #get name
     name = addrString.replace(',' , '')
     name = name.replace('.' , '')
-    return [responseType, plate.strip(), name.strip(), addr.strip(), '', city.strip(), state.strip(), zip, '']
+    return [responseType, plate.strip(), name.strip(), addr.strip(), '', city.strip(), state.strip(), zip, '', '', '' , '']
 
 def parsePermit(responseType, typeString):
     # find header and remove
@@ -456,7 +456,7 @@ def parsePermit(responseType, typeString):
         if found != None:
             state, zip = found.group().split()
             city = addr2[:found.start()]
-    return [responseType, plate.strip(), name.strip(), addr.strip(), '', city.strip(), state, zip, issued]
+    return [responseType, plate.strip(), name.strip(), addr.strip(), '', city.strip(), state, zip, '', '', '', issued]
 
 def parseTemporary(responseType, typeString):
     # find header and remove
@@ -507,7 +507,7 @@ def parseTemporary(responseType, typeString):
     # get zip
     nextWord = wordPattern.search(typeString)
     zip = nextWord.group()
-    return [responseType, plate.strip(), name.strip(), addr.strip(), '', city.strip(), state.strip(), zip, startDate, endDate]
+    return [responseType, plate.strip(), name.strip(), addr.strip(), '', city.strip(), state.strip(), zip, '', startDate, endDate, '']
 
     # SPECIAL
 def parseSpecial(responseType, typeString):
@@ -546,7 +546,7 @@ def parseSpecial(responseType, typeString):
         if found != None:
             state, zip = found.group().split()
             city = addr2[:found.start()]
-    return [responseType, plate.strip(), name.strip(), addr.strip(), '', city.strip(), state.strip(), zip, '']
+    return [responseType, plate.strip(), name.strip(), addr.strip(), '', city.strip(), state.strip(), zip, '', '', '', '']
 
 def parseCanceled(responseType, typeString):
     #save the plate

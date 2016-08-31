@@ -236,208 +236,242 @@ def recordInit():
     return recordDictionary
 
 
-# Entry point
+def txDotDataInit():
+    recordDictionary = {
+        "plate":'',
+        "plate_st":'',
+        "combined_name":'',
+        "address":'',
+        "city":'',
+        "state":'',
+        "zip":'',
+        "ownedStartDate":'',
+        "title_date":'',
+        "start_date":'',
+        "end_date":'' ,
+        "make":'' ,
+        "model":'' ,
+        "body":'' ,
+        "vehicle_year":''
+        }
+    return recordDictionary
+
+
 from TxDot_LIB import *
 
-delay=10
-url = 'https://mvinet.txdmv.gov'
-driver = openBrowser(url)
+if __name__ == '__main__':
 
-incre = re.compile("INC\d{12}[A-Z]?") # Regex that matches incident references
+    delay=10
+    url = 'https://mvinet.txdmv.gov'
+    driver = openBrowser(url)
 
-try:
-    dbConnect, dbcursor = ConnectToAccessFile()
-    #for row in dbcursor.columns(table='Sheet1'): # debug
-    #    print row.column_name                    # debug
-    #dbcursor.execute("SELECT * FROM Sheet1")
-    dbcursor.execute("SELECT plate FROM [list of plate 11 without matching sheet1]")
+    incre = re.compile("INC\d{12}[A-Z]?") # Regex that matches incident references
 
-    recordList = []
-    #while True:
-    count = 1  # test loop
-    if count < 3: # test loop
-        row = dbcursor.fetchone()
-        #if row is None: # test loop
-            #break # test loop
-        plate = row[0]
-        results = query(driver, delay, plate)
-        if results is not None:
-            print results # for debug
-            fileString = repairLineBreaks(results)
-            #remove non-ascii
-            fileString = "".join(filter(lambda x:x in string.printable, fileString))
-        count += 1 # test loop
-        foundCurrentPlate = False
+    try:
+        dbConnect, dbcursor = ConnectToAccessFile()
+        #for row in dbcursor.columns(table='Sheet1'): # debug
+        #    print row.column_name                    # debug
+        #dbcursor.execute("SELECT * FROM Sheet1")
+        dbcursor.execute("SELECT plate FROM [list of plate 11 without matching sheet1]")
+
+        recordList = []
+        #while True:
+        count = 1  # test loop
+        if count < 3: # test loop
+            row = dbcursor.fetchone()
+            #if row is None: # test loop
+                #break # test loop
+            plate = row[0]
+            results = query(driver, delay, plate)
+            if results is not None:
+                print results # for debug
+                fileString = repairLineBreaks(results)
+                #remove non-ascii
+                fileString = "".join(filter(lambda x:x in string.printable, fileString))
+            count += 1 # test loop
+            foundCurrentPlate = False
+            while True:
+                try:
+                    responseType, startNum, endNum = findResponseType(plate, fileString)
+                except:
+                    responseType = None
+                    if foundCurrentPlate == False:
+                        print "\n", plate, ' Plate/Pattern not found'
+                    break
+                if responseType != None: # there must be a valid text record to process
+                    foundCurrentPlate = True
+                    #print 'main:', responseType, startNum, endNum # for debug
+                    typeString = fileString[startNum:endNum + 1]
+                    #print typeString # for debug
+                    fileString = fileString[:startNum] + fileString[endNum + 1:] # what is this for ?
+                    listData = parseRecord(responseType, typeString)
+                    #csvString = csvStringFromList(listData)
+                    # make txdot data record here
+                    recordList.append(listData)
+        for csvRecord in recordList:
+            recordDictionary = recordInit()
+#       0          1     2     3    4   5      6     7         8             9         10      11
+# responseType, plate, name, addr, '', city, state, zip, ownedStartDate, startDate, endDate, issued
+            recordDictionary["plate"]= csvRecord[1]
+            recordDictionary["plate_st"]= 'TX'
+            recordDictionary["combined_name"] = csvRecord[2]
+            recordDictionary["address"]= csvRecord[3]
+            recordDictionary["city"]= csvRecord[5]
+            recordDictionary["state"]= csvRecord[6]
+            recordDictionary["zip"]= csvRecord[7]
+            recordDictionary['ownedStartDate']= csvRecord[8]
+            recordDictionary["start_date"]= csvRecord[9]
+            recordDictionary["end_date"]= csvRecord[10]
+            '''
+            recordDictionary["title_date"]= csvRecord[1]
+            recordDictionary["make"]= csvRecord[1]
+            recordDictionary["model"]= csvRecord[1]
+            recordDictionary["body"]= csvRecord[1]
+            recordDictionary["vehicle_year"]= csvRecord[1]
+            recordDictionary["images_reviewed"]= csvRecord[1]
+            recordDictionary["images_corrected"]= csvRecord[1]
+            recordDictionary["reason"]= csvRecord[1]
+            recordDictionary["time_stamp"]= csvRecord[1]
+            recordDictionary["agent"]= csvRecord[1]
+            recordDictionary["title_month"]= csvRecord[1]
+            recordDictionary["title_day"]= csvRecord[1]
+            recordDictionary["title_year"]= csvRecord[1]
+            recordDictionary["collections"]= csvRecord[1]
+            recordDictionary["multiple"]= csvRecord[1]
+            recordDictionary["unassign"]= csvRecord[1]
+            recordDictionary["completed"]= csvRecord[1]
+            recordDictionary["temp_plate"]= csvRecord[1]
+            recordDictionary["dealer_plate"]= csvRecord[1]
+            '''
+            """
+            {"plate":'', "plate_st":'', "combined_name":'', "address":'', "city":'', "state":'', "zip":'', \
+            "title_date":'', "start_date":'', "end_date":'' , "make":'' , "model":'' , "body":'' , "vehicle_year":'' , \
+            "images_reviewed":'' , "images_corrected":'', "reason":'', "time_stamp":'', "agent":'', \
+            "title_month":'', "title_day":'', "title_year":'', "collections":'', \
+            "multiple":'', "unassign":'', "completed":'', \
+            "temp_plate":'', "dealer_plate":'' \
+            }
+            """
+            """
+            Inserts a record in to the Access database
+            (PLATE, PLATE_ST, [COMBINED NAME], ADDRESS, CITY, ZIPCODE, STATE,
+            [TITLE DATE], [START DATE], [END DATE], [VEHICLE MAKE], [VEHICLE MODEL], [VEHICLE BODY])
+            """
+            #dbcursor.execute('''SELECT Plate, Plate_St, [Combined Name], Address, City, State, ZipCode, \
+            #    [Title Date], [Start Date], [End Date], [Vehicle Make], [Vehicle Model], [Vehicle Body], [Vehicle Year], \
+            #    [Total Image Reviewed], [Total Image corrected], Reason, [Time Stamp], [Agent Initial] \
+            #    FROM Sheet1''')
+
+            #    Title_Month, Title_Day, Title_Year, [Sent to Collections Agency],
+            #    Multiple, Unassign, [Completed: Yes / No Record],
+            #   [E-Tags (Temporary Plates)], [Dealer Plates]
+
+            recordDictionary["zip"]= int(recordDictionary["zip"])
+            recordDictionary["ownedStartDate"]= int(recordDictionary["zip"])
+            recordDictionary["start_date"]= int(recordDictionary["zip"])
+            recordDictionary["end_date"]= int(recordDictionary["zip"])
+            sql = "INSERT INTO Sheet1 (Plate, Plate_St, [Combined Name], Address, City, State, ZipCode) \
+                        VALUES (     '{plate}', '{plate_st}', '{combined_name}', '{address}', '{city}', '{state}', \
+                                    '{zip:d}')"\
+                        .format(**recordDictionary)
+            #sql = "INSERT INTO Sheet1 (Plate, Plate_St, [Combined Name], Address, City, State, ZipCode,[Start Date], [End Date]) \
+            #            VALUES (     '{plate}', '{plate_st}', '{combined_name}', '{address}', '{city}', '{state}', \
+            #                       '{zip:d}', '{start_date:d}', '{end_date:d}')"\
+            #            .format(**recordDictionary)
+
+            #sql = "INSERT INTO Sheet1 (PLATE, [COMBINED NAME]) \
+            #    VALUES ('{}', '{}')".format(plate, combined_name )
+            dbcursor.execute(sql)
+
+# 'd' Signed integer decimal.
+# 'i' Signed integer decimal.
+# 'o' Signed octal value.
+# 'u' Obsolete type – it is identical to 'd'.
+# 'x' Signed hexadecimal (lowercase).
+# 'X' Signed hexadecimal (uppercase).
+# 'e' Floating point exponential format (lowercase).
+# 'E' Floating point exponential format (uppercase).
+# 'f' Floating point decimal format.
+# 'F' Floating point decimal format.
+# 'g' Floating point format. Uses lowercase exponential format or decimal format
+# 'G' Floating point format. Uses uppercase exponential format or decimal format
+# 'c' Single character (accepts integer or single character string).
+# 'r' String (converts any Python object using repr()).
+# 's' String (converts any Python object using str()).
+# '%' No argument is converted, results in a '%' character in the result.
+
+        """
+        rowcount = 0
         while True:
-            try:
-                responseType, startNum, endNum = findResponseType(plate, fileString)
-            except:
-                responseType = None
-                if foundCurrentPlate == False:
-                    print "\n", plate, ' Plate/Pattern not found'
+            row = dbcursor.fetchone()
+            if row is None:
                 break
-            if responseType != None: # there must be a valid text record to process
-                foundCurrentPlate = True
-                #print 'main:', responseType, startNum, endNum # for debug
-                typeString = fileString[startNum:endNum + 1]
-                #print typeString # for debug
-                fileString = fileString[:startNum] + fileString[endNum + 1:]
-                listData = parseRecord(responseType, typeString)
-                #csvString = csvStringFromList(listData)
-                recordList.append(listData)
-    for csvRecord in recordList:
-        recordDictionary = recordInit()
-#       0          1     2     3    4   5      6     7      8         9
-# responseType, plate, name, addr, '', city, state, zip, startDate, endDate
-        recordDictionary["plate"]= csvRecord[1]
-        recordDictionary["plate_st"]= 'TX'
-        recordDictionary["combined_name"] = csvRecord[2]
-        recordDictionary["address"]= csvRecord[3]
-        recordDictionary["city"]= csvRecord[5]
-        recordDictionary["state"]= csvRecord[6]
-        recordDictionary["zip"]= csvRecord[7]
-        recordDictionary["start_date"]= csvRecord[8]
-        recordDictionary["end_date"]= csvRecord[9]
-        '''
-        recordDictionary["plate"]= csvRecord[1]
-        recordDictionary["plate_st"]= 'TX'
-        recordDictionary["combined_name"]
-        recordDictionary["address"]= csvRecord[1]
-        recordDictionary["city"]= csvRecord[1]
-        recordDictionary["state"]= csvRecord[1]
-        recordDictionary["zip"]= csvRecord[1]
-        recordDictionary["title_date"]= csvRecord[1]
-        recordDictionary["start_date"]= csvRecord[1]
-        recordDictionary["end_date"]= csvRecord[1]
-        recordDictionary["make"]= csvRecord[1]
-        recordDictionary["model"]= csvRecord[1]
-        recordDictionary["body"]= csvRecord[1]
-        recordDictionary["vehicle_year"]= csvRecord[1]
-        recordDictionary["images_reviewed"]= csvRecord[1]
-        recordDictionary["images_corrected"]= csvRecord[1]
-        recordDictionary["reason"]= csvRecord[1]
-        recordDictionary["time_stamp"]= csvRecord[1]
-        recordDictionary["agent"]= csvRecord[1]
-        recordDictionary["title_month"]= csvRecord[1]
-        recordDictionary["title_day"]= csvRecord[1]
-        recordDictionary["title_year"]= csvRecord[1]
-        recordDictionary["collections"]= csvRecord[1]
-        recordDictionary["multiple"]= csvRecord[1]
-        recordDictionary["unassign"]= csvRecord[1]
-        recordDictionary["completed"]= csvRecord[1]
-        recordDictionary["temp_plate"]= csvRecord[1]
-        recordDictionary["dealer_plate"]= csvRecord[1]
-        '''
-        """
-        {"plate":'', "plate_st":'', "combined_name":'', "address":'', "city":'', "state":'', "zip":'', \
-        "title_date":'', "start_date":'', "end_date":'' , "make":'' , "model":'' , "body":'' , "vehicle_year":'' , \
-        "images_reviewed":'' , "images_corrected":'', "reason":'', "time_stamp":'', "agent":'', \
-        "title_month":'', "title_day":'', "title_year":'', "collections":'', \
-        "multiple":'', "unassign":'', "completed":'', \
-        "temp_plate":'', "dealer_plate":'' \
-        }
+            rowcount += 1
+            print "Plate {}".format(row[0])
+            #print "entire row -->", row
+        print rowcount
         """
         """
-        Inserts a record in to the Access database
-        (PLATE, PLATE_ST, [COMBINED NAME], ADDRESS, CITY, ZIPCODE, STATE,
-        [TITLE DATE], [START DATE], [END DATE], [VEHICLE MAKE], [VEHICLE MODEL], [VEHICLE BODY])
+        for column in dbcursor.columns(table='US State'):
+            print column.column_name
+        dbcursor.execute('''SELECT Field1
+                            FROM [US State]''')
+        while True:
+            row = dbcursor.fetchone()
+            if row is None:
+                break
+            print "entire row -->{}".format(row[0])
         """
-        #dbcursor.execute('''SELECT Plate, Plate_St, [Combined Name], Address, City, State, ZipCode, \
-        #    [Title Date], [Start Date], [End Date], [Vehicle Make], [Vehicle Model], [Vehicle Body], [Vehicle Year], \
-        #    [Total Image Reviewed], [Total Image corrected], Reason, [Time Stamp], [Agent Initial] \
-        #    FROM Sheet1''')
 
-        #    Title_Month, Title_Day, Title_Year, [Sent to Collections Agency],
-        #    Multiple, Unassign, [Completed: Yes / No Record],
-        #   [E-Tags (Temporary Plates)], [Dealer Plates]
-        sql = "INSERT INTO Sheet1 (Plate, Plate_St, [Combined Name], \
-                        Address, City, State, ZipCode,[Start Date], [End Date]) \
-                    VALUES ('{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}')"\
-                    .format(recordDictionary["plate"], \
-                            recordDictionary["plate_st"], \
-                            recordDictionary["combined_name"], \
-                            recordDictionary["address"], \
-                            recordDictionary["city"], \
-                            recordDictionary["state"], \
-                            recordDictionary["zip"], \
-                            recordDictionary["start_date"], \
-                            recordDictionary["end_date"] )
-        #sql = "INSERT INTO Sheet1 (PLATE, [COMBINED NAME]) \
-        #    VALUES ('{}', '{}')".format(plate, combined_name )
-        dbcursor.execute(sql)
+        print("Comitting changes")
+        dbcursor.commit()
+            #dbcursor.execute("DELETE * FROM {}".format(table))
+            #rows = dbcursor.fetchall()
+            #dbfacilities = {unicode(row[1]):row[0] for row in rows}
 
-    """
-    rowcount = 0
-    while True:
-        row = dbcursor.fetchone()
-        if row is None:
-            break
-        rowcount += 1
-        print "Plate {}".format(row[0])
-        #print "entire row -->", row
-    print rowcount
-    """
-    """
-    for column in dbcursor.columns(table='US State'):
-        print column.column_name
-    dbcursor.execute('''SELECT Field1
-                        FROM [US State]''')
-    while True:
-        row = dbcursor.fetchone()
-        if row is None:
-            break
-        print "entire row -->{}".format(row[0])
-    """
+        #s7incidents = {unicode(row[0]):S7Incident(*row) for row in rows if incre.match(row[0])}
+        #s7cursor.execute("SELECT DISTINCT RAISED FROM INCIDENTS")
+        #s7productions = [r[0] for r in rows]
+        #s7ad1s = [S7AD1(*row) for row in rows]
+        #[p.Process(dbcursor) for p in s7financials]
+        #s7sc3s = [S7SC3(*row) for row in rows]
+        #print("Writing SC3s ({})".format(len(s7sc3s)))
 
-    print("Comitting changes")
-    dbcursor.commit()
-        #dbcursor.execute("DELETE * FROM {}".format(table))
-        #rows = dbcursor.fetchall()
-        #dbfacilities = {unicode(row[1]):row[0] for row in rows}
+        # do the SELECT @@IDENTITY to give us the autonumber index.
+        # To make sure everything is case-insensitive convert the hash keys to UPPERCASE.
 
-    #s7incidents = {unicode(row[0]):S7Incident(*row) for row in rows if incre.match(row[0])}
-    #s7cursor.execute("SELECT DISTINCT RAISED FROM INCIDENTS")
-    #s7productions = [r[0] for r in rows]
-    #s7ad1s = [S7AD1(*row) for row in rows]
-    #[p.Process(dbcursor) for p in s7financials]
-    #s7sc3s = [S7SC3(*row) for row in rows]
-    #print("Writing SC3s ({})".format(len(s7sc3s)))
-
-    # do the SELECT @@IDENTITY to give us the autonumber index.
-    # To make sure everything is case-insensitive convert the hash keys to UPPERCASE.
-
-    #for p in sorted(s7productions):
-    #    dbcursor.execute("INSERT INTO PRODUCTIONS (PRODUCTION) VALUES ('{}')".format(p))
-    #    dbcursor.execute("SELECT @@IDENTITY")
-    #    dbproductions[p.upper()] = dbcursor.fetchone()[0]
+        #for p in sorted(s7productions):
+        #    dbcursor.execute("INSERT INTO PRODUCTIONS (PRODUCTION) VALUES ('{}')".format(p))
+        #    dbcursor.execute("SELECT @@IDENTITY")
+        #    dbproductions[p.upper()] = dbcursor.fetchone()[0]
 
 
-    ## Now process the incidents etc. that we have retrieved from the S7 database
-    #
-    #print("Writing incidents ({})".format(len(s7incidents)))
-    #[s7incidents[k].ProcessIncident(dbcursor, dbfacilities, dbproductions) for k in sorted(s7incidents)]
+        ## Now process the incidents etc. that we have retrieved from the S7 database
+        #
+        #print("Writing incidents ({})".format(len(s7incidents)))
+        #[s7incidents[k].ProcessIncident(dbcursor, dbfacilities, dbproductions) for k in sorted(s7incidents)]
 
-    # Match the new parent incident IDs in the AD1s and then write to the new table. Some
-    # really old AD1s don't have the parent incident reference in the REF field, it is just
-    # mentioned SOMEWHERE in the commentary. So if the REF field doesn't match then do a
-    # re.search (not re.match!) for it. It isn't essential to match these older AD1s with
-    # their parent incident, but it is quite useful (and tidy).
+        # Match the new parent incident IDs in the AD1s and then write to the new table. Some
+        # really old AD1s don't have the parent incident reference in the REF field, it is just
+        # mentioned SOMEWHERE in the commentary. So if the REF field doesn't match then do a
+        # re.search (not re.match!) for it. It isn't essential to match these older AD1s with
+        # their parent incident, but it is quite useful (and tidy).
 
-    #print("Matching and writing AD1s".format(len(s7ad1s)))
-    #for a in s7ad1s:
-    #    if a.ref in s7incidents:
-    #        a.SetPID(s7incidents[a.ref].dbid)
-    #        a.SetProduction(s7incidents[a.ref].production)
-    #    else:
-    #        z=incre.search(a.commentary)
-    #        if z and z.group() in s7incidents:
-    #            a.SetPID(s7incidents[z.group()].dbid)
-    #            a.SetProduction(s7incidents[z.group()].production)
-    #    a.Process(dbcursor)
+        #print("Matching and writing AD1s".format(len(s7ad1s)))
+        #for a in s7ad1s:
+        #    if a.ref in s7incidents:
+        #        a.SetPID(s7incidents[a.ref].dbid)
+        #        a.SetProduction(s7incidents[a.ref].production)
+        #    else:
+        #        z=incre.search(a.commentary)
+        #        if z and z.group() in s7incidents:
+        #            a.SetPID(s7incidents[z.group()].dbid)
+        #            a.SetProduction(s7incidents[z.group()].production)
+        #    a.Process(dbcursor)
 
-finally:
-    print("Closing databases")
-    dbConnect.close()
+    finally:
+        print("Closing databases")
+        dbConnect.close()
 
 '''
 import string
