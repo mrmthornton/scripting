@@ -1,4 +1,6 @@
 *.7z
+*.accdb
+*.accde
 *.csv
 *.exe
 .git/
@@ -21,3 +23,4 @@ PycharmProjects
 RemoteSystemsTempFiles/
 templist
 test
+
