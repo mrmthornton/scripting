@@ -591,11 +591,11 @@ def query(driver, delay, plate):
     plateSubmitElement.send_keys(plate)
     plateSubmitElement.send_keys('\n')
 
-    textLocator =  (By.XPATH, '//div[@style="font-family: Courier New;"]')
-    #wait until text element contains 'plate'
+    elemLocator =  (By.XPATH, '//div[contains(@class,"iw-div-overflow")]')
+    # wait until text element is rendered
     try:
-        WebDriverWait(driver, delay).until(EC.text_to_be_present_in_element(textLocator, plate))
-        textElement = findElementOnPage(driver, delay, textLocator)
+        WebDriverWait(driver, delay).until(EC.presence_of_element_located(elemLocator))
+        textElement = findElementOnPage(driver, delay, elemLocator)
         uText = textElement.text
     except TimeoutException:
         print "ERROR: record LP may not match input LP"
