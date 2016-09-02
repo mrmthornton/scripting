@@ -72,7 +72,7 @@ def excuse_violation(driver, parameters):
             submitted = fillFormAndSubmit(driver, startWindow, element, inputString, parameters)
             #check for excusal page found  ????
             time.sleep(1)
-            driver.switch_to_default_content()
+            #driver.switch_to_default_content()
             pageLoaded = newPageElementFound(driver, delay, (By.XPATH, '//frame[@name="fraTOP"]'), parameters['headerLocator'])
             #move to the correct frame
             foundFrame = findAndSelectFrame(driver, delay, "fraVF")

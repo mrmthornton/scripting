@@ -108,7 +108,7 @@ def findResponseType(plate, fileString):
 
     # NO RECORD
     targetType = 'NORECORD'
-    startPattern = re.compile('REG 00' + '[\s]+' + plate)
+    startPattern = re.compile('PLATE:' + '[\s]+' + plate)
     endPattern = re.compile('NO RECORD IN RTS DATABASE')
     startNum, endNum = findStartEnd(fileString,startPattern, endPattern)
     if startNum != None:
@@ -154,7 +154,7 @@ def findResponseType(plate, fileString):
     # TEMPORARY
     targetType = 'TEMPORARY'
     startPattern = re.compile(r'SELECTION REQUEST:\s+TEMPORARY TAG\s+' + plate)
-    endPattern = re.compile(r',\w{2,2},\d{5,5}')  #ZipPlus
+    endPattern = re.compile(r',\w{2,2},\d{5,5}')  # ,ST,Zip
     startNum, endNum = findStartEnd(fileString,startPattern, endPattern)
     if startNum != None:
         print  'findResponseType:', targetType, plate
@@ -204,8 +204,10 @@ def findResponseType(plate, fileString):
         return [targetType, startNum, endNum]
     return None
 
-# parse<RESPONSETYPE>() return a list of strings as follows
+# parseRecord() calls the appropriate 'parse<RESPONSETYPE>()',
+# which returns a list of strings as follows:
 # ['response type', 'plate', 'name', 'addr', 'apt', 'city', 'state', 'zip', 'owned']
+# Other than 'response type' and 'plate', the strings may be empty.
 def parseRecord(responseType, typeString):
     if responseType == 'NORECORD':
         return parseNoRecord(responseType, typeString)
@@ -228,12 +230,12 @@ def parseRecord(responseType, typeString):
     return None
 
 def parseNoRecord(responseType, typeString):
-    noRecordPattern = re.compile('REG 00 ')
+    noRecordPattern = re.compile('PLATE: ')
     header = noRecordPattern.search(typeString)
     typeString = typeString[header.end():]
     nextWord = wordPattern.search(typeString)
     plate = nextWord.group()
-    return [responseType, plate, '', '', '', '', '', '', '']
+    return [responseType, plate, '', '', '', '', '', '', '', '', '', '']
 
 def parsePlacard(responseType, typeString):
     headerPattern = re.compile(r'SELECTION REQUEST:\s+PLACARD\s+')
@@ -243,7 +245,7 @@ def parsePlacard(responseType, typeString):
         nextWord = wordPattern.search(typeString)
         if nextWord != None:
             plate = nextWord.group()
-    return [responseType, plate.strip(), '', '', '', '', '', '', '']
+    return [responseType, plate.strip(), '', '', '', '', '', '', '', '', '', '']
 
 def parseDealer(responseType, typeString):
     dealerPattern = re.compile('DEALER' + '[\s]+')
@@ -285,7 +287,7 @@ def parseDealer(responseType, typeString):
     nextWord = wordPattern.search(typeString)
     zip = nextWord.group()
     typeString =  typeString[nextWord.end() + 1:]
-    return [responseType, plate.strip(), name.strip(), addr.strip(), '', city.strip(), state.strip(), zip, '']
+    return [responseType, plate.strip(), name.strip(), addr.strip(), '', city.strip(), state.strip(), zip, '', '', '', '']
 
 def parseStandard(responseType, typeString):
     # remove header
@@ -376,7 +378,7 @@ def parseStandard(responseType, typeString):
             state = Rstate
             zip = Rzip
     #print [responseType, plate, reg_dt, name, name2, addr, addr2, city, state, zip, ownedStartDate]
-    return [responseType, plate.strip(), name.strip(), addr.strip(), addr2.strip(), city.strip(), state.strip(), zip, ownedStartDate]
+    return [responseType, plate.strip(), name.strip(), addr.strip(), addr2.strip(), city.strip(), state.strip(), zip, ownedStartDate, '', '', '']
 
 def parseTxirp(responseType, typeString):
     #remove first word and get plate
@@ -410,7 +412,7 @@ def parseTxirp(responseType, typeString):
     #get name
     name = addrString.replace(',' , '')
     name = name.replace('.' , '')
-    return [responseType, plate.strip(), name.strip(), addr.strip(), '', city.strip(), state.strip(), zip, '']
+    return [responseType, plate.strip(), name.strip(), addr.strip(), '', city.strip(), state.strip(), zip, '', '', '' , '']
 
 def parsePermit(responseType, typeString):
     # find header and remove
@@ -454,7 +456,7 @@ def parsePermit(responseType, typeString):
         if found != None:
             state, zip = found.group().split()
             city = addr2[:found.start()]
-    return [responseType, plate.strip(), name.strip(), addr.strip(), '', city.strip(), state, zip, issued]
+    return [responseType, plate.strip(), name.strip(), addr.strip(), '', city.strip(), state, zip, '', '', '', issued]
 
 def parseTemporary(responseType, typeString):
     # find header and remove
@@ -464,10 +466,15 @@ def parseTemporary(responseType, typeString):
     # get plate
     nextWord = wordPattern.search(typeString)
     plate = nextWord.group()
-    # find valid date string, and convert to issued date
+    # find valid date string, and convert to Start Date
     validDate = dateYearFirstPattern.search(typeString)
     dateYearFirst = validDate.group()
-    issued = dateYearFirst[5:] + '/' + dateYearFirst[0:4]
+    startDate = dateYearFirst[5:] + '/' + dateYearFirst[0:4]
+    typeString = typeString[validDate.end():]
+    # find valid date string, and convert to End Date
+    validDate = dateYearFirstPattern.search(typeString) # why doesn't this work?
+    dateYearFirst = validDate.group()
+    endDate = dateYearFirst[5:] + '/' + dateYearFirst[0:4]
     typeString = typeString[validDate.end():]
     # find name and address, remove everything up to that point
     tempNamePattern = re.compile(r'NAME:\s+')
@@ -500,7 +507,7 @@ def parseTemporary(responseType, typeString):
     # get zip
     nextWord = wordPattern.search(typeString)
     zip = nextWord.group()
-    return [responseType, plate.strip(), name.strip(), addr.strip(), '', city.strip(), state.strip(), zip, issued]
+    return [responseType, plate.strip(), name.strip(), addr.strip(), '', city.strip(), state.strip(), zip, '', startDate, endDate, '']
 
     # SPECIAL
 def parseSpecial(responseType, typeString):
@@ -539,7 +546,7 @@ def parseSpecial(responseType, typeString):
         if found != None:
             state, zip = found.group().split()
             city = addr2[:found.start()]
-    return [responseType, plate.strip(), name.strip(), addr.strip(), '', city.strip(), state.strip(), zip, '']
+    return [responseType, plate.strip(), name.strip(), addr.strip(), '', city.strip(), state.strip(), zip, '', '', '', '']
 
 def parseCanceled(responseType, typeString):
     #save the plate
@@ -572,8 +579,11 @@ def timeout():
 
 
 def query(driver, delay, plate):
-    plateSubmitLocator = (By.XPATH, '//input[@class="v-textfield v-widget iw-child v-textfield-iw-child iw-mandatory v-textfield-iw-mandatory v-has-width"]')
+    # the input field is uniquely defined by the MANDATORY class attributes
+    # class="v-textfield v-widget v-has-width iw-child v-textfield-iw-child iw-mandatory v-textfield-iw-mandatory"
+    plateSubmitLocator = (By.XPATH, '//input[contains(@class,"v-textfield-iw-mandatory")]')
     plateSubmitElement = findElementOnPage(driver, delay, plateSubmitLocator)
+
     if plateSubmitElement is None:
         print "query: plate submission element not found on page"
         return None
@@ -581,9 +591,15 @@ def query(driver, delay, plate):
     plateSubmitElement.send_keys(plate)
     plateSubmitElement.send_keys('\n')
 
-    textLocator =  (By.XPATH, '//div[@style="font-family: Courier New;"]')
-    textElement = findElementOnPage(driver, delay, textLocator)
-    uText = textElement.text
-
+    elemLocator =  (By.XPATH, '//div[@class,"font-family: Courier New;"]')
+    # wait until text element is rendered
+    try:
+        WebDriverWait(driver, delay).until(EC.text_to_be_present_in_element(elementLocator,plate))
+        textElement = findElementOnPage(driver, delay, elemLocator)
+        uText = textElement.text
+    except TimeoutException:
+        print "ERROR: record LP may not match input LP"
+        return None
+    plateSubmitElement.clear() # does this need to be cleaned to be found?
     return str(uText)
 

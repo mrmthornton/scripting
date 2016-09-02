@@ -3,7 +3,7 @@
 *.accde
 *.csv
 *.exe
-.git/
+*.laccdb
 *.lnk
 *.log
 *.msg
@@ -13,6 +13,7 @@
 *.xlsx
 *.xlsm
 *.zip
+.git/
 .idea/
 .metadata/
 How To Read a TXDOT.pdf

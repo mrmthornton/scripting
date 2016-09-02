@@ -32,7 +32,7 @@ def violatorSearch():
     'delay' : 15,
     'url' : 'https://lprod.scip.ntta.org/scip/jsp/SignIn.jsp', # initial URL
     #'url' : 'http://intranet/SitePages', # initial URL
-    'operatorMessage' : "Use debug mode, open VPS, new violator search window, and run to completion",
+    'operatorMessage' : "Use debug mode, open VPS, new VIOLATION SEARCH window, and run to completion",
     'staleLocator' : (By.XPATH,'//h1[contains(text(),"Violator Maintenance")]'),
     'buttonLocator' : (By.XPATH,'//input[@value="Query"]'),
     'frameParamters' : {'useFrames' : True, 'frameLocator' : (By.XPATH, '//frame[@name="fraRxL"]') },
@@ -68,10 +68,12 @@ def dataIO(driver, parameters):
             element = findElementOnPage(driver, delay, inputLocator)
             submitted = fillFormAndSubmit(driver, startWindow, element, plateString, parameters) # why so slow?
             time.sleep(1)  #page may not be there yet!  how long to wait?
-            pageLoaded = newPageElementFound(driver, delay, (By.XPATH, '//frame[@name="fraTOP"]'), vioPageTextLocator)
+            FrameLocatorTOP= (By.XPATH, '//frame[@name="fraTOP"]')
+            pageLoaded = newPageElementFound(driver, delay, FrameLocatorTOP, vioPageTextLocator)
             foundFrame = findAndSelectFrame(driver, delay, "fraRL")
             #time.sleep(1)  #text may not be there yet!  how long to wait?
             text = getTextResults(driver, delay, plateString, parameters, "fraRL")
+            # if text is not None and is not 0 ????
             if text is not None: # if there is text, process it
                 sys.stdout.write(plateString + ", " + str(text) + '\n')
                 outfile.write(plateString + ", " + str(text) + '\n')

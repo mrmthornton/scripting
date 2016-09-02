@@ -99,15 +99,12 @@ def findAndSelectFrame(driver, delay, frameName):
                     return False
 
     targetLocator = None
-
     # build the target locator from the argument
     if frameName is None: return False
-
     locatorText = '//frame[@name="' + frameName + '"]'
     # print locatorText
     targetLocator =  (By.XPATH, '//frame[@name="' + frameName + '"]' )
     # print targetLocator
-
     return walkFrames(targetLocator, None)
 
 
