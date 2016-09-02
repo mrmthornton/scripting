@@ -287,7 +287,7 @@ def parseDealer(responseType, typeString):
     nextWord = wordPattern.search(typeString)
     zip = nextWord.group()
     typeString =  typeString[nextWord.end() + 1:]
-    return [responseType, plate.strip(), name.strip(), addr.strip(), '', city.strip(), state.strip(), zip, '']
+    return [responseType, plate.strip(), name.strip(), addr.strip(), '', city.strip(), state.strip(), zip, '', '', '', '']
 
 def parseStandard(responseType, typeString):
     # remove header
