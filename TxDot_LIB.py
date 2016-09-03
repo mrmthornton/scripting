@@ -5,8 +5,8 @@
 # Author:      mthornton
 #
 # Created:     2014 NOV 24
-# Update:      2015 FEB 11
-# Copyright:   (c) mthornton 2014, 2015
+# Update:      2016 SEP 2
+# Copyright:   (c) mthornton 2014, 2015, 2016
 #-------------------------------------------------------------------------------
 
 from selenium import webdriver
@@ -118,6 +118,7 @@ def findResponseType(plate, fileString):
     # DEALER
     targetType = 'DEALER'
     startPattern = re.compile('DEALER' + '[\s]+' + plate)
+    #endPattern = re.compile('^CODE ')
     endPattern = re.compile('CODE ' + '[A-Z]{2,2}' + '[\s]+' + '[0-9]+')
     startNum, endNum = findStartEnd(fileString,startPattern, endPattern)
     if startNum != None:

@@ -1,4 +1,5 @@
-# -*- coding: UTF-8 -*-
+#
+## -*- coding: UTF-8 -*-
 """
 Routine to migrate the S7 data from MySQL to the new Access
 database.
@@ -126,13 +127,13 @@ if __name__ == '__main__':
             row = dbcursor.fetchone()
             if row is None:
                 break
-            plate = row[0]
+            plate = str(row[0])
             results = query(driver, delay, plate)
             if results is not None:
                 print results # for debug
                 fileString = repairLineBreaks(results)
                 #remove non-ascii
-                fileString = "".join(filter(lambda x:x in string.printable, fileString))
+                ##fileString = "".join(filter(lambda x:x in string.printable, fileString))
 
             foundCurrentPlate = False
             while True:
