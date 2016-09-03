@@ -591,10 +591,11 @@ def query(driver, delay, plate):
     plateSubmitElement.send_keys(plate)
     plateSubmitElement.send_keys('\n')
 
-    elemLocator =  (By.XPATH, '//div[@class,"font-family: Courier New;"]')
+    elemLocator =  (By.XPATH, '//div[@style="font-family: Courier New;"]')
     # wait until text element is rendered
     try:
-        WebDriverWait(driver, delay).until(EC.text_to_be_present_in_element(elementLocator,plate))
+        #WebDriverWait(driver, delay).until(EC.text_to_be_present_in_element_value(elemLocator,plate))
+        WebDriverWait(driver, delay).until(EC.text_to_be_present_in_element(elemLocator,plate))
         textElement = findElementOnPage(driver, delay, elemLocator)
         uText = textElement.text
     except TimeoutException:
