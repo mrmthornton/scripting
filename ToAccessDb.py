@@ -1,5 +1,4 @@
-#
-## -*- coding: UTF-8 -*-
+# -*- coding: UTF-8 -*-
 """
 Routine to migrate the S7 data from MySQL to the new Access
 database.
@@ -130,7 +129,7 @@ if __name__ == '__main__':
             plate = str(row[0])
             results = query(driver, delay, plate)
             if results is not None:
-                print results # for debug
+                #print results # for debug
                 fileString = repairLineBreaks(results)
                 #remove non-ascii
                 ##fileString = "".join(filter(lambda x:x in string.printable, fileString))
@@ -156,7 +155,7 @@ if __name__ == '__main__':
                     recordList.append(listData)
                     print listData
                     assert(len(listData)==12)
-        recordList =[['DEALER', '05780V2', 'CAR MASTER', '4600 E Grand Ave', '', 'Dallas', 'TX', '75223', '', '', '', '']]
+        #recordList =[['DEALER', '05780V2', 'CAR MASTER', '4600 E Grand Ave', '', 'Dallas', 'TX', '75223', '', '', '', '']]
         for csvRecord in recordList:
             record = txDotDataFill(txDotDataInit(), csvRecord)
             """

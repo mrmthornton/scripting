@@ -1,11 +1,12 @@
 #-------------------------------------------------------------------------------
-# Name:        TxDotParse
-# Purpose:     parse the multi-formated results from the TXDMV RTS database
+# Name:        TxDot_LIB
+# Purpose:     code to parse the multi-formated results
+#              retreived from the TX DMV RTS-database
 #
 # Author:      mthornton
 #
 # Created:     2014 NOV 24
-# Update:      2016 SEP 2
+# Update:      2016 SEP 6
 # Copyright:   (c) mthornton 2014, 2015, 2016
 #-------------------------------------------------------------------------------
 
@@ -118,8 +119,8 @@ def findResponseType(plate, fileString):
     # DEALER
     targetType = 'DEALER'
     startPattern = re.compile('DEALER' + '[\s]+' + plate)
-    #endPattern = re.compile('^CODE ')
-    endPattern = re.compile('CODE ' + '[A-Z]{2,2}' + '[\s]+' + '[0-9]+')
+    endPattern = re.compile('CODE ')
+    #endPattern = re.compile('CODE ' + '[A-Z]{2,2}' + '[\s]+' + '[0-9]+')
     startNum, endNum = findStartEnd(fileString,startPattern, endPattern)
     if startNum != None:
         print  'findResponseType:', targetType, plate
