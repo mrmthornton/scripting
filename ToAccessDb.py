@@ -1,12 +1,13 @@
 # -*- coding: UTF-8 -*-
 #-------------------------------------------------------------------------------
 # Name:        ToAccessDB
-# Purpose:     Read LP from a DB and
+# Purpose:     Read LP from DB, gather TxDot info, if any, and combine with
+#              user input to form a complete record, write record to DB.
 #
 # Author:      mthornton
 #
 # Created:     2016 AUG 1
-# Update:      2016 SEP 7
+# Update:      2016 SEP 9
 # Copyright:   (c) mthornton 2016
 # educational snippits thanks to Tim Greening-Jackson, (timATgreening-jackson.com)
 #-------------------------------------------------------------------------------
@@ -74,28 +75,51 @@ def txDotDataFill(recordDictionary, csvRecord):
         recordDictionary['ownedStartDate']= csvRecord[8]
         recordDictionary["start_date"]= csvRecord[9]
         recordDictionary["end_date"]= csvRecord[10]
-        '''
-        recordDictionary["title_date"]= csvRecord[1]
-        recordDictionary["make"]= csvRecord[1]
-        recordDictionary["model"]= csvRecord[1]
-        recordDictionary["body"]= csvRecord[1]
-        recordDictionary["vehicle_year"]= csvRecord[1]
-        recordDictionary["images_reviewed"]= csvRecord[1]
-        recordDictionary["images_corrected"]= csvRecord[1]
-        recordDictionary["reason"]= csvRecord[1]
-        recordDictionary["time_stamp"]= csvRecord[1]
-        recordDictionary["agent"]= csvRecord[1]
-        recordDictionary["title_month"]= csvRecord[1]
-        recordDictionary["title_day"]= csvRecord[1]
-        recordDictionary["title_year"]= csvRecord[1]
-        recordDictionary["collections"]= csvRecord[1]
-        recordDictionary["multiple"]= csvRecord[1]
-        recordDictionary["unassign"]= csvRecord[1]
-        recordDictionary["completed"]= csvRecord[1]
-        recordDictionary["temp_plate"]= csvRecord[1]
-        recordDictionary["dealer_plate"]= csvRecord[1]
-        '''
+        #recordDictionary["title_date"]= csvRecord[x1]
+        #recordDictionary["make"]= csvRecord[x1]
+        #recordDictionary["model"]= csvRecord[x1]
+        #recordDictionary["body"]= csvRecord[x1]
+        #recordDictionary["vehicle_year"]= csvRecord[x1]
+        #recordDictionary["images_reviewed"]= csvRecord[x1]
+        #recordDictionary["images_corrected"]= csvRecord[x1]
+        #recordDictionary["reason"]= csvRecord[x1]
+        #recordDictionary["time_stamp"]= csvRecord[x1]
+        #recordDictionary["agent"]= csvRecord[x1]
+        #recordDictionary["title_month"]= csvRecord[x1]
+        #recordDictionary["title_day"]= csvRecord[x1]
+        #recordDictionary["title_year"]= csvRecord[x1]
+        #recordDictionary["collections"]= csvRecord[x1]
+        #recordDictionary["multiple"]= csvRecord[x1]
+        #recordDictionary["unassign"]= csvRecord[x1x]
+        #recordDictionary["completed"]= ''
+        #recordDictionary["temp_plate"]= csvRecord[x1]
+        #recordDictionary["dealer_plate"]= csvRecord[x1]
         return recordDictionary
+
+
+def txDotToDbRecord(txDotRec, db):
+
+    if txDotRec["type"]=='NORECORD':
+        db["completed"]='NO RECORD'
+    if txDotRec["type"]=='TEMPORARY':
+        db["temp_plate"]= True
+
+    if txDotRec["zip"]!='':
+        db["zip"] = int(txDotRec["zip"])
+    else:
+        db["zip"] = 0
+
+    #if txDotRec["start_date"]!='':
+    #    db["start_date"] = int(txDotRec["start_date"])
+    #else:
+    #    db["start_date"] = 0
+
+    #if txDotRec["end_date"]!='':
+    #    db["end_date"] = int(txDotRec["end_date"])
+    #else:
+    #    db["end_date"] = 0
+
+    return db
 
 
 from TxDot_LIB import *
@@ -113,12 +137,12 @@ if __name__ == '__main__':
         #for row in dbcursor.columns(table='Sheet1'): # debug
         #    print row.column_name                    # debug
         #dbcursor.execute("SELECT * FROM Sheet1")
-        dbcursor.execute("SELECT plate FROM [list of plate 11 without matching sheet1]") #  ,4,8,9,10,11,12
+        dbcursor.execute("SELECT plate FROM [list of plate 4 without matching sheet1]") #  ,4,8,9,10, '11'  ,12
         #dbcursor.execute("SELECT plate FROM [list of plates ? without matching sheet1]") # 2,3,5,6,7
 
         recordList = []
         loopCount = 0       # debug loop
-        while loopCount<10:  # debug loop
+        while loopCount<3:  # debug loop
         #while True:
         #while False:  # skip this loop
             row = dbcursor.fetchone()
@@ -139,6 +163,7 @@ if __name__ == '__main__':
                     responseType = None
                     if foundCurrentPlate == False:
                         print "\n", plate, ' Plate/Pattern not found'
+                        time.sleep(1)
                     break
                 if responseType != None: # there must be a valid text record to process
                     foundCurrentPlate = True
@@ -158,29 +183,14 @@ if __name__ == '__main__':
         #            ['NORECORD', '057B0392', '', '', '', '', '', '', '', '', '', ''],\
         #            ['NORECORD', '057C086', '', '', '', '', '', '', '', '', '', '']    ]
         for csvRecord in recordList:
-            record = txDotDataFill(txDotDataInit(), csvRecord)
+            txDotRecord = txDotDataFill(txDotDataInit(), csvRecord)
+            dbRecord = recordInit()
+            dbRecord = txDotToDbRecord(txDotRecord, dbRecord)
 
-            if record["type"]=='NORECORD':
-                record["completed"]='NO RECORD'
-
-            if record["zip"]!='':
-                record["zip"] = int(record["zip"])
-            else:
-                record["zip"] = 0
-
-            if record["ownedStartDate"]!='':
-                record["ownedStartDate"] = int(record["ownedStartDate"])
-
-            if record["start_date"]!='':
-                record["start_date"] = int(record["start_date"])
-
-            if record["end_date"]!='':
-                record["end_date"] = int(record["end_date"])
-
-            sql = "INSERT INTO Sheet1 (Plate, Plate_St, [Combined Name], Address, City, State, ZipCode) \
+            sql = "INSERT INTO Sheet1 (Plate, Plate_St, [Combined Name], Address, City, State, ZipCode), [Completed: Yes / No Record] \
                         VALUES (     '{plate}', '{plate_st}', '{combined_name}', '{address}', '{city}', '{state}', \
-                                    '{zip}')"\
-                        .format(**record)
+                                    '{zip}', '{completed}')"\
+                        .format(**dbRecord)
 
             dbcursor.execute(sql)
 
