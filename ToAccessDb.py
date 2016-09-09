@@ -1,18 +1,15 @@
 # -*- coding: UTF-8 -*-
-"""
-Routine to migrate the S7 data from MySQL to the new Access
-database.
-
-We're using the pyodbc libraries to connect to Microsoft Access
-Note that there are 32- and 64-bit versions of these libraries
-available but in order to work the word-length for pyodbc and by
-implication Python and all its associated compiled libraries must
-match that of MS Access. Which is an arse as I've just had to
-delete my 64-bit installation of Python and replace it and all
-the libraries with the 32-bit version.
-
-Tim Greening-Jackson 08 May 2013 (timATgreening-jackson.com)
-"""
+#-------------------------------------------------------------------------------
+# Name:        ToAccessDB
+# Purpose:     Read LP from a DB and
+#
+# Author:      mthornton
+#
+# Created:     2016 AUG 1
+# Update:      2016 SEP 7
+# Copyright:   (c) mthornton 2016
+# educational snippits thanks to Tim Greening-Jackson, (timATgreening-jackson.com)
+#-------------------------------------------------------------------------------
 
 import datetime
 import pyodbc
@@ -23,14 +20,10 @@ from Tkinter import *
 
 
 def ConnectToAccessFile():
-        """
-        Prompt the user for an Access database file,
-        create a connection and a cursor.
-        """
-        # Prompts the user to select which Access DB file he wants to use and then attempts to connect
+        #Prompt the user for db, create connection and cursor.
         root = Tk()
-        dbname = tkFileDialog.askopenfilename(parent=root, title="Select output database",
-                    filetypes=[('Access locked', '*.accde'), ('Access db', '*.accdb')])
+        dbname = tkFileDialog.askopenfilename(parent=root, title="Select database",
+                    filetypes=[('locked', '*.accde'), ('normal', '*.accdb')])
         root.destroy()
         # Connect to the Access database
         connectedDB = pyodbc.connect("Driver={Microsoft Access Driver (*.mdb, *.accdb)};DBQ="+dbname+";")
@@ -57,6 +50,7 @@ def recordInit():
 
 def txDotDataInit():
     recordDictionary = {
+        "type":'',
         "plate":'', "plate_st":'',
         "combined_name":'',
         "address":'', "city":'', "state":'', "zip":'',
@@ -69,6 +63,7 @@ def txDotDataInit():
 def txDotDataFill(recordDictionary, csvRecord):
     #       0          1     2     3    4   5      6     7         8             9         10      11
     # responseType, plate, name, addr, '', city, state, zip, ownedStartDate, startDate, endDate, issued
+        recordDictionary["type"]= csvRecord[0]
         recordDictionary["plate"]= csvRecord[1]
         recordDictionary["plate_st"]= 'TX'
         recordDictionary["combined_name"] = csvRecord[2]
@@ -118,11 +113,14 @@ if __name__ == '__main__':
         #for row in dbcursor.columns(table='Sheet1'): # debug
         #    print row.column_name                    # debug
         #dbcursor.execute("SELECT * FROM Sheet1")
-        dbcursor.execute("SELECT plate FROM [list of plate 11 without matching sheet1]")
+        dbcursor.execute("SELECT plate FROM [list of plate 11 without matching sheet1]") #  ,4,8,9,10,11,12
+        #dbcursor.execute("SELECT plate FROM [list of plates ? without matching sheet1]") # 2,3,5,6,7
 
         recordList = []
-        #while False: # for debug
-        while True:
+        loopCount = 0       # debug loop
+        while loopCount<10:  # debug loop
+        #while True:
+        #while False:  # skip this loop
             row = dbcursor.fetchone()
             if row is None:
                 break
@@ -133,7 +131,6 @@ if __name__ == '__main__':
                 fileString = repairLineBreaks(results)
                 #remove non-ascii
                 ##fileString = "".join(filter(lambda x:x in string.printable, fileString))
-
             foundCurrentPlate = False
             while True:
                 try:
@@ -155,10 +152,63 @@ if __name__ == '__main__':
                     recordList.append(listData)
                     print listData
                     assert(len(listData)==12)
-        #recordList =[['DEALER', '05780V2', 'CAR MASTER', '4600 E Grand Ave', '', 'Dallas', 'TX', '75223', '', '', '', '']]
+            loopCount += 1 # debug loop
+
+        #recordList =[['DEALER', '05798V', 'Roadrunner Services, LLC', '125 Stable Creek Rd', '', 'Fayetteville', 'GA', '30215', '', '', '', ''],\
+        #            ['NORECORD', '057B0392', '', '', '', '', '', '', '', '', '', ''],\
+        #            ['NORECORD', '057C086', '', '', '', '', '', '', '', '', '', '']    ]
         for csvRecord in recordList:
             record = txDotDataFill(txDotDataInit(), csvRecord)
-            """
+
+            if record["type"]=='NORECORD':
+                record["completed"]='NO RECORD'
+
+            if record["zip"]!='':
+                record["zip"] = int(record["zip"])
+            else:
+                record["zip"] = 0
+
+            if record["ownedStartDate"]!='':
+                record["ownedStartDate"] = int(record["ownedStartDate"])
+
+            if record["start_date"]!='':
+                record["start_date"] = int(record["start_date"])
+
+            if record["end_date"]!='':
+                record["end_date"] = int(record["end_date"])
+
+            sql = "INSERT INTO Sheet1 (Plate, Plate_St, [Combined Name], Address, City, State, ZipCode) \
+                        VALUES (     '{plate}', '{plate_st}', '{combined_name}', '{address}', '{city}', '{state}', \
+                                    '{zip}')"\
+                        .format(**record)
+
+            dbcursor.execute(sql)
+
+        print("Comitting changes")
+        dbcursor.commit()
+
+    finally:
+        print("Closing databases")
+        dbConnect.close()
+
+            #dbcursor.execute('''SELECT Plate, Plate_St, [Combined Name], Address, City, State, ZipCode, \
+            #    [Title Date], [Start Date], [End Date], [Vehicle Make], [Vehicle Model], [Vehicle Body], [Vehicle Year], \
+            #    [Total Image Reviewed], [Total Image corrected], Reason, [Time Stamp], [Agent Initial] \
+            #    FROM Sheet1''')
+
+            #    Title_Month, Title_Day, Title_Year, [Sent to Collections Agency],
+            #    Multiple, Unassign, [Completed: Yes / No Record],
+            #   [E-Tags (Temporary Plates)], [Dealer Plates]
+
+            #sql = "INSERT INTO Sheet1 (Plate, Plate_St, [Combined Name], Address, City, State, ZipCode,[Start Date], [End Date]) \
+            #            VALUES (     '{plate}', '{plate_st}', '{combined_name}', '{address}', '{city}', '{state}', \
+            #                       '{zip:d}', '{start_date:d}', '{end_date:d}')"\
+            #            .format(**record)
+
+            #sql = "INSERT INTO Sheet1 (PLATE, [COMBINED NAME]) \
+            #    VALUES ('{}', '{}')".format(plate, combined_name )
+
+        """
             { "plate":'', "plate_st":'', "combined_name":'', "address":'', "city":'', "state":'', "zip":'', \
             "title_date":'', "start_date":'', "end_date":'' , "make":'' , "model":'' , "body":'' , "vehicle_year":'' , \
             "images_reviewed":'' , "images_corrected":'', "reason":'', "time_stamp":'', "agent":'', \
@@ -170,32 +220,6 @@ if __name__ == '__main__':
             (PLATE, PLATE_ST, [COMBINED NAME], ADDRESS, CITY, ZIPCODE, STATE,
             [TITLE DATE], [START DATE], [END DATE], [VEHICLE MAKE], [VEHICLE MODEL], [VEHICLE BODY])
             """
-            #dbcursor.execute('''SELECT Plate, Plate_St, [Combined Name], Address, City, State, ZipCode, \
-            #    [Title Date], [Start Date], [End Date], [Vehicle Make], [Vehicle Model], [Vehicle Body], [Vehicle Year], \
-            #    [Total Image Reviewed], [Total Image corrected], Reason, [Time Stamp], [Agent Initial] \
-            #    FROM Sheet1''')
-
-            #    Title_Month, Title_Day, Title_Year, [Sent to Collections Agency],
-            #    Multiple, Unassign, [Completed: Yes / No Record],
-            #   [E-Tags (Temporary Plates)], [Dealer Plates]
-
-            record["zip"]            = int(record["zip"])
-            record["ownedStartDate"] = int(record["zip"])
-            record["start_date"]     = int(record["zip"])
-            record["end_date"]       = int(record["zip"])
-            sql = "INSERT INTO Sheet1 (Plate, Plate_St, [Combined Name], Address, City, State, ZipCode) \
-                        VALUES (     '{plate}', '{plate_st}', '{combined_name}', '{address}', '{city}', '{state}', \
-                                    '{zip:d}')"\
-                        .format(**record)
-            #sql = "INSERT INTO Sheet1 (Plate, Plate_St, [Combined Name], Address, City, State, ZipCode,[Start Date], [End Date]) \
-            #            VALUES (     '{plate}', '{plate_st}', '{combined_name}', '{address}', '{city}', '{state}', \
-            #                       '{zip:d}', '{start_date:d}', '{end_date:d}')"\
-            #            .format(**record)
-
-            #sql = "INSERT INTO Sheet1 (PLATE, [COMBINED NAME]) \
-            #    VALUES ('{}', '{}')".format(plate, combined_name )
-            dbcursor.execute(sql)
-
 # 'd' Signed integer decimal.
 # 'i' Signed integer decimal.
 # 'o' Signed octal value.
@@ -213,7 +237,8 @@ if __name__ == '__main__':
 # 's' String (converts any Python object using str()).
 # '%' No argument is converted, results in a '%' character in the result.
 
-        """
+def printDbColumnNames():
+    """
         rowcount = 0
         while True:
             row = dbcursor.fetchone()
@@ -224,7 +249,7 @@ if __name__ == '__main__':
             #print "entire row -->", row
         print rowcount
         """
-        """
+    """
         for column in dbcursor.columns(table='US State'):
             print column.column_name
         dbcursor.execute('''SELECT Field1
@@ -236,8 +261,7 @@ if __name__ == '__main__':
             print "entire row -->{}".format(row[0])
         """
 
-        print("Comitting changes")
-        dbcursor.commit()
+
             #dbcursor.execute("DELETE * FROM {}".format(table))
             #rows = dbcursor.fetchall()
             #dbfacilities = {unicode(row[1]):row[0] for row in rows}
@@ -282,12 +306,8 @@ if __name__ == '__main__':
         #            a.SetProduction(s7incidents[z.group()].production)
         #    a.Process(dbcursor)
 
-    finally:
-        print("Closing databases")
-        dbConnect.close()
 
 '''
-import string
 
 params = [filter(lambda x: x in string.printable, item.text)
           for item in row.find_all('td')]
