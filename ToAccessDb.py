@@ -101,13 +101,19 @@ def txDotToDbRecord(txDotRec, db):
 
     if txDotRec["type"]=='NORECORD':
         db["completed"]='NO RECORD'
-    if txDotRec["type"]=='TEMPORARY':
-        db["temp_plate"]= True
+
+    db["plate"] = txDotRec["plate"]
+    db["plate_st"] = txDotRec["plate_st"]
+    db["combined_name"] = txDotRec["combined_name"]
+    db["address"] = txDotRec["address"]
+    db["city"] = txDotRec["city"]
 
     if txDotRec["zip"]!='':
         db["zip"] = int(txDotRec["zip"])
     else:
         db["zip"] = 0
+
+    db["title_date"] = txDotRec["title_date"]
 
     #if txDotRec["start_date"]!='':
     #    db["start_date"] = int(txDotRec["start_date"])
@@ -118,6 +124,29 @@ def txDotToDbRecord(txDotRec, db):
     #    db["end_date"] = int(txDotRec["end_date"])
     #else:
     #    db["end_date"] = 0
+
+    #db["make"] = txDotRec["make"]
+    #db["model"] = txDotRec["model"]
+    #db["body"] = txDotRec["body"]
+    #db["vehicle_year"] = txDotRec["vehicle_year"]
+    #db["images_reviewed"] = txDotRec["images_reviewed"]
+    #db["images_corrected"] = txDotRec["images_corrected"]
+    #db["reason"] = txDotRec["reason"]
+    #db["time_stamp"] = txDotRec["time_stamp"]
+    db["agent"] = "mthornton"
+    #db["title_month"] = txDotRec["title_month"]
+    #db["title_day"] = txDotRec["title_day"]
+    #db["title_year"] = txDotRec["title_year"]
+    #db["collections"] = txDotRec["collections"]
+    #db["multiple"] = txDotRec["multiple"]
+    #db["unassign"] = txDotRec["unassign"]
+    #db["completed"] = txDotRec["completed"]
+    if txDotRec["type"]=='TEMPORARY':
+        db["temp_plate"]= 1
+    #db["dealer_plate"] = txDotRec["dealer_plate"]
+
+
+
 
     return db
 
@@ -142,7 +171,7 @@ if __name__ == '__main__':
 
         recordList = []
         loopCount = 0       # debug loop
-        while loopCount<3:  # debug loop
+        while loopCount<10:  # debug loop
         #while True:
         #while False:  # skip this loop
             row = dbcursor.fetchone()
@@ -179,17 +208,20 @@ if __name__ == '__main__':
                     assert(len(listData)==12)
             loopCount += 1 # debug loop
 
-        #recordList =[['DEALER', '05798V', 'Roadrunner Services, LLC', '125 Stable Creek Rd', '', 'Fayetteville', 'GA', '30215', '', '', '', ''],\
-        #            ['NORECORD', '057B0392', '', '', '', '', '', '', '', '', '', ''],\
-        #            ['NORECORD', '057C086', '', '', '', '', '', '', '', '', '', '']    ]
         for csvRecord in recordList:
             txDotRecord = txDotDataFill(txDotDataInit(), csvRecord)
             dbRecord = recordInit()
             dbRecord = txDotToDbRecord(txDotRecord, dbRecord)
+            print dbRecord # for debug
 
-            sql = "INSERT INTO Sheet1 (Plate, Plate_St, [Combined Name], Address, City, State, ZipCode), [Completed: Yes / No Record] \
-                        VALUES (     '{plate}', '{plate_st}', '{combined_name}', '{address}', '{city}', '{state}', \
-                                    '{zip}', '{completed}')"\
+            #sql = "INSERT INTO Sheet1 (Plate, Plate_St, [Combined Name], Address, City, State, ZipCode, [Completed: Yes / No Record]) \
+            #            VALUES (     '{plate}', '{plate_st}', '{combined_name}', '{address}', '{city}', '{state}', \
+            #                        '{zip}', '{completed}')"\
+            #            .format(**dbRecord)
+            sql = "INSERT INTO Sheet1 (Plate, Plate_St, [Combined Name], Address, City, State, ZipCode,\
+                                         [Completed: Yes / No Record], [Agent Initial]) \
+                        VALUES (     '{plate}', '{plate_st}', '{combined_name}', '{address}', '{city}', '{state}', '{zip}',\
+                                         '{completed}', '{agent}')"\
                         .format(**dbRecord)
 
             dbcursor.execute(sql)
