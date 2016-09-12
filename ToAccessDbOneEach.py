@@ -99,33 +99,18 @@ def txDotDataFill(recordDictionary, csvRecord):
 
 
 def txDotToDbRecord(txDotRec, db):
-<<<<<<< HEAD
-
     if txDotRec["type"]=='NORECORD':
         db["completed"]='NO RECORD'
-
-=======
-    if txDotRec["type"]=='NORECORD':
-        db["completed"]='NO RECORD'
->>>>>>> ntta
     db["plate"] = txDotRec["plate"]
     db["plate_st"] = txDotRec["plate_st"]
     db["combined_name"] = txDotRec["combined_name"]
     db["address"] = txDotRec["address"]
     db["city"] = txDotRec["city"]
-<<<<<<< HEAD
-
-=======
     db["state"]= txDotRec["state"]
->>>>>>> ntta
     if txDotRec["zip"]!='':
         db["zip"] = int(txDotRec["zip"])
     else:
         db["zip"] = 0
-<<<<<<< HEAD
-
-=======
->>>>>>> ntta
     db["title_date"] = txDotRec["title_date"]
 
     #if txDotRec["start_date"]!='':
@@ -156,12 +141,8 @@ def txDotToDbRecord(txDotRec, db):
     #db["completed"] = txDotRec["completed"]
     if txDotRec["type"]=='TEMPORARY':
         db["temp_plate"]= 1
-<<<<<<< HEAD
-    #db["dealer_plate"] = txDotRec["dealer_plate"]
-=======
     if txDotRec["type"]=='DEALER':
         db["dealer_plate"]= 1
->>>>>>> ntta
 
     return db
 
@@ -249,10 +230,7 @@ if __name__ == '__main__':
     finally:
         print("Closing databases")
         dbConnect.close()
-<<<<<<< HEAD
-=======
         driver.close()
->>>>>>> ntta
 
 # 'd' Signed integer decimal.
 # 'i' Signed integer decimal.
