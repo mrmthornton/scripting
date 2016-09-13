@@ -21,6 +21,28 @@ import tkFileDialog
 from Tkinter import *
 
 
+def printDbColumnNames():
+    rowcount = 0
+    while True:
+        row = dbcursor.fetchone()
+        if row is None:
+            break
+        rowcount += 1
+        print "Plate {}".format(row[0])
+        #print "entire row -->", row
+    print rowcount
+
+    for column in dbcursor.columns(table='US State'):
+        print column.column_name
+    dbcursor.execute('''SELECT Field1
+                        FROM [US State]''')
+    while True:
+        row = dbcursor.fetchone()
+        if row is None:
+            break
+        print "entire row -->{}".format(row[0])
+
+
 def ConnectToAccessFile():
         #Prompt the user for db, create connection and cursor.
         root = Tk()
@@ -99,30 +121,19 @@ def txDotDataFill(recordDictionary, csvRecord):
 
 
 def txDotToDbRecord(txDotRec, db):
-    if txDotRec["type"]=='NORECORD':
-        db["completed"]='NO RECORD'
+    if txDotRec["type"]=='NORECORD': db["completed"]='NO RECORD'
     db["plate"] = txDotRec["plate"]
     db["plate_st"] = txDotRec["plate_st"]
     db["combined_name"] = txDotRec["combined_name"]
     db["address"] = txDotRec["address"]
     db["city"] = txDotRec["city"]
     db["state"]= txDotRec["state"]
-    if txDotRec["zip"]!='':
-        db["zip"] = int(txDotRec["zip"])
-    else:
-        db["zip"] = 0
+    if txDotRec["zip"]!='': db["zip"] = int(txDotRec["zip"])
     db["title_date"] = txDotRec["title_date"]
-
     #if txDotRec["start_date"]!='':
     #    db["start_date"] = int(txDotRec["start_date"])
-    #else:
-    #    db["start_date"] = 0
-
     #if txDotRec["end_date"]!='':
     #    db["end_date"] = int(txDotRec["end_date"])
-    #else:
-    #    db["end_date"] = 0
-
     #db["make"] = txDotRec["make"]
     #db["model"] = txDotRec["model"]
     #db["body"] = txDotRec["body"]
@@ -139,10 +150,8 @@ def txDotToDbRecord(txDotRec, db):
     #db["multiple"] = txDotRec["multiple"]
     #db["unassign"] = txDotRec["unassign"]
     #db["completed"] = txDotRec["completed"]
-    if txDotRec["type"]=='TEMPORARY':
-        db["temp_plate"]= 1
-    if txDotRec["type"]=='DEALER':
-        db["dealer_plate"]= 1
+    if txDotRec["type"]=='TEMPORARY': db["temp_plate"]= 1
+    if txDotRec["type"]=='DEALER': db["dealer_plate"]= 1
 
     return db
 
@@ -163,15 +172,16 @@ if __name__ == '__main__':
         #    print row.column_name                    # debug
         #dbcursor.execute("SELECT * FROM Sheet1")
         #dbcursor.execute("SELECT plate FROM [list of plate 4 without matching sheet1]") #  ,4,8,9,10, '11'  ,12
-        dbcursor.execute("SELECT plate FROM [list of plates 3 without matching sheet1]") # 2,3,5,6,7
+        dbcursor.execute("SELECT plate FROM [list of plates 2 without matching sheet1]") # 2,3,5,6,7
 
         recordList = []
         loopCount = 0       # debug loop
-        while loopCount<1:  # debug loop
+        while loopCount<3:  # debug loop
         #while True:
         #while False:  # skip this loop
             row = dbcursor.fetchone()
             if row is None:
+                print "main() : Finished, no more input records."
                 break
             plate = str(row[0])
             results = query(driver, delay, plate)
@@ -188,7 +198,7 @@ if __name__ == '__main__':
                     responseType = None
                     if foundCurrentPlate == False:
                         print "\n", plate, ' Plate/Pattern not found'
-                        time.sleep(1)
+                        time.sleep(3)
                     break
                 if responseType != None: # there must be a valid text record to process
                     foundCurrentPlate = True
@@ -210,18 +220,21 @@ if __name__ == '__main__':
             dbRecord = txDotToDbRecord(txDotRecord, dbRecord)
             print dbRecord # for debug
             sql = "INSERT INTO Sheet1 (Plate, Plate_St, [Combined Name], Address, City, State, ZipCode,\
-                                         [Completed: Yes / No Record], [Time Stamp], [Agent Initial], \
-                                         [E-Tags (Temporary Plates)], [Dealer Plates] ) \
+                                       [Time Stamp], [Agent Initial], \
+                                       [Completed: Yes / No Record], \
+                                       [E-Tags (Temporary Plates)], [Dealer Plates] ) \
                             VALUES (  '{plate}', '{plate_st}', '{combined_name}', '{address}', '{city}', '{state}', '{zip}',\
-                                         '{completed}', '{time_stamp}', '{agent}', \
-                                         '{temp_plate}', '{dealer_plate}' ) "\
+                                      '{time_stamp}', '{agent}', \
+                                      '{completed}',  \
+                                      '{temp_plate}', '{dealer_plate}' ) "\
                         .format(**dbRecord)
-                                    # Plate, Plate_St, [Combined Name], Address, City, State, ZipCode,
-            # [Title Date], [Start Date], [End Date], [Vehicle Make], [Vehicle Model], [Vehicle Body], [Vehicle Year],
-            # [Total Image Reviewed], [Total Image corrected], Reason,      [Time Stamp], [Agent Initial] \
-            # Title_Month, Title_Day, Title_Year, [Sent to Collections Agency],
-            # Multiple, Unassign,       [Completed: Yes / No Record],
-                                    # [E-Tags (Temporary Plates)], [Dealer Plates]
+#                                                                   Plate, Plate_St, [Combined Name], Address, City, State, ZipCode,
+# [Title Date], [Start Date], [End Date],
+# [Vehicle Make], [Vehicle Model], [Vehicle Body], [Vehicle Year],
+# [Total Image Reviewed], [Total Image corrected], Reason,          [Time Stamp], [Agent Initial] \
+# Title_Month, Title_Day, Title_Year, [Sent to Collections Agency],
+# Multiple, Unassign,                                              [Completed: Yes / No Record],
+#                                                                   [E-Tags (Temporary Plates)], [Dealer Plates]
             dbcursor.execute(sql)
 
         print("Comitting changes")
@@ -230,7 +243,8 @@ if __name__ == '__main__':
     finally:
         print("Closing databases")
         dbConnect.close()
-        driver.close()
+        driver.close() # close browser window
+        driver.quit()  # close command window
 
 # 'd' Signed integer decimal.
 # 'i' Signed integer decimal.
@@ -248,31 +262,6 @@ if __name__ == '__main__':
 # 'r' String (converts any Python object using repr()).
 # 's' String (converts any Python object using str()).
 # '%' No argument is converted, results in a '%' character in the result.
-
-def printDbColumnNames():
-    """
-        rowcount = 0
-        while True:
-            row = dbcursor.fetchone()
-            if row is None:
-                break
-            rowcount += 1
-            print "Plate {}".format(row[0])
-            #print "entire row -->", row
-        print rowcount
-        """
-    """
-        for column in dbcursor.columns(table='US State'):
-            print column.column_name
-        dbcursor.execute('''SELECT Field1
-                            FROM [US State]''')
-        while True:
-            row = dbcursor.fetchone()
-            if row is None:
-                break
-            print "entire row -->{}".format(row[0])
-        """
-
 
             #dbcursor.execute("DELETE * FROM {}".format(table))
             #rows = dbcursor.fetchall()
