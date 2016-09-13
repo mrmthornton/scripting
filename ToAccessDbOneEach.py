@@ -38,14 +38,14 @@ def recordInit():
     recordDictionary = {
         "plate":'', "plate_st":'',
         "combined_name":'',
-        "address":'', "city":'', "state":'', "zip":'',
+        "address":'', "city":'', "state":'', "zip":0,
         "title_date":'', "start_date":'', "end_date":'' ,
-        "make":'' , "model":'' , "body":'' , "vehicle_year":'' ,
-        "images_reviewed":'', "images_corrected":'', "reason":'',
+        "make":'' , "model":'' , "body":'' , "vehicle_year":0 ,
+        "images_reviewed":0, "images_corrected":0, "reason":'',
         "time_stamp":'', "agent":'',
         "title_month":'', "title_day":'', "title_year":'',
-        "collections":'', "multiple":'', "unassign":'',
-        "completed":'', "temp_plate":'', "dealer_plate":''
+        "collections":0, "multiple":0, "unassign":0,
+        "completed":'', "temp_plate":0, "dealer_plate":0
         }
     return recordDictionary
 
