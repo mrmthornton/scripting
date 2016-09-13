@@ -111,10 +111,10 @@ def txDotDataFill(recordDictionary, csvRecord):
         #recordDictionary["title_month"]= csvRecord[x1]
         #recordDictionary["title_day"]= csvRecord[x1]
         #recordDictionary["title_year"]= csvRecord[x1]
-        #recordDictionary["collections"]= csvRecord[x1]
-        #recordDictionary["multiple"]= csvRecord[x1]
-        #recordDictionary["unassign"]= csvRecord[x1x]
-        #recordDictionary["completed"]= ''
+        #recordDictionary["collections"]=
+        #recordDictionary["multiple"]=
+        #recordDictionary["unassign"]=
+        #recordDictionary["completed"]=
         #recordDictionary["temp_plate"]= csvRecord[x1]
         #recordDictionary["dealer_plate"]= csvRecord[x1]
         return recordDictionary
@@ -176,7 +176,7 @@ if __name__ == '__main__':
 
         recordList = []
         loopCount = 0       # debug loop
-        while loopCount<3:  # debug loop
+        while loopCount<50:  # debug loop
         #while True:
         #while False:  # skip this loop
             row = dbcursor.fetchone()
@@ -219,22 +219,22 @@ if __name__ == '__main__':
             dbRecord = recordInit()
             dbRecord = txDotToDbRecord(txDotRecord, dbRecord)
             print dbRecord # for debug
-            sql = "INSERT INTO Sheet1 (Plate, Plate_St, [Combined Name], Address, City, State, ZipCode,\
+            sql = "INSERT INTO Sheet1 (Plate, Plate_St, [Combined Name], Address, City, State, ZipCode, \
                                        [Time Stamp], [Agent Initial], \
-                                       [Completed: Yes / No Record], \
+                                       [Sent to Collections Agency],  Multiple, Unassign, [Completed: Yes / No Record], \
                                        [E-Tags (Temporary Plates)], [Dealer Plates] ) \
-                            VALUES (  '{plate}', '{plate_st}', '{combined_name}', '{address}', '{city}', '{state}', '{zip}',\
+                            VALUES (  '{plate}', '{plate_st}', '{combined_name}', '{address}', '{city}', '{state}', '{zip}', \
                                       '{time_stamp}', '{agent}', \
-                                      '{completed}',  \
+                                      '{collections}', '{multiple}', '{unassign}', '{completed}', \
                                       '{temp_plate}', '{dealer_plate}' ) "\
                         .format(**dbRecord)
-#                                                                   Plate, Plate_St, [Combined Name], Address, City, State, ZipCode,
+#                                                               Plate, Plate_St, [Combined Name], Address, City, State, ZipCode,
 # [Title Date], [Start Date], [End Date],
 # [Vehicle Make], [Vehicle Model], [Vehicle Body], [Vehicle Year],
-# [Total Image Reviewed], [Total Image corrected], Reason,          [Time Stamp], [Agent Initial] \
-# Title_Month, Title_Day, Title_Year, [Sent to Collections Agency],
-# Multiple, Unassign,                                              [Completed: Yes / No Record],
-#                                                                   [E-Tags (Temporary Plates)], [Dealer Plates]
+# [Total Image Reviewed], [Total Image corrected], Reason,      [Time Stamp], [Agent Initial] \
+# Title_Month, Title_Day, Title_Year,
+#                                                               [Sent to Collections Agency],  Multiple, Unassign, [Completed: Yes / No Record],
+#                                                               [E-Tags (Temporary Plates)], [Dealer Plates]
             dbcursor.execute(sql)
 
         print("Comitting changes")
