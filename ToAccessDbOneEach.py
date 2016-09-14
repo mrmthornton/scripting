@@ -122,6 +122,7 @@ def txDotDataFill(recordDictionary, csvRecord):
 
 def txDotToDbRecord(txDotRec, db):
     if txDotRec["type"]=='NORECORD': db["completed"]='NO RECORD'
+    else: db["completed"]='YES'
     db["plate"] = txDotRec["plate"]
     db["plate_st"] = txDotRec["plate_st"]
     db["combined_name"] = txDotRec["combined_name"]
@@ -141,7 +142,8 @@ def txDotToDbRecord(txDotRec, db):
     #db["images_reviewed"] = txDotRec["images_reviewed"]
     #db["images_corrected"] = txDotRec["images_corrected"]
     #db["reason"] = txDotRec["reason"]
-    db["time_stamp"] = '9/12/2016 16:40:23'
+    db["time_stamp"] = time.strftime("%m/%d/%Y %I:%M:%S %p") # month, day, long year, 12 hr, AM/PM
+    #db["time_stamp"] = '9/13/2016 4:53:47 PM'
     db["agent"] = "mthornton"
     #db["title_month"] = txDotRec["title_month"]
     #db["title_day"] = txDotRec["title_day"]
@@ -171,17 +173,24 @@ if __name__ == '__main__':
         #for row in dbcursor.columns(table='Sheet1'): # debug
         #    print row.column_name                    # debug
         #dbcursor.execute("SELECT * FROM Sheet1")
-        #dbcursor.execute("SELECT plate FROM [list of plate 4 without matching sheet1]") #  ,4,8,9,10, '11'  ,12
-        dbcursor.execute("SELECT plate FROM [list of plates 2 without matching sheet1]") # 2,3,5,6,7
+        dbcursor.execute("SELECT plate FROM [list of plate 4 without matching sheet1]") #  ,4,8,9,10, '11'  ,12
+        #dbcursor.execute("SELECT plate FROM [list of plates 2 without matching sheet1]") # 2,3,5,6,7
+        lpList = []
+        loopCount = 0
+        while loopCount<2:
+            lpRecord = dbcursor.fetchone()
+            if lpRecord is None:
+                print "main() : Finished, no more input records."
+                break
+            lpList.append(lpRecord)
+            loopCount += 1
 
-        recordList = []
-        loopCount = 0       # debug loop
-        while loopCount<50:  # debug loop
         #while True:
         #while False:  # skip this loop
-            row = dbcursor.fetchone()
+        for row in lpList:
+            #row = dbcursor.fetchone()
             if row is None:
-                print "main() : Finished, no more input records."
+                print "main() : Finished, no more LP's ."
                 break
             plate = str(row[0])
             results = query(driver, delay, plate)
@@ -191,6 +200,7 @@ if __name__ == '__main__':
                 #remove non-ascii
                 ##fileString = "".join(filter(lambda x:x in string.printable, fileString))
             foundCurrentPlate = False
+            recordList = []
             while True:
                 try:
                     responseType, startNum, endNum = findResponseType(plate, fileString)
@@ -207,27 +217,28 @@ if __name__ == '__main__':
                     #print typeString # for debug
                     fileString = fileString[:startNum] + fileString[endNum + 1:] # what is this for ?
                     listData = parseRecord(responseType, typeString)
-                    #csvString = csvStringFromList(listData)
                     # make txdot data record here
                     recordList.append(listData)
                     print listData
                     assert(len(listData)==12)
-            loopCount += 1 # debug loop
 
-        for csvRecord in recordList:
-            txDotRecord = txDotDataFill(txDotDataInit(), csvRecord)
-            dbRecord = recordInit()
-            dbRecord = txDotToDbRecord(txDotRecord, dbRecord)
-            print dbRecord # for debug
-            sql = "INSERT INTO Sheet1 (Plate, Plate_St, [Combined Name], Address, City, State, ZipCode, \
-                                       [Time Stamp], [Agent Initial], \
-                                       [Sent to Collections Agency],  Multiple, Unassign, [Completed: Yes / No Record], \
-                                       [E-Tags (Temporary Plates)], [Dealer Plates] ) \
-                            VALUES (  '{plate}', '{plate_st}', '{combined_name}', '{address}', '{city}', '{state}', '{zip}', \
-                                      '{time_stamp}', '{agent}', \
-                                      '{collections}', '{multiple}', '{unassign}', '{completed}', \
-                                      '{temp_plate}', '{dealer_plate}' ) "\
-                        .format(**dbRecord)
+            for csvRecord in recordList:
+                txDotRecord = txDotDataFill(txDotDataInit(), csvRecord)
+                dbRecord = recordInit()
+                dbRecord = txDotToDbRecord(txDotRecord, dbRecord)
+                print dbRecord # for debug
+                sql = "INSERT INTO Sheet1 (Plate, Plate_St, [Combined Name], Address, City, State, ZipCode, \
+                                           [Time Stamp], [Agent Initial], \
+                                           [Sent to Collections Agency],  Multiple, Unassign, [Completed: Yes / No Record], \
+                                           [E-Tags (Temporary Plates)], [Dealer Plates] ) \
+                                VALUES (  '{plate}', '{plate_st}', '{combined_name}', '{address}', '{city}', '{state}', '{zip}', \
+                                          '{time_stamp}', '{agent}', \
+                                          '{collections}', '{multiple}', '{unassign}', '{completed}', \
+                                          '{temp_plate}', '{dealer_plate}' ) "\
+                            .format(**dbRecord)
+                dbcursor.execute(sql)
+            print("Comitting changes")
+            dbcursor.commit()
 #                                                               Plate, Plate_St, [Combined Name], Address, City, State, ZipCode,
 # [Title Date], [Start Date], [End Date],
 # [Vehicle Make], [Vehicle Model], [Vehicle Body], [Vehicle Year],
@@ -235,10 +246,6 @@ if __name__ == '__main__':
 # Title_Month, Title_Day, Title_Year,
 #                                                               [Sent to Collections Agency],  Multiple, Unassign, [Completed: Yes / No Record],
 #                                                               [E-Tags (Temporary Plates)], [Dealer Plates]
-            dbcursor.execute(sql)
-
-        print("Comitting changes")
-        dbcursor.commit()
 
     finally:
         print("Closing databases")

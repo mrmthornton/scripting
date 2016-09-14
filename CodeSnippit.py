@@ -1,5 +1,6 @@
 # snippet of code for filtering html text into printable text.
 
+def printableText():
     try:   # delay to ignore presence of initial message
         WebDriverWait(driver,delay).until(EC.alert_is_present())
     except:
@@ -17,6 +18,17 @@
     except TimeoutException:
         timeout()
 
-driver.close()
+    driver.close()
 
+
+def testTime():
+    import datetime
+    shortyear = time.strftime("%d/%m/%y %H:%M:%S")
+    longyear = time.strftime("%d/%m/%Y %I:%M:%S %p")
+    print x
+
+
+if __name__ == '__main__':
+
+    testTime()
 
