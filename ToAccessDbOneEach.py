@@ -111,7 +111,7 @@ def txDotDataFill(recordDictionary, csvRecord):
         #recordDictionary["title_month"]= csvRecord[x1]
         #recordDictionary["title_day"]= csvRecord[x1]
         #recordDictionary["title_year"]= csvRecord[x1]
-        #recordDictionary["collections"]=
+        #recordDictionary["collections"]= 0
         #recordDictionary["multiple"]=
         #recordDictionary["unassign"]=
         #recordDictionary["completed"]=
@@ -162,6 +162,7 @@ from TxDot_LIB import *
 
 if __name__ == '__main__':
 
+    NUMBERtoProcess =3
     delay=10
     url = 'https://mvinet.txdmv.gov'
     driver = openBrowser(url)
@@ -177,7 +178,7 @@ if __name__ == '__main__':
         #dbcursor.execute("SELECT plate FROM [list of plates 2 without matching sheet1]") # 2,3,5,6,7
         lpList = []
         loopCount = 0
-        while loopCount<2:
+        while loopCount< NUMBERtoProcess:
             lpRecord = dbcursor.fetchone()
             if lpRecord is None:
                 print "main() : Finished, no more input records."
@@ -185,10 +186,7 @@ if __name__ == '__main__':
             lpList.append(lpRecord)
             loopCount += 1
 
-        #while True:
-        #while False:  # skip this loop
         for row in lpList:
-            #row = dbcursor.fetchone()
             if row is None:
                 print "main() : Finished, no more LP's ."
                 break
@@ -228,14 +226,16 @@ if __name__ == '__main__':
                 dbRecord = txDotToDbRecord(txDotRecord, dbRecord)
                 print dbRecord # for debug
                 sql = "INSERT INTO Sheet1 (Plate, Plate_St, [Combined Name], Address, City, State, ZipCode, \
-                                           [Time Stamp], [Agent Initial], \
-                                           [Sent to Collections Agency],  Multiple, Unassign, [Completed: Yes / No Record], \
-                                           [E-Tags (Temporary Plates)], [Dealer Plates] ) \
-                                VALUES (  '{plate}', '{plate_st}', '{combined_name}', '{address}', '{city}', '{state}', '{zip}', \
-                                          '{time_stamp}', '{agent}', \
-                                          '{collections}', '{multiple}', '{unassign}', '{completed}', \
-                                          '{temp_plate}', '{dealer_plate}' ) "\
-                            .format(**dbRecord)
+                                            [Vehicle Make], [Vehicle Model], [Vehicle Body], [Vehicle Year], \
+                                            [Time Stamp], [Agent Initial], \
+                                            [Sent to Collections Agency],  Multiple, Unassign, [Completed: Yes / No Record], \
+                                            [E-Tags (Temporary Plates)], [Dealer Plates] ) \
+                            VALUES (    '{plate}', '{plate_st}', '{combined_name}', '{address}', '{city}', '{state}', '{zip}', \
+                                        '{make}', '{model}', '{body}', {vehicle_year},\
+                                        '{time_stamp}', '{agent}', \
+                                        {collections}, {multiple}, {unassign}, '{completed}', \
+                                        {temp_plate}, {dealer_plate} ) "\
+                                .format(**dbRecord)
                 dbcursor.execute(sql)
             print("Comitting changes")
             dbcursor.commit()
@@ -246,6 +246,15 @@ if __name__ == '__main__':
 # Title_Month, Title_Day, Title_Year,
 #                                                               [Sent to Collections Agency],  Multiple, Unassign, [Completed: Yes / No Record],
 #                                                               [E-Tags (Temporary Plates)], [Dealer Plates]
+
+#                           "plate":'', "plate_st":'', "combined_name":'', "address":'', "city":'', "state":'', "zip":0,
+#  "title_date":'', "start_date":'', "end_date":'' ,
+#                           "make":'' , "model":'' , "body":'' , "vehicle_year":0 ,
+#                           "images_reviewed":0, "images_corrected":0, "reason":'',
+#                           "time_stamp":'', "agent":'',
+#  "title_month":'', "title_day":'', "title_year":'',
+#                           "collections":0, "multiple":0, "unassign":0, "completed":'',
+#                           "temp_plate":0, "dealer_plate":0
 
     finally:
         print("Closing databases")
@@ -270,18 +279,13 @@ if __name__ == '__main__':
 # 's' String (converts any Python object using str()).
 # '%' No argument is converted, results in a '%' character in the result.
 
-            #dbcursor.execute("DELETE * FROM {}".format(table))
-            #rows = dbcursor.fetchall()
-            #dbfacilities = {unicode(row[1]):row[0] for row in rows}
-
+        #dbcursor.execute("DELETE * FROM {}".format(table))
+        #rows = dbcursor.fetchall()
+        #dbfacilities = {unicode(row[1]):row[0] for row in rows}
         #s7incidents = {unicode(row[0]):S7Incident(*row) for row in rows if incre.match(row[0])}
-        #s7cursor.execute("SELECT DISTINCT RAISED FROM INCIDENTS")
+        #cursor.execute("SELECT DISTINCT RAISED FROM INCIDENTS")
         #s7productions = [r[0] for r in rows]
         #s7ad1s = [S7AD1(*row) for row in rows]
-        #[p.Process(dbcursor) for p in s7financials]
-        #s7sc3s = [S7SC3(*row) for row in rows]
-        #print("Writing SC3s ({})".format(len(s7sc3s)))
-
         # do the SELECT @@IDENTITY to give us the autonumber index.
         # To make sure everything is case-insensitive convert the hash keys to UPPERCASE.
 
@@ -289,11 +293,6 @@ if __name__ == '__main__':
         #    dbcursor.execute("INSERT INTO PRODUCTIONS (PRODUCTION) VALUES ('{}')".format(p))
         #    dbcursor.execute("SELECT @@IDENTITY")
         #    dbproductions[p.upper()] = dbcursor.fetchone()[0]
-
-
-        ## Now process the incidents etc. that we have retrieved from the S7 database
-        #
-        #print("Writing incidents ({})".format(len(s7incidents)))
         #[s7incidents[k].ProcessIncident(dbcursor, dbfacilities, dbproductions) for k in sorted(s7incidents)]
 
         # Match the new parent incident IDs in the AD1s and then write to the new table. Some
@@ -339,46 +338,25 @@ class S7Incident:
      workaround,fix, handoff, lro, nlro, facility, ctas, summary, raised, code):
         self.id_incident=unicode(id_incident)
         self.priority = {u'P1':1, u'P2':2, u'P3':3, u'P4':4, u'P5':5} [unicode(priority.upper())]
-        self.begin = begin
-        self.acknowledge = acknowledge
-        self.diagnose = diagnose
-        self.workaround = workaround
         self.fix = fix
         self.handoff = True if handoff else False
-        self.lro = True if lro else False
         self.nlro = True if nlro else False
         self.facility = unicode(facility)
-        self.ctas = ctas
         self.summary = "** NONE ***" if type(summary) is NoneType else summary.replace("'","")
         self.raised = raised.replace("'","")
         self.code = 0 if code is None else code
-        self.production = None
         self.dbid = None
 
     def __repr__(self):
-        return "[{}] ID:{} P{} Prod:{} Begin:{} A:{} D:+{}s W:+{}s F:+{}s\nH/O:{} LRO:{} NLRO:{} Facility={} CTAS={}\nSummary:'{}',Raised:'{}',Code:{}".format(
-        self.id_incident,self.dbid, self.priority, self.production, self.begin,
-        self.acknowledge, self.diagnose, self.workaround, self.fix,
-        self.handoff, self.lro, self.nlro, self.facility, self.ctas,
-        self.summary, self.raised, self.code)
+        return "[{}] ID:{} P{} Prod:{} Begin:{} A:{} D:+{}s W:+{}s F:+{}s\nH/O:{} LRO:{} NLRO:{} Facility={} CTAS={}\nSummary:'{}',Raised:'{}',Code:{}"\
+            .format( self.id_incident,self.dbid, self.priority, self.production, self.begin,
+                    self.acknowledge, self.diagnose, self.workaround, self.fix,
+                    self.handoff, self.lro, self.nlro, self.facility, self.ctas,
+                    self.summary, self.raised, self.code)
 
     def ProcessIncident(self, cursor, facilities, productions):
-        """
-        Produces the SQL necessary to insert the incident in to the Access
-        database, executes it and then gets the autonumber ID (dbid) of the newly
-        created incident (this is used so LRO, NRLO CTAS and AD1 can refer to
-        their parent incident.
-
-        If the incident is classed as LRO, NLRO, CTAS then the appropriate
-        record is created. Returns the dbid.
-        """
-        if self.raised.upper() in productions:
-            self.production = productions[self.raised.upper()]
-        else:
-           self.production = 0
-
-        sql="""INSERT INTO INCIDENTS (ID_INCIDENT, PRIORITY, FACILITY, BEGIN,
-        ACKNOWLEDGE, DIAGNOSE, WORKAROUND, FIX, HANDOFF, SUMMARY, RAISED, CODE, PRODUCTION)
+        sql="""INSERT INTO INCIDENTS
+        (ID_INCIDENT, PRIORITY, FACILITY, BEGIN, ACKNOWLEDGE, DIAGNOSE, WORKAROUND, FIX, HANDOFF, SUMMARY, RAISED, CODE, PRODUCTION)
         VALUES ('{}', {}, {}, #{}#, {}, {}, {}, {}, {}, '{}', '{}', {}, {})
         """.format(self.id_incident, self.priority, facilities[self.facility], self.begin,
            self.acknowledge, self.diagnose, self.workaround, self.fix,
@@ -387,45 +365,19 @@ class S7Incident:
         cursor.execute("SELECT @@IDENTITY")
         self.dbid = cursor.fetchone()[0]
 
-        if self.lro:
-            self.ProcessLRO(cursor, facilities[self.facility])
-
-        if self.nlro:
-            self.ProcessNLRO(cursor, facilities[self.facility])
-
-        if self.ctas:
-            self.ProcessCTAS(cursor, facilities[self.facility], self.ctas)
-
-        return self.dbid
-
-
 class S7AD1:
     """
     S7.AD1 records.
     """
     def __init__(self, id_ad1, date, ref, commentary, adjustment):
-        self.id_ad1 = id_ad1
         self.date = date
         self.ref = unicode(ref)
         self.commentary = unicode(commentary)
         self.adjustment = float(adjustment)
-        self.pid = 0
-        self.production = 0
 
     def __repr__(self):
         return "[{}] Date:{} Parent:{} PID:{} Amount:{} Commentary: {} "\
            .format(self.id_ad1, self.date.strftime("%d/%m/%y"), self.ref, self.pid, self.adjustment, self.commentary)
-
-    def SetPID(self, pid):
-        self.pid = pid
-
-    def SetProduction(self, p):
-        self.production = p
-
-    def Process(self, cursor):
-        sql = "INSERT INTO AD1 (pid, begin, commentary, production, adjustment) VALUES ({}, #{}#, '{}', {}, {})"\
-          .format(self.pid, self.date.strftime("%d/%m/%y"), self.commentary, self.production, self.adjustment)
-        cursor.execute(sql)
 
 class S7Financial:
     """
@@ -455,18 +407,6 @@ class S7Financial:
         cursor.execute(sql)
 
 class S7SC3:
-    """
-    Miscellaneous S7 SC3 stuff. The new table is identical to the old one.
-    """
-    def __init__(self, begin, month, year, p1ot, p2ot, totchg, succchg, chgwithinc, fldchg, egychg):
-        self.begin = begin
-        self.p1ot = p1ot
-        self.p2ot = p2ot
-        self.changes = totchg
-        self.successful = succchg
-        self.incidents = chgwithinc
-        self.failed = fldchg
-        self.emergency = egychg
 
     def __repr__(self):
         return "{} P1:{} P2:{} CHG:{} SUC:{} INC:{} FLD:{} EGY:{}"\
