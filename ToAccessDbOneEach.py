@@ -15,10 +15,11 @@
 
 import datetime
 import pyodbc
-import re
+#import re
 import string
 import tkFileDialog
 from Tkinter import *
+from TxDot_LIB import *
 
 
 def printDbColumnNames():
@@ -61,7 +62,7 @@ def recordInit():
         "plate":'', "plate_st":'',
         "combined_name":'',
         "address":'', "city":'', "state":'', "zip":0,
-        "title_date":'', "start_date":'', "end_date":'' ,
+        "title_date":'', "start_date":'', "end_date":'',
         "make":'' , "model":'' , "body":'' , "vehicle_year":0 ,
         "images_reviewed":0, "images_corrected":0, "reason":'',
         "time_stamp":'', "agent":'',
@@ -98,7 +99,7 @@ def txDotDataFill(recordDictionary, csvRecord):
         recordDictionary['ownedStartDate']= csvRecord[8]
         recordDictionary["start_date"]= csvRecord[9]
         recordDictionary["end_date"]= csvRecord[10]
-        #recordDictionary["title_date"]= csvRecord[x1]
+        #recordDictionary["title_date"]=
         #recordDictionary["make"]= csvRecord[x1]
         #recordDictionary["model"]= csvRecord[x1]
         #recordDictionary["body"]= csvRecord[x1]
@@ -130,11 +131,12 @@ def txDotToDbRecord(txDotRec, db):
     db["city"] = txDotRec["city"]
     db["state"]= txDotRec["state"]
     if txDotRec["zip"]!='': db["zip"] = int(txDotRec["zip"])
-    db["title_date"] = txDotRec["title_date"]
-    #if txDotRec["start_date"]!='':
-    #    db["start_date"] = int(txDotRec["start_date"])
-    #if txDotRec["end_date"]!='':
-    #    db["end_date"] = int(txDotRec["end_date"])
+    #db["title_date"] = txDotRec["title_date"]
+    db["title_date"] = '1/1/1900'
+    if txDotRec["start_date"]!='': db["start_date"] = txDotRec["start_date"]
+    else: db["start_date"] = '01/01/1900'
+    if txDotRec["end_date"]!='': db["end_date"] = txDotRec["end_date"]
+    else: db["end_date"] = '01/01/1900'
     #db["make"] = txDotRec["make"]
     #db["model"] = txDotRec["model"]
     #db["body"] = txDotRec["body"]
@@ -158,11 +160,9 @@ def txDotToDbRecord(txDotRec, db):
     return db
 
 
-from TxDot_LIB import *
-
 if __name__ == '__main__':
 
-    NUMBERtoProcess =3
+    NUMBERtoProcess = 2
     delay=10
     url = 'https://mvinet.txdmv.gov'
     driver = openBrowser(url)
@@ -174,7 +174,7 @@ if __name__ == '__main__':
         #for row in dbcursor.columns(table='Sheet1'): # debug
         #    print row.column_name                    # debug
         #dbcursor.execute("SELECT * FROM Sheet1")
-        dbcursor.execute("SELECT plate FROM [list of plate 4 without matching sheet1]") #  ,4,8,9,10, '11'  ,12
+        dbcursor.execute("SELECT plate FROM [list of plate 4 without matching sheet1]") # (1),4,8,9,10, '11'  ,12
         #dbcursor.execute("SELECT plate FROM [list of plates 2 without matching sheet1]") # 2,3,5,6,7
         lpList = []
         loopCount = 0
@@ -205,7 +205,7 @@ if __name__ == '__main__':
                 except:
                     responseType = None
                     if foundCurrentPlate == False:
-                        print "\n", plate, ' Plate/Pattern not found'
+                        print plate, ' Plate/Pattern not found. Unable to resolve record type.'
                         time.sleep(3)
                     break
                 if responseType != None: # there must be a valid text record to process
@@ -226,22 +226,28 @@ if __name__ == '__main__':
                 dbRecord = txDotToDbRecord(txDotRecord, dbRecord)
                 print dbRecord # for debug
                 sql = "INSERT INTO Sheet1 (Plate, Plate_St, [Combined Name], Address, City, State, ZipCode, \
-                                            [Vehicle Make], [Vehicle Model], [Vehicle Body], [Vehicle Year], \
-                                            [Time Stamp], [Agent Initial], \
-                                            [Sent to Collections Agency],  Multiple, Unassign, [Completed: Yes / No Record], \
-                                            [E-Tags (Temporary Plates)], [Dealer Plates] ) \
+                                          [Title Date], [Start Date], [End Date], \
+                                          [Vehicle Make], [Vehicle Model], [Vehicle Body], [Vehicle Year], \
+                                          [Time Stamp], [Agent Initial], \
+                                          [Sent to Collections Agency],  Multiple, Unassign, [Completed: Yes / No Record], \
+                                          [E-Tags (Temporary Plates)], [Dealer Plates] ) \
                             VALUES (    '{plate}', '{plate_st}', '{combined_name}', '{address}', '{city}', '{state}', '{zip}', \
+                                        '{title_date}', '{start_date}', '{end_date}', \
                                         '{make}', '{model}', '{body}', {vehicle_year},\
                                         '{time_stamp}', '{agent}', \
                                         {collections}, {multiple}, {unassign}, '{completed}', \
                                         {temp_plate}, {dealer_plate} ) "\
                                 .format(**dbRecord)
+                                #[Title Date], [Start Date], [End Date], \
+                                #'{title_date}', '{start_date}', '{end_date}', \
                 dbcursor.execute(sql)
             print("Comitting changes")
             dbcursor.commit()
+# from TxDot lib --> ['response type', 'plate', 'name', 'addr', 'addr2', 'city', 'state', 'zip', 'ownedStartDate', 'startDate', 'endDate', 'issued']
+
 #                                                               Plate, Plate_St, [Combined Name], Address, City, State, ZipCode,
-# [Title Date], [Start Date], [End Date],
-# [Vehicle Make], [Vehicle Model], [Vehicle Body], [Vehicle Year],
+#                                                               [Title Date], [Start Date], [End Date],
+#                                                               [Vehicle Make], [Vehicle Model], [Vehicle Body], [Vehicle Year],
 # [Total Image Reviewed], [Total Image corrected], Reason,      [Time Stamp], [Agent Initial] \
 # Title_Month, Title_Day, Title_Year,
 #                                                               [Sent to Collections Agency],  Multiple, Unassign, [Completed: Yes / No Record],
@@ -337,6 +343,7 @@ class S7Incident:
     def __init__(self, id_incident, priority, begin, acknowledge, diagnose,
      workaround,fix, handoff, lro, nlro, facility, ctas, summary, raised, code):
         self.id_incident=unicode(id_incident)
+        # a dictionary preceeding a list-comprehension
         self.priority = {u'P1':1, u'P2':2, u'P3':3, u'P4':4, u'P5':5} [unicode(priority.upper())]
         self.fix = fix
         self.handoff = True if handoff else False

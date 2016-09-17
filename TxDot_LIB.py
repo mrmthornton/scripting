@@ -40,8 +40,8 @@ def repairLineBreaks(fileString):
     # partial-word, newline(\n) white-space, partial word, identifier(, . -)
 
     # broken ZipPlus numbers have a pattern of
-    # partial-number, optional dash(-), partial-number, newline(\n), white-space, partial-number
-    # or partial-number, newline(\n), white-space, partial-number, optional dash(-), partial-number
+    # five-numbers, dash(-), [white space], [return(\r)], newline(\n), [white-space], partial-number or
+    # partial-number, [white space], [return(\r)], newline(\n), [white-space], partial-number, dash(-), four-numbers
 
     # broken address lines ?
 
@@ -57,7 +57,8 @@ def repairLineBreaks(fileString):
             fileString = fileStringBegin + fileStringMiddle + fileStringEnd
         else:
             break
-    numberBreakPattern = re.compile(r'\d{5,5}-\d*\n *\d+|\d+\n *\d*-\d{4,4}') # find broken ZipPlus
+    #numberBreakPattern = re.compile(r'\d{5,5}-\d*\n *\d+|\d+\n *\d*-\d{4,4}',re.MULTILINE) # find broken ZipPlus
+    numberBreakPattern = re.compile(r'\d+ *\r\n *\d*-\d{4,4}',re.MULTILINE) # find broken ZipPlus
     zipPlusPattern = re.compile(r'\d{5,5}-\d{4,4}')
     zipCodePattern = re.compile(r'\d{5,5}')
     while True:
@@ -186,7 +187,7 @@ def findResponseType(plate, fileString):
     canceledStartPattern = re.compile('LIC ' + '[A-Z0-9]+' + ' [A-Z]{3,3}' + '/' '[0-9]{4,4}')
     canceledEndPattern = re.compile('TITLE' + '[.]')
     found = canceledPattern.search(fileString)
-    foundtemp = found.group()     # found at least one cancelel pattern
+    #foundtemp = found.group()     # found at least one cancelel pattern  # is this needed?
     # examine all start-positions for closest, but not past canceled-position
     if found != None:
         startCancel = found.start()
@@ -208,7 +209,7 @@ def findResponseType(plate, fileString):
 
 # parseRecord() calls the appropriate 'parse<RESPONSETYPE>()',
 # which returns a list of strings as follows:
-# ['response type', 'plate', 'name', 'addr', 'apt', 'city', 'state', 'zip', 'owned']
+# ['response type', 'plate', 'name', 'addr', 'addr2', 'city', 'state', 'zip', 'ownedStartDate', 'startDate', 'endDate', 'issued']
 # Other than 'response type' and 'plate', the strings may be empty.
 def parseRecord(responseType, typeString):
     if responseType == 'NORECORD':
@@ -379,7 +380,6 @@ def parseStandard(responseType, typeString):
             city = Rcity
             state = Rstate
             zip = Rzip
-    #print [responseType, plate, reg_dt, name, name2, addr, addr2, city, state, zip, ownedStartDate]
     return [responseType, plate.strip(), name.strip(), addr.strip(), addr2.strip(), city.strip(), state.strip(), zip, ownedStartDate, '', '', '']
 
 def parseTxirp(responseType, typeString):
@@ -587,7 +587,7 @@ def query(driver, delay, plate):
     plateSubmitElement = findElementOnPage(driver, delay, plateSubmitLocator)
 
     if plateSubmitElement is None:
-        print "query: plate submission element not found on page"
+        print "query: plate submission form not found on page"
         return None
     plateSubmitElement.clear()
     plateSubmitElement.send_keys(plate)
@@ -601,8 +601,20 @@ def query(driver, delay, plate):
         textElement = findElementOnPage(driver, delay, elemLocator)
         uText = textElement.text
     except TimeoutException:
-        print "ERROR: record LP may not match input LP"
+        print "ERROR: Timeout, record LP may not match input LP"
         return None
     plateSubmitElement.clear() # does this need to be cleaned to be found?
     return str(uText)
+
+if __name__ == "__main__":
+    # TEST 'repairLineBreaks()
+    lpList = ['06D3951', '06D5330', '06D5884', '05Y7722']
+    with open('temp.txt', 'r') as infile:
+        text = infile.read()
+        print text
+        text = repairLineBreaks(text)
+        print text
+        for lp in lpList:
+            result = findResponseType('06D3951', text)
+            if result is not None: print result[0]
 
