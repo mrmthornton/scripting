@@ -228,39 +228,41 @@ if __name__ == '__main__':
                 sql = "INSERT INTO Sheet1 (Plate, Plate_St, [Combined Name], Address, City, State, ZipCode, \
                                           [Title Date], [Start Date], [End Date], \
                                           [Vehicle Make], [Vehicle Model], [Vehicle Body], [Vehicle Year], \
+                                          [Total Image Reviewed], [Total Image corrected], Reason, \
                                           [Time Stamp], [Agent Initial], \
                                           [Sent to Collections Agency],  Multiple, Unassign, [Completed: Yes / No Record], \
                                           [E-Tags (Temporary Plates)], [Dealer Plates] ) \
                             VALUES (    '{plate}', '{plate_st}', '{combined_name}', '{address}', '{city}', '{state}', '{zip}', \
                                         '{title_date}', '{start_date}', '{end_date}', \
                                         '{make}', '{model}', '{body}', {vehicle_year},\
+                                        '{images_reviewed}', '{images_corrected}', '{reason}', \
                                         '{time_stamp}', '{agent}', \
-                                        {collections}, {multiple}, {unassign}, '{completed}', \
-                                        {temp_plate}, {dealer_plate} ) "\
+                                         {collections}, {multiple}, {unassign}, '{completed}', \
+                                         {temp_plate}, {dealer_plate} ) "\
                                 .format(**dbRecord)
-                                #[Title Date], [Start Date], [End Date], \
-                                #'{title_date}', '{start_date}', '{end_date}', \
                 dbcursor.execute(sql)
             print("Comitting changes")
             dbcursor.commit()
+
 # from TxDot lib --> ['response type', 'plate', 'name', 'addr', 'addr2', 'city', 'state', 'zip', 'ownedStartDate', 'startDate', 'endDate', 'issued']
 
-#                                                               Plate, Plate_St, [Combined Name], Address, City, State, ZipCode,
-#                                                               [Title Date], [Start Date], [End Date],
-#                                                               [Vehicle Make], [Vehicle Model], [Vehicle Body], [Vehicle Year],
-# [Total Image Reviewed], [Total Image corrected], Reason,      [Time Stamp], [Agent Initial] \
-# Title_Month, Title_Day, Title_Year,
-#                                                               [Sent to Collections Agency],  Multiple, Unassign, [Completed: Yes / No Record],
-#                                                               [E-Tags (Temporary Plates)], [Dealer Plates]
-
-#                           "plate":'', "plate_st":'', "combined_name":'', "address":'', "city":'', "state":'', "zip":0,
-#  "title_date":'', "start_date":'', "end_date":'' ,
-#                           "make":'' , "model":'' , "body":'' , "vehicle_year":0 ,
-#                           "images_reviewed":0, "images_corrected":0, "reason":'',
-#                           "time_stamp":'', "agent":'',
-#  "title_month":'', "title_day":'', "title_year":'',
-#                           "collections":0, "multiple":0, "unassign":0, "completed":'',
-#                           "temp_plate":0, "dealer_plate":0
+"""  ALMOST FULL WRITE TO DATABASE missing title day, month, year -->  this will never happen. some fields are exclusive of others. """
+'''             sql = "INSERT INTO Sheet1 (Plate, Plate_St, [Combined Name], Address, City, State, ZipCode, \
+                                          [Title Date], [Start Date], [End Date], \
+                                          [Vehicle Make], [Vehicle Model], [Vehicle Body], [Vehicle Year], \
+                                          [Total Image Reviewed], [Total Image corrected], Reason, \
+                                          [Time Stamp], [Agent Initial], \
+                                          [Sent to Collections Agency],  Multiple, Unassign, [Completed: Yes / No Record], \
+                                          [E-Tags (Temporary Plates)], [Dealer Plates] ) \
+                            VALUES (    '{plate}', '{plate_st}', '{combined_name}', '{address}', '{city}', '{state}', '{zip}', \
+                                        '{title_date}', '{start_date}', '{end_date}', \
+                                        '{make}', '{model}', '{body}', {vehicle_year},\
+                                        '{images_reviewed}', '{images_corrected}', '{reason}', \
+                                        '{time_stamp}', '{agent}', \
+                                         {collections}, {multiple}, {unassign}, '{completed}', \
+                                         {temp_plate}, {dealer_plate} ) "\
+                                .format(**dbRecord)
+'''
 
     finally:
         print("Closing databases")
