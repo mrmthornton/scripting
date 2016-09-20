@@ -57,6 +57,35 @@ def ConnectToAccessFile():
         return connectedDB, dbcursor
 
 
+def makeSqlString(dictStruct):
+    sql = "INSERT INTO Sheet1 (Plate, Plate_St, [Combined Name], Address, City, State"
+    sval = " VALUES ( '{plate}', '{plate_st}', '{combined_name}', '{address}', '{city}', '{state}'"
+    #if dictStruct["zip"]!= 0:
+    sql = sql + ", ZipCode"
+    sval = sval + ", '{zip}'"
+    #if dictStruct["title_date"]!= 0:
+    sql = sql + ", [Title Date]"
+    sval = sval + ", '{title_date}'"
+    #if dictStruct["start_date"]==0:
+    sql = sql + ", [Start Date], [End Date]"
+    sval = sval + ", '{start_date}', '{end_date}'"
+    sql = sql + ", [Vehicle Make], [Vehicle Model], [Vehicle Body]"
+    sval = sval + ", '{make}', '{model}', '{body}'"
+    #if dictStruct["vehicle_year"]==0:
+    sql = sql + ", [Vehicle Year]"
+    sval = sval + ", {vehicle_year}"
+    sql = sql + ", [Total Image Reviewed], [Total Image corrected], Reason, \
+                [Time_Stamp], [Agent Initial], \
+                [Sent to Collections Agency],  Multiple, Unassign, [Completed: Yes / No Record], \
+                [E-Tags (Temporary Plates)], [Dealer Plates] )"
+    sval = sval + ", '{images_reviewed}', '{images_corrected}', '{reason}', \
+                 '{time_stamp}', '{agent}', \
+                  {collections}, {multiple}, {unassign}, '{completed}', \
+                  {temp_plate}, {dealer_plate} )"
+    return sql + sval
+
+
+
 def recordInit():
     recordDictionary = {
         "plate":'', "plate_st":'',
@@ -103,7 +132,7 @@ def txDotDataFill(recordDictionary, csvRecord):
         #recordDictionary["make"]= csvRecord[x1]
         #recordDictionary["model"]= csvRecord[x1]
         #recordDictionary["body"]= csvRecord[x1]
-        #recordDictionary["vehicle_year"]= csvRecord[x1]
+        recordDictionary["vehicle_year"]= 0
         #recordDictionary["images_reviewed"]= csvRecord[x1]
         #recordDictionary["images_corrected"]= csvRecord[x1]
         #recordDictionary["reason"]= csvRecord[x1]
@@ -132,11 +161,11 @@ def txDotToDbRecord(txDotRec, db):
     db["state"]= txDotRec["state"]
     if txDotRec["zip"]!='': db["zip"] = int(txDotRec["zip"])
     #db["title_date"] = txDotRec["title_date"]
-    db["title_date"] = '1/1/1900'
+    db["title_date"] = 0
     if txDotRec["start_date"]!='': db["start_date"] = txDotRec["start_date"]
-    else: db["start_date"] = '01/01/1900'
+    else: db["start_date"] = 0
     if txDotRec["end_date"]!='': db["end_date"] = txDotRec["end_date"]
-    else: db["end_date"] = '01/01/1900'
+    else: db["end_date"] = 0
     #db["make"] = txDotRec["make"]
     #db["model"] = txDotRec["model"]
     #db["body"] = txDotRec["body"]
@@ -174,7 +203,7 @@ if __name__ == '__main__':
         #for row in dbcursor.columns(table='Sheet1'): # debug
         #    print row.column_name                    # debug
         #dbcursor.execute("SELECT * FROM Sheet1")
-        dbcursor.execute("SELECT plate FROM [list of plate 4 without matching sheet1]") # (1),4,8,9,10, '11'  ,12
+        dbcursor.execute("SELECT plate FROM [list of plate 11 without matching sheet1]") # (1),4,8,9,10, '11'  ,12
         #dbcursor.execute("SELECT plate FROM [list of plates 2 without matching sheet1]") # 2,3,5,6,7
         lpList = []
         loopCount = 0
@@ -225,33 +254,35 @@ if __name__ == '__main__':
                 dbRecord = recordInit()
                 dbRecord = txDotToDbRecord(txDotRecord, dbRecord)
                 print dbRecord # for debug
-                sql = "INSERT INTO Sheet1 (Plate, Plate_St, [Combined Name], Address, City, State, ZipCode, \
-                                          [Title Date], [Start Date], [End Date], \
-                                          [Vehicle Make], [Vehicle Model], [Vehicle Body], [Vehicle Year], \
-                                          [Total Image Reviewed], [Total Image corrected], Reason, \
-                                          [Time Stamp], [Agent Initial], \
-                                          [Sent to Collections Agency],  Multiple, Unassign, [Completed: Yes / No Record], \
-                                          [E-Tags (Temporary Plates)], [Dealer Plates] ) \
-                            VALUES (    '{plate}', '{plate_st}', '{combined_name}', '{address}', '{city}', '{state}', '{zip}', \
-                                        '{title_date}', '{start_date}', '{end_date}', \
-                                        '{make}', '{model}', '{body}', {vehicle_year},\
-                                        '{images_reviewed}', '{images_corrected}', '{reason}', \
-                                        '{time_stamp}', '{agent}', \
-                                         {collections}, {multiple}, {unassign}, '{completed}', \
-                                         {temp_plate}, {dealer_plate} ) "\
-                                .format(**dbRecord)
+                sql = makeSqlString(dbRecord)
+                print sql
+                sql.format(**dbRecord)
+                #sql = "INSERT INTO Sheet1 (Plate, Plate_St, [Combined Name], Address, City, State, ZipCode, \
+                #                          [Title Date], [Start Date], [End Date], \
+                #                          [Vehicle Make], [Vehicle Model], [Vehicle Body], [Vehicle Year], \
+                #                          [Total Image Reviewed], [Total Image corrected], Reason, \
+                #                          [Time_Stamp], [Agent Initial], \
+                #                          [Sent to Collections Agency],  Multiple, Unassign, [Completed: Yes / No Record], \
+                #                          [E-Tags (Temporary Plates)], [Dealer Plates] ) \
+                #            VALUES (    '{plate}', '{plate_st}', '{combined_name}', '{address}', '{city}', '{state}', '{zip}', \
+                #                        '{title_date}', '{start_date}', '{end_date}', \
+                #                        '{make}', '{model}', '{body}', {vehicle_year},\
+                #                        '{images_reviewed}', '{images_corrected}', '{reason}', \
+                #                        '{time_stamp}', '{agent}', \
+                #                         {collections}, {multiple}, {unassign}, '{completed}', \
+                #                         {temp_plate}, {dealer_plate} ) "\
+                #                .format(**dbRecord)
                 dbcursor.execute(sql)
             print("Comitting changes")
             dbcursor.commit()
 
 # from TxDot lib --> ['response type', 'plate', 'name', 'addr', 'addr2', 'city', 'state', 'zip', 'ownedStartDate', 'startDate', 'endDate', 'issued']
-
-"""  ALMOST FULL WRITE TO DATABASE missing title day, month, year -->  this will never happen. some fields are exclusive of others. """
-'''             sql = "INSERT INTO Sheet1 (Plate, Plate_St, [Combined Name], Address, City, State, ZipCode, \
+#"""  ALMOST FULL WRITE TO DATABASE missing title day, month, year -->  this will never happen. some fields are exclusive of others. """
+            '''             sql = "INSERT INTO Sheet1 (Plate, Plate_St, [Combined Name], Address, City, State, ZipCode, \
                                           [Title Date], [Start Date], [End Date], \
                                           [Vehicle Make], [Vehicle Model], [Vehicle Body], [Vehicle Year], \
                                           [Total Image Reviewed], [Total Image corrected], Reason, \
-                                          [Time Stamp], [Agent Initial], \
+                                          [Time_Stamp], [Agent Initial], \
                                           [Sent to Collections Agency],  Multiple, Unassign, [Completed: Yes / No Record], \
                                           [E-Tags (Temporary Plates)], [Dealer Plates] ) \
                             VALUES (    '{plate}', '{plate_st}', '{combined_name}', '{address}', '{city}', '{state}', '{zip}', \
