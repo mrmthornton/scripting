@@ -27,136 +27,6 @@ import sys
 import string
 import time
 
-def googleValues():
-    parameters = {
-    'delay' : 5,
-    'url' : 'http://www.google.com', # initial URL
-    'operatorMessage' : "Google test: no operator actions needed.",
-    'startPageTextLocator' : (By.XPATH,'//input[@value = "Google Search"]'),
-    'startPageVerifyText' : '',
-    'inputLocator' : (By.XPATH,'//input[@name="q"]'),
-    'staleLocator' : None,
-    'staleLocator2' : None,
-    #'buttonLocator' : None,
-    'buttonLocator' : (By.XPATH,'//button[@value="Search"]'),
-    'frameParamters' : {'useFrames' : False},
-    'resultPageTextLocator' : (By.XPATH, '//TD/H1'),
-    'resultPageVerifyText' : '',
-    'outputLocator' : (By.XPATH, '//div[@id="resultStats"][contains(text(),"About")]'),
-    'resultIndexParameters' : {'regex' : "About ([0-9,]+) ", 'selector' : 'tail'},  # head, tail, or all
-    'dataInFileName' : 'google.csv',
-    'dataOutFileName' : 'output.txt',
-    'returnOrClick' : 'return', # use Return or Click to submit form
-    }
-    return parameters
-
-def sigmaAldrichValues():
-    parameters = {
-    'delay' : 5,
-    'url' : 'http://www.sigmaaldrich.com/united-states.html', # initial URL
-    'operatorMessage' : "sigmaaldrich test run:  no operator actions needed.",
-    'startPageTextLocator' : (By.XPATH, '//a'),
-    'startPageVerifyText' : 'Hello. Sign in.',
-    'inputLocator' : (By.XPATH,'//input[@name = "Query"]'),
-    'staleLocator' : (By.XPATH,'//A[contains(text(),"query?")]'),
-    'buttonLocator' : None,
-    'frameParamters' : {'useFrames' : False},
-    'resultPageTextLocator' : (By.XPATH, '//p[contains(text(),"matches found for")]'),
-    'resultPageVerifyText' : '',
-    'outputLocator' : (By.XPATH, '//p[@class="resultsFoundText"]'),
-    'resultIndexParameters' : {'index' : "matches found for", 'selector' : 'tail'},  # head, tail, or all
-    'dataInFileName' : 'plates.csv',
-    'dataOutFileName' : 'platesOut.txt',
-    'returnOrClick' : 'return', # use Return or Click to submit form
-    }
-    return parameters
-
-def hntbValues():
-    parameters = {
-    'delay' : 5,
-    'url' : 'http://www.hntb.com', # initial URL
-    'operatorMessage' : "HNTB test run:  run in debug mode, click magnifying glass.",
-    'startPageTextLocator' : (By.XPATH, '//h2'),
-    'startPageVerifyText' : 'About HNTB',
-    'inputLocator' : (By.XPATH,'//input[@name = "s"]'),
-    'staleLocator' : None,
-    'staleLocator2' : None,
-    'buttonLocator' : None,
-    'frameParamters' : {'useFrames' : False},
-    'resultPageTextLocator' : (By.XPATH, '//TITLE'),
-    'resultPageVerifyText' : 'Search Result',
-    'outputLocator' : (By.ID, "resultStats"),
-    'resultIndexParameters' : {'regex' : " Results", 'selector' : 'tail'},  # head, tail, or all
-    'dataInFileName' : 'plates.csv',
-    'dataOutFileName' : 'platesOut.txt',
-    'returnOrClick' : 'return', # use Return or Click to submit form
-    }
-    return parameters
-
-def ciscoValues():
-    parameters = {
-    'delay' : 5,
-    'url' : 'http://www.cisco.com/univercd/cc/td/doc/product/voice/c_ipphone/index.html', # initial URL
-    'operatorMessage' : "Cisco test: no operator actions needed.",
-    'startPageTextLocator' : (By.XPATH, '(//DIV/H1[@class="title-section"] | //div/h1[@class="title-section title-section-only"])'),
-    'startPageVerifyText' : '404 Page Not Found',
-    'inputLocator' : (By.XPATH, '(//input[@id = "searchPhrase"] | //input[@id = "search-Phrase search-Phrase-only"])'),
-    'staleLocator' : None,
-    'buttonLocator' : None,
-    'frameParamters' : {'useFrames' : False},
-    'resultPageTextLocator' : (By.XPATH, '//H2[@class="title-page"]'),
-    'resultPageVerifyText' : 'Search Results',
-    'outputLocator' : (By.CLASS_NAME,'searchStatus'),
-    'resultIndexParameters' : {'index' : "of ", 'selector' : 'tail'},  # head, tail, or all
-    'dataInFileName' : 'plates.csv',
-    'dataOutFileName' : 'platesOut.txt',
-    'returnOrClick' : 'return', # use Return or Click to submit form
-    }
-    return parameters
-
-def theInternetNavigate():
-    parameters = {
-    'delay' : 10,
-    'url' : 'http://the-internet.herokuapp.com/dynamic_controls', # initial URL
-    'operatorMessage' : "the-internet test: no operator actions needed.",
-    'startPageTextLocator' : (By.XPATH, '//H4[contains(text(), "Dynamic Controls")]'),
-    'startPageVerifyText' : '',
-    'inputLocator' : None,
-    'staleLocator' : (By.XPATH, '(//button[contains(text(),"Remove")] | //button[contains(text(),"Add")])'),
-    'buttonLocator' : (By.XPATH, '//button[@id="btn"]'),
-    'frameParamters' : {'useFrames' : False },
-    'resultPageTextLocator' : (By.XPATH, '//input[@id="checkbox"]'),
-    'resultPageVerifyText' : None,
-    'outputLocator' : None,
-    'resultIndexParameters' : {'index' : '', 'selector' : ''},  # head, tail, or all
-    'dataInFileName' : 'google.csv',
-    'dataOutFileName' : 'output.txt',
-    'returnOrClick' : 'click', # use Return or Click to submit form
-    }
-    return parameters
-
-def theInternetFrames():
-    parameters = {
-    'delay' : 5,
-    'url' : 'http://the-internet.herokuapp.com/nested_frames', # initial URL
-    'operatorMessage' : "the-internet test: no operator actions needed.",
-    'startPageTextLocator' : (By.XPATH, '//frameset'),
-    'startPageVerifyText' : '',
-    'inputLocator' : None,
-    'staleLocator' : None,
-    'buttonLocator' : None,
-    'frameParamters' : {'useFrames' : True, 'frameLocator' : [(By.XPATH, '//frame[@name="skipThisOne"]'),
-                                                              (By.XPATH, '//frame[@name="frameX-top"]'),
-                                                              (By.XPATH, '//frame[@name="frame-bottom"]')]},
-    'resultPageTextLocator' : (By.XPATH, '//frame[@name="frame-top"]'),
-    'resultPageVerifyText' : None,
-    'outputLocator' : None,
-    'resultIndexParameters' : {'index' : "", 'selector' : ''},  # head, tail, or all
-    'dataInFileName' : 'google.csv',
-    'dataOutFileName' : 'output.txt',
-    'returnOrClick' : 'click', # use Return or Click to submit form
-    }
-    return parameters
 
 def violatorSearch():
     parameters = {
@@ -220,18 +90,15 @@ def dataIO(driver, parameters):
 
 if __name__ == '__main__':
 
-    parameters = googleValues()# can't google from production.
-    #parameters = sigmaAldrichValues()
-    #parameters = hntbValues()
-    #parameters = ciscoValues() # should work on production systems
-    #parameters = theInternetNavigate()
-    #parameters = theInternetFrames()
     parameters = violatorSearch()
 
     findStartWindowDelay = 3
     print parameters['operatorMessage']
     regexPattens = loadRegExPatterns()
-    driver = openBrowser(parameters['url'])
-    dataIO(driver, parameters)
-    driver.close()
+    try:
+        driver = openBrowser(parameters['url'])
+        dataIO(driver, parameters)
+    finally:
+        driver.close()
+        driver.quit()
 

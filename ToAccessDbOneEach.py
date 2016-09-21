@@ -161,11 +161,11 @@ def txDotToDbRecord(txDotRec, db):
     db["state"]= txDotRec["state"]
     if txDotRec["zip"]!='': db["zip"] = int(txDotRec["zip"])
     #db["title_date"] = txDotRec["title_date"]
-    db["title_date"] = 0
+    db["title_date"] = '1/1/1900'
     if txDotRec["start_date"]!='': db["start_date"] = txDotRec["start_date"]
-    else: db["start_date"] = 0
+    else: db["start_date"] = '1/1/1900'
     if txDotRec["end_date"]!='': db["end_date"] = txDotRec["end_date"]
-    else: db["end_date"] = 0
+    else: db["end_date"] = '1/1/1900'
     #db["make"] = txDotRec["make"]
     #db["model"] = txDotRec["model"]
     #db["body"] = txDotRec["body"]
@@ -191,7 +191,7 @@ def txDotToDbRecord(txDotRec, db):
 
 if __name__ == '__main__':
 
-    NUMBERtoProcess = 2
+    NUMBERtoProcess = 20
     delay=10
     url = 'https://mvinet.txdmv.gov'
     driver = openBrowser(url)
@@ -254,24 +254,32 @@ if __name__ == '__main__':
                 dbRecord = recordInit()
                 dbRecord = txDotToDbRecord(txDotRecord, dbRecord)
                 print dbRecord # for debug
-                sql = makeSqlString(dbRecord)
-                print sql
-                sql.format(**dbRecord)
+                # #sql = makeSqlString(dbRecord)
+                # #print sql
+                # #sql.format(**dbRecord)
+                sql = "INSERT INTO Sheet1 (Plate, Plate_St, [Combined Name], Address, City, State, ZipCode, \
+                                          [Title Date], [Start Date], [End Date], \
+                                          [Vehicle Make], [Vehicle Model], [Vehicle Body], [Vehicle Year], \
+                                          [Total Image Reviewed], [Total Image corrected], Reason, \
+                                          [Time_Stamp], [Agent Initial], \
+                                          [Sent to Collections Agency],  Multiple, Unassign, [Completed: Yes / No Record], \
+                                          [E-Tags (Temporary Plates)], [Dealer Plates] \
+                                          ) \
+                            VALUES (    '{plate}', '{plate_st}', '{combined_name}', '{address}', '{city}', '{state}', {zip}, \
+                                        '{title_date}', '{start_date}', '{end_date}', \
+                                        '{make}', '{model}', '{body}', {vehicle_year},\
+                                         {images_reviewed}, {images_corrected}, '{reason}', \
+                                        '{time_stamp}', '{agent}', \
+                                         {collections}, {multiple}, {unassign}, '{completed}', \
+                                         {temp_plate}, {dealer_plate} \
+                                         ) ".format(**dbRecord)
                 #sql = "INSERT INTO Sheet1 (Plate, Plate_St, [Combined Name], Address, City, State, ZipCode, \
-                #                          [Title Date], [Start Date], [End Date], \
-                #                          [Vehicle Make], [Vehicle Model], [Vehicle Body], [Vehicle Year], \
-                #                          [Total Image Reviewed], [Total Image corrected], Reason, \
-                #                          [Time_Stamp], [Agent Initial], \
-                #                          [Sent to Collections Agency],  Multiple, Unassign, [Completed: Yes / No Record], \
-                #                          [E-Tags (Temporary Plates)], [Dealer Plates] ) \
-                #            VALUES (    '{plate}', '{plate_st}', '{combined_name}', '{address}', '{city}', '{state}', '{zip}', \
-                #                        '{title_date}', '{start_date}', '{end_date}', \
-                #                        '{make}', '{model}', '{body}', {vehicle_year},\
-                #                        '{images_reviewed}', '{images_corrected}', '{reason}', \
-                #                        '{time_stamp}', '{agent}', \
-                #                         {collections}, {multiple}, {unassign}, '{completed}', \
-                #                         {temp_plate}, {dealer_plate} ) "\
-                #                .format(**dbRecord)
+                #                          [Title Date], [Start Date], [End Date] \
+                #                          ) \
+                #            VALUES (    '{plate}', '{plate_st}', '{combined_name}', '{address}', '{city}', '{state}', {zip}, \
+                #                        '{title_date}', '{start_date}', '{end_date}' \
+                #                         ) ".format(**dbRecord)
+                '''"title_month":'', "title_day":'', "title_year":'','''   # where is this added ?
                 dbcursor.execute(sql)
             print("Comitting changes")
             dbcursor.commit()
