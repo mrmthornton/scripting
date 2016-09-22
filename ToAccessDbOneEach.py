@@ -62,7 +62,7 @@ def makeSqlString(dictStruct):
     sval = " VALUES ( '{plate}', '{plate_st}', '{combined_name}', '{address}', '{city}', '{state}'"
     #if dictStruct["zip"]!= 0:
     sql = sql + ", ZipCode"
-    sval = sval + ", '{zip}'"
+    sval = sval + ", {zip}"
     #if dictStruct["title_date"]!= 0:
     sql = sql + ", [Title Date]"
     sval = sval + ", '{title_date}'"
@@ -191,7 +191,7 @@ def txDotToDbRecord(txDotRec, db):
 
 if __name__ == '__main__':
 
-    NUMBERtoProcess = 20
+    NUMBERtoProcess = 3
     delay=10
     url = 'https://mvinet.txdmv.gov'
     driver = openBrowser(url)
@@ -254,10 +254,10 @@ if __name__ == '__main__':
                 dbRecord = recordInit()
                 dbRecord = txDotToDbRecord(txDotRecord, dbRecord)
                 print dbRecord # for debug
-                # #sql = makeSqlString(dbRecord)
-                # #print sql
-                # #sql.format(**dbRecord)
-                sql = "INSERT INTO Sheet1 (Plate, Plate_St, [Combined Name], Address, City, State, ZipCode, \
+                sql = makeSqlString(dbRecord)
+                print sql
+                sql.format(**dbRecord)
+                """sql = "INSERT INTO Sheet1 (Plate, Plate_St, [Combined Name], Address, City, State, ZipCode, \
                                           [Title Date], [Start Date], [End Date], \
                                           [Vehicle Make], [Vehicle Model], [Vehicle Body], [Vehicle Year], \
                                           [Total Image Reviewed], [Total Image corrected], Reason, \
@@ -272,13 +272,7 @@ if __name__ == '__main__':
                                         '{time_stamp}', '{agent}', \
                                          {collections}, {multiple}, {unassign}, '{completed}', \
                                          {temp_plate}, {dealer_plate} \
-                                         ) ".format(**dbRecord)
-                #sql = "INSERT INTO Sheet1 (Plate, Plate_St, [Combined Name], Address, City, State, ZipCode, \
-                #                          [Title Date], [Start Date], [End Date] \
-                #                          ) \
-                #            VALUES (    '{plate}', '{plate_st}', '{combined_name}', '{address}', '{city}', '{state}', {zip}, \
-                #                        '{title_date}', '{start_date}', '{end_date}' \
-                #                         ) ".format(**dbRecord)
+                                         ) ".format(**dbRecord)"""
                 '''"title_month":'', "title_day":'', "title_year":'','''   # where is this added ?
                 dbcursor.execute(sql)
             print("Comitting changes")
