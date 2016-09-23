@@ -72,7 +72,7 @@ def makeSqlString(dictStruct):
         sval.append(", '{start_date}', '{end_date}'")
         sql.append(", [Vehicle Make], [Vehicle Model], [Vehicle Body]")
         sval.append(", '{make}', '{model}', '{body}'")
-    if dictStruct["vehicle_year"]==0:
+    if dictStruct["vehicle_year"]!=0:
         sql.append(", [Vehicle Year]")
         sval.append(", {vehicle_year}")
     sql.append(", [Total Image Reviewed], [Total Image corrected], Reason, \
@@ -196,14 +196,12 @@ if __name__ == '__main__':
     url = 'https://mvinet.txdmv.gov'
     driver = openBrowser(url)
 
-    incre = re.compile("INC\d{12}[A-Z]?") # Regex that matches incident references
-
     try:
         dbConnect, dbcursor = ConnectToAccessFile()
         #for row in dbcursor.columns(table='Sheet1'): # debug
         #    print row.column_name                    # debug
         #dbcursor.execute("SELECT * FROM Sheet1")
-        dbcursor.execute("SELECT plate FROM [list of plate 11 without matching sheet1]") # (1),4,8,9,10, '11'  ,12
+        dbcursor.execute("SELECT plate FROM [list of plate 4 without matching sheet1]") # (1),4,8,9,10, '11'  ,12
         #dbcursor.execute("SELECT plate FROM [list of plates 2 without matching sheet1]") # 2,3,5,6,7
         lpList = []
         loopCount = 0
@@ -220,6 +218,18 @@ if __name__ == '__main__':
                 print "main() : Finished, no more LP's ."
                 break
             plate = str(row[0])
+
+#            #VPS section
+#            startPageTextLocator = (By.XPATH, '//TD/H1[contains(text(),"Violation Search")]')
+#            # pause on next line for entry of credentials, and window navigation.
+#            ##startWindow = findTargetPage(driver, findStartWindowDelay, startPageTextLocator, "mainframe")
+#            startWindow = findTargetPage(driver, findStartWindowDelay, startPageTextLocator)
+#            if startWindow is None:
+#                print "Start Page not found."
+#                return None
+
+
+            #TXDOT section
             results = query(driver, delay, plate)
             if results is not None:
                 #print results # for debug
@@ -246,16 +256,17 @@ if __name__ == '__main__':
                     listData = parseRecord(responseType, typeString)
                     # make txdot data record here
                     recordList.append(listData)
-                    print listData
+                    #print listData # for debug
                     assert(len(listData)==12)
 
+            # Database section
             for csvRecord in recordList:
                 txDotRecord = txDotDataFill(txDotDataInit(), csvRecord)
                 dbRecord = recordInit()
                 dbRecord = txDotToDbRecord(txDotRecord, dbRecord)
                 print dbRecord # for debug
                 sqlString = makeSqlString(dbRecord)
-                print sqlString
+                #print sqlString # for debug
                 sql = sqlString.format(**dbRecord)
                 """sql = "INSERT INTO Sheet1 (Plate, Plate_St, [Combined Name], Address, City, State, ZipCode, \
                                           [Title Date], [Start Date], [End Date], \
@@ -304,40 +315,13 @@ if __name__ == '__main__':
 # 's' String (converts any Python object using str()).
 # '%' No argument is converted, results in a '%' character in the result.
 
-        #dbcursor.execute("DELETE * FROM {}".format(table))
-        #rows = dbcursor.fetchall()
-        #dbfacilities = {unicode(row[1]):row[0] for row in rows}
-        #s7incidents = {unicode(row[0]):S7Incident(*row) for row in rows if incre.match(row[0])}
-        #cursor.execute("SELECT DISTINCT RAISED FROM INCIDENTS")
-        #s7productions = [r[0] for r in rows]
-        #s7ad1s = [S7AD1(*row) for row in rows]
-        # do the SELECT @@IDENTITY to give us the autonumber index.
-        # To make sure everything is case-insensitive convert the hash keys to UPPERCASE.
-
-        #for p in sorted(s7productions):
-        #    dbcursor.execute("INSERT INTO PRODUCTIONS (PRODUCTION) VALUES ('{}')".format(p))
-        #    dbcursor.execute("SELECT @@IDENTITY")
-        #    dbproductions[p.upper()] = dbcursor.fetchone()[0]
-        #[s7incidents[k].ProcessIncident(dbcursor, dbfacilities, dbproductions) for k in sorted(s7incidents)]
-
-        # Match the new parent incident IDs in the AD1s and then write to the new table. Some
-        # really old AD1s don't have the parent incident reference in the REF field, it is just
-        # mentioned SOMEWHERE in the commentary. So if the REF field doesn't match then do a
-        # re.search (not re.match!) for it. It isn't essential to match these older AD1s with
-        # their parent incident, but it is quite useful (and tidy).
-
-        #print("Matching and writing AD1s".format(len(s7ad1s)))
-        #for a in s7ad1s:
-        #    if a.ref in s7incidents:
-        #        a.SetPID(s7incidents[a.ref].dbid)
-        #        a.SetProduction(s7incidents[a.ref].production)
-        #    else:
-        #        z=incre.search(a.commentary)
-        #        if z and z.group() in s7incidents:
-        #            a.SetPID(s7incidents[z.group()].dbid)
-        #            a.SetProduction(s7incidents[z.group()].production)
-        #    a.Process(dbcursor)
-
+#dbcursor.execute("DELETE * FROM {}".format(table))
+#rows = dbcursor.fetchall()
+#dbfacilities = {unicode(row[1]):row[0] for row in rows}
+#s7incidents = {unicode(row[0]):S7Incident(*row) for row in rows if incre.match(row[0])}
+#cursor.execute("SELECT DISTINCT RAISED FROM INCIDENTS")
+#s7ad1s = [S7AD1(*row) for row in rows]
+# do the SELECT @@IDENTITY to give us the autonumber index.
 
 '''
 
@@ -374,7 +358,8 @@ class S7Incident:
         self.dbid = None
 
     def __repr__(self):
-        return "[{}] ID:{} P{} Prod:{} Begin:{} A:{} D:+{}s W:+{}s F:+{}s\nH/O:{} LRO:{} NLRO:{} Facility={} CTAS={}\nSummary:'{}',Raised:'{}',Code:{}"\
+        return "[{}] ID:{} P{} Prod:{} Begin:{} \
+    A:{} D:+{}s W:+{}s F:+{}s\nH/O:{} LRO:{} NLRO:{} Facility={} CTAS={}\nSummary:'{}',Raised:'{}',Code:{}"\
             .format( self.id_incident,self.dbid, self.priority, self.production, self.begin,
                     self.acknowledge, self.diagnose, self.workaround, self.fix,
                     self.handoff, self.lro, self.nlro, self.facility, self.ctas,

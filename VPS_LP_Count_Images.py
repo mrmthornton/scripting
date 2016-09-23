@@ -69,7 +69,7 @@ def dataIO(driver, parameters):
                 break
             plateString = cleanUpString(rawString)
             element = findElementOnPage(driver, delay, parameters['inputLocator'])
-            submitted = fillFormAndSubmit(driver, startWindow, element, plateString, parameters) # why so slow?
+            submitted = fillFormAndSubmit(driver, startWindow, element, plateString, parameters) # why so slow?  IeDriver64 ??
             time.sleep(1)  #page may not be there yet!  how long to wait?
             pageLoaded = newPageElementFound(driver, delay, (By.XPATH, '//frame[@name="fraTOP"]'), parameters['staleLocator2'])
             foundFrame = findAndSelectFrame(driver, delay, "fraRL")
