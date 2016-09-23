@@ -21,6 +21,30 @@ from Tkinter import *
 from TxDot_LIB import *
 
 
+def setParameters():
+    parameters = {
+    'delay' : 15,
+    'url' : 'https://lprod.scip.ntta.org/scip/jsp/SignIn.jsp', # initial URL
+    #'url' : 'http://intranet/SitePages', # initial URL
+    'operatorMessage' : "",
+    'inputLocator' : (By.XPATH, '//input[@id = "P_LIC_PLATE_NBR"]'),
+    'staleLocator' : (By.XPATH,'//h1[contains(text(),"Violation Search")]'),
+    'staleLocator2' : (By.XPATH,'//h1[contains(text(),"Violation Search Result")]'),
+    'buttonLocator' : (By.XPATH,'//input[@value="Query"]'),
+    'frameParamters' : {'useFrames' : True, 'frameLocator' : (By.XPATH, '//frame[@name="fraRxL"]') },
+    'resultPageTextLocator' : (By.XPATH, '//TD/H1'),
+    'resultPageVerifyText' : 'Violation Search Results',
+    'outputLocator' : (By.XPATH,'//BODY/P[contains(text(),"Record")]'),
+    'resultIndexParameters' : {'regex' : "Records \d+ to \d+ of (\d+)", 'selector' : 'tail'},  # head, tail, or all
+    #'dataInFileName' : 'LP_Repeats_Count_short.csv',
+    #'dataInFileName' : 'LP_Repeats_Count.csv',
+    'dataInFileName' : 'LP_Repeats_Count_200.csv',
+    'dataOutFileName' : 'LP_Repeats_Count_Out.txt',
+    'returnOrClick' : 'return', # use Return or Click to submit form
+    }
+    return parameters
+
+
 def printDbColumnNames():
     rowcount = 0
     while True:
@@ -194,7 +218,11 @@ if __name__ == '__main__':
     NUMBERtoProcess = 3
     delay=10
     url = 'https://mvinet.txdmv.gov'
-    driver = openBrowser(url)
+    txDriver = openBrowser(url)
+    driver = openBrowser(parameters['url'])
+    parameters = setParameters()
+    parameters['operatorMessage'] = "Use debug mode, \n open VPS, new violator search window, \n open DMV window, \n run to completion"
+    print parameters['operatorMessage']
 
     try:
         dbConnect, dbcursor = ConnectToAccessFile()
@@ -218,19 +246,35 @@ if __name__ == '__main__':
                 print "main() : Finished, no more LP's ."
                 break
             plate = str(row[0])
-
-#            #VPS section
-#            startPageTextLocator = (By.XPATH, '//TD/H1[contains(text(),"Violation Search")]')
-#            # pause on next line for entry of credentials, and window navigation.
-#            ##startWindow = findTargetPage(driver, findStartWindowDelay, startPageTextLocator, "mainframe")
-#            startWindow = findTargetPage(driver, findStartWindowDelay, startPageTextLocator)
-#            if startWindow is None:
-#                print "Start Page not found."
-#                return None
-
-
+            '''
+            #VPS section
+            startPageTextLocator = (By.XPATH, '//TD/H1[contains(text(),"Violation Search")]')
+            # pause on next line for entry of credentials, and window navigation.
+            ##startWindow = findTargetPage(driver, findStartWindowDelay, startPageTextLocator, "mainframe")
+            startWindow = findTargetPage(driver, findStartWindowDelay, startPageTextLocator)
+            if startWindow is None:
+                print "Start Page not found."
+                break
+            element = findElementOnPage(driver, delay, parameters['inputLocator'])
+            submitted = fillFormAndSubmit(driver, startWindow, element, plateString, parameters) # why so slow?  IeDriver64 ??
+            time.sleep(1)  #page may not be there yet!  how long to wait?
+            pageLoaded = newPageElementFound(driver, delay, (By.XPATH, '//frame[@name="fraTOP"]'), parameters['staleLocator2'])
+            foundFrame = findAndSelectFrame(driver, delay, "fraRL")
+            #time.sleep(1)  #text may not be there yet!  how long to wait?
+            text = getTextResults(driver, delay, plateString, parameters, "fraRL")
+            if text is not None: # if there is text, process it
+                sys.stdout.write(plateString + ", " + str(text) + '\n')
+                outfile.write(plateString + ", " + str(text) + '\n')
+                outfile.flush()
+            # navigate to search position
+            if type(parameters['buttonLocator']) is None: # no button, start at 'top' of the page
+                driver.switch_to_default_content()
+            else: # there is a button. find it/click it/wait for page to load
+                clicked = findAndClickButton(driver, delay, parameters)
+                pageLoaded = newPageElementFound(driver, delay, None, parameters['staleLocator'])
+            '''
             #TXDOT section
-            results = query(driver, delay, plate)
+            results = query(txDriver, delay, plate)
             if results is not None:
                 #print results # for debug
                 fileString = repairLineBreaks(results)
@@ -297,6 +341,8 @@ if __name__ == '__main__':
         dbConnect.close()
         driver.close() # close browser window
         driver.quit()  # close command window
+        txDriver.close()
+        txDriver.quit()
 
 # 'd' Signed integer decimal.
 # 'i' Signed integer decimal.
