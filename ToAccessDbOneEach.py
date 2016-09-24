@@ -215,14 +215,14 @@ def txDotToDbRecord(txDotRec, db):
 
 if __name__ == '__main__':
 
-    NUMBERtoProcess = 3
+    NUMBERtoProcess = 80
     delay=10
-    url = 'https://mvinet.txdmv.gov'
-    txDriver = openBrowser(url)
-    driver = openBrowser(parameters['url'])
     parameters = setParameters()
     parameters['operatorMessage'] = "Use debug mode, \n open VPS, new violator search window, \n open DMV window, \n run to completion"
     print parameters['operatorMessage']
+    txDriver = openBrowser('https://mvinet.txdmv.gov')
+    driver = openBrowser(parameters['url'])
+
 
     try:
         dbConnect, dbcursor = ConnectToAccessFile()
@@ -245,36 +245,35 @@ if __name__ == '__main__':
             if row is None:
                 print "main() : Finished, no more LP's ."
                 break
-            plate = str(row[0])
-            '''
-            #VPS section
-            startPageTextLocator = (By.XPATH, '//TD/H1[contains(text(),"Violation Search")]')
-            # pause on next line for entry of credentials, and window navigation.
-            ##startWindow = findTargetPage(driver, findStartWindowDelay, startPageTextLocator, "mainframe")
-            startWindow = findTargetPage(driver, findStartWindowDelay, startPageTextLocator)
-            if startWindow is None:
-                print "Start Page not found."
-                break
-            element = findElementOnPage(driver, delay, parameters['inputLocator'])
-            submitted = fillFormAndSubmit(driver, startWindow, element, plateString, parameters) # why so slow?  IeDriver64 ??
-            time.sleep(1)  #page may not be there yet!  how long to wait?
-            pageLoaded = newPageElementFound(driver, delay, (By.XPATH, '//frame[@name="fraTOP"]'), parameters['staleLocator2'])
-            foundFrame = findAndSelectFrame(driver, delay, "fraRL")
-            #time.sleep(1)  #text may not be there yet!  how long to wait?
-            text = getTextResults(driver, delay, plateString, parameters, "fraRL")
-            if text is not None: # if there is text, process it
-                sys.stdout.write(plateString + ", " + str(text) + '\n')
-                outfile.write(plateString + ", " + str(text) + '\n')
-                outfile.flush()
-            # navigate to search position
-            if type(parameters['buttonLocator']) is None: # no button, start at 'top' of the page
-                driver.switch_to_default_content()
-            else: # there is a button. find it/click it/wait for page to load
-                clicked = findAndClickButton(driver, delay, parameters)
-                pageLoaded = newPageElementFound(driver, delay, None, parameters['staleLocator'])
-            '''
+            plateString = str(row[0])
+
+            if False:
+                #VPS section
+                startPageTextLocator = (By.XPATH, '//TD/H1[contains(text(),"Violation Search")]')
+                # pause on next line for entry of credentials, and window navigation.
+                ##startWindow = findTargetPage(driver, findStartWindowDelay, startPageTextLocator, "mainframe")
+                startWindow = findTargetPage(driver, findStartWindowDelay, startPageTextLocator)
+                if startWindow is None:
+                    print "Start Page not found."
+                    break
+                element = findElementOnPage(driver, delay, parameters['inputLocator'])
+                submitted = fillFormAndSubmit(driver, startWindow, element, plateString, parameters) # why so slow?  IeDriver64 ??
+                time.sleep(1)  #page may not be there yet!  how long to wait?
+                pageLoaded = newPageElementFound(driver, delay, (By.XPATH, '//frame[@name="fraTOP"]'), parameters['staleLocator2'])
+                foundFrame = findAndSelectFrame(driver, delay, "fraRL")
+                #time.sleep(1)  #text may not be there yet!  how long to wait?
+                text = getTextResults(driver, delay, plateString, parameters, "fraRL")
+                if text is not None: # if there is text, process it
+                    sys.stdout.write(plateString + ", " + str(text) + '\n')
+                # navigate to search position
+                if type(parameters['buttonLocator']) is None: # no button, start at 'top' of the page
+                    driver.switch_to_default_content()
+                else: # there is a button. find it/click it/wait for page to load
+                    clicked = findAndClickButton(driver, delay, parameters)
+                    pageLoaded = newPageElementFound(driver, delay, None, parameters['staleLocator'])
+
             #TXDOT section
-            results = query(txDriver, delay, plate)
+            results = query(txDriver, delay, plateString)
             if results is not None:
                 #print results # for debug
                 fileString = repairLineBreaks(results)
@@ -284,11 +283,11 @@ if __name__ == '__main__':
             recordList = []
             while True:
                 try:
-                    responseType, startNum, endNum = findResponseType(plate, fileString)
+                    responseType, startNum, endNum = findResponseType(plateString, fileString)
                 except:
                     responseType = None
                     if foundCurrentPlate == False:
-                        print plate, ' Plate/Pattern not found. Unable to resolve record type.'
+                        print plateString, ' Plate/Pattern not found. Unable to resolve record type.'
                         time.sleep(3)
                     break
                 if responseType != None: # there must be a valid text record to process
