@@ -36,10 +36,8 @@ def setParameters():
     'resultPageVerifyText' : 'Violation Search Results',
     'outputLocator' : (By.XPATH,'//BODY/P[contains(text(),"Record")]'),
     'resultIndexParameters' : {'regex' : "Records \d+ to \d+ of (\d+)", 'selector' : 'tail'},  # head, tail, or all
-    #'dataInFileName' : 'LP_Repeats_Count_short.csv',
-    #'dataInFileName' : 'LP_Repeats_Count.csv',
-    'dataInFileName' : 'LP_Repeats_Count_200.csv',
-    'dataOutFileName' : 'LP_Repeats_Count_Out.txt',
+    'dataInFileName' : '',
+    'dataOutFileName' : '',
     'returnOrClick' : 'return', # use Return or Click to submit form
     }
     return parameters
@@ -78,6 +76,14 @@ def ConnectToAccessFile():
         dbcursor=connectedDB.cursor()
         print("ConnectToAccessFile: Connected to {}".format(dbname))
         return connectedDB, dbcursor
+
+
+def waitForUser():
+        #Wait for user input
+        root = Tk()
+        event = tkFileDialog.askopenfilename(parent=root, title="Select database",
+                    filetypes=[('locked', '*.accde'), ('normal', '*.accdb')])
+        root.destroy()
 
 
 def makeSqlString(dictStruct):
@@ -215,7 +221,7 @@ def txDotToDbRecord(txDotRec, db):
 
 if __name__ == '__main__':
 
-    NUMBERtoProcess = 80
+    NUMBERtoProcess = 3
     delay=10
     parameters = setParameters()
     parameters['operatorMessage'] = "Use debug mode, \n open VPS, new violator search window, \n open DMV window, \n run to completion"
@@ -229,7 +235,7 @@ if __name__ == '__main__':
         #for row in dbcursor.columns(table='Sheet1'): # debug
         #    print row.column_name                    # debug
         #dbcursor.execute("SELECT * FROM Sheet1")
-        dbcursor.execute("SELECT plate FROM [list of plate 4 without matching sheet1]") # (1),4,8,9,10, '11'  ,12
+        dbcursor.execute("SELECT plate FROM [list of plate 8 without matching sheet1]") # (1),4,8,9,10, '11'  ,12
         #dbcursor.execute("SELECT plate FROM [list of plates 2 without matching sheet1]") # 2,3,5,6,7
         lpList = []
         loopCount = 0
