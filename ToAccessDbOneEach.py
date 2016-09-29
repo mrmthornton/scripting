@@ -222,6 +222,7 @@ def txDotToDbRecord(txDotRec, db):
 if __name__ == '__main__':
 
     NUMBERtoProcess = 3
+    vpsBool = True
     delay=10
     parameters = setParameters()
     parameters['operatorMessage'] = "Use debug mode, \n open VPS, new violator search window, \n open DMV window, \n run to completion"
@@ -234,8 +235,7 @@ if __name__ == '__main__':
         dbConnect, dbcursor = ConnectToAccessFile()
         #for row in dbcursor.columns(table='Sheet1'): # debug
         #    print row.column_name                    # debug
-        #dbcursor.execute("SELECT * FROM Sheet1")
-        dbcursor.execute("SELECT plate FROM [list of plate 8 without matching sheet1]") # (1),4,8,9,10, '11'  ,12
+        dbcursor.execute("SELECT plate FROM [list of plate without matching sheet1]") # (1),4,8,9,10, '11'  ,12
         #dbcursor.execute("SELECT plate FROM [list of plates 2 without matching sheet1]") # 2,3,5,6,7
         lpList = []
         loopCount = 0
@@ -253,8 +253,8 @@ if __name__ == '__main__':
                 break
             plateString = str(row[0])
 
-            if False:
-                #VPS section
+            if vpsBool:
+                #VPS section   *****************************************************************
                 startPageTextLocator = (By.XPATH, '//TD/H1[contains(text(),"Violation Search")]')
                 # pause on next line for entry of credentials, and window navigation.
                 ##startWindow = findTargetPage(driver, findStartWindowDelay, startPageTextLocator, "mainframe")
@@ -270,7 +270,24 @@ if __name__ == '__main__':
                 #time.sleep(1)  #text may not be there yet!  how long to wait?
                 text = getTextResults(driver, delay, plateString, parameters, "fraRL")
                 if text is not None: # if there is text, process it
-                    sys.stdout.write(plateString + ", " + str(text) + '\n')
+                    sys.stdout.write("Initial # of " + plateString + ", " + str(text) + '\n')
+                    startNum = int(str(text))
+                    # insert orm to wait for user input
+                    # navigate to search position
+                    if type(parameters['buttonLocator']) is None: # no button, start at 'top' of the page
+                        driver.switch_to_default_content()
+                    else: # there is a button. find it/click it/wait for page to load
+                        clicked = findAndClickButton(driver, delay, parameters)
+                        pageLoaded = newPageElementFound(driver, delay, None, parameters['staleLocator'])
+                    submitted = fillFormAndSubmit(driver, startWindow, element, plateString, parameters) # why so slow?  IeDriver64 ??
+                    time.sleep(1)  #page may not be there yet!  how long to wait?
+                    pageLoaded = newPageElementFound(driver, delay, (By.XPATH, '//frame[@name="fraTOP"]'), parameters['staleLocator2'])
+                    foundFrame = findAndSelectFrame(driver, delay, "fraRL")
+                    #time.sleep(1)  #text may not be there yet!  how long to wait?
+                    text = getTextResults(driver, delay, plateString, parameters, "fraRL")
+                    endNum = int(str(text))
+                    diffNum = startNum - endNum
+                    print  startNum, endNum, diffNum
                 # navigate to search position
                 if type(parameters['buttonLocator']) is None: # no button, start at 'top' of the page
                     driver.switch_to_default_content()
@@ -278,7 +295,7 @@ if __name__ == '__main__':
                     clicked = findAndClickButton(driver, delay, parameters)
                     pageLoaded = newPageElementFound(driver, delay, None, parameters['staleLocator'])
 
-            #TXDOT section
+            #TXDOT section   *****************************************************************
             results = query(txDriver, delay, plateString)
             if results is not None:
                 #print results # for debug
@@ -308,7 +325,7 @@ if __name__ == '__main__':
                     #print listData # for debug
                     assert(len(listData)==12)
 
-            # Database section
+            # Database section   *****************************************************************
             for csvRecord in recordList:
                 txDotRecord = txDotDataFill(txDotDataInit(), csvRecord)
                 dbRecord = recordInit()
