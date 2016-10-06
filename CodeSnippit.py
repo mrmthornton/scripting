@@ -27,8 +27,14 @@ def testTime():
     longyear = time.strftime("%d/%m/%Y %I:%M:%S %p")
     print x
 
+import tkMessageBox
+from ToAccessDbOneEach import ConnectToAccessFile
+def waitForUser(msg='huh?'):
+        root = Tk()
+        tkMessageBox.askyesno(message=msg)
+        root.destroy()
 
 if __name__ == '__main__':
 
-    testTime()
+    waitForUser('Okay?')
 

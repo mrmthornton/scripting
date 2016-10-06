@@ -8,7 +8,7 @@
 # Author:      mthornton
 #
 # Created:     2016 AUG 12
-# Update:      2016 SEP 30
+# Update:      2016 SEP 22
 # Copyright:   (c) mthornton 2016
 # educational snippits thanks to Tim Greening-Jackson, (timATgreening-jackson.com)
 #-------------------------------------------------------------------------------
@@ -17,7 +17,6 @@ import datetime
 import pyodbc
 import string
 import tkFileDialog
-import tkMessageBox
 from Tkinter import *
 from TxDot_LIB import *
 
@@ -67,23 +66,24 @@ def printDbColumnNames():
 
 
 def ConnectToAccessFile():
-    #Prompt the user for db, create connection and cursor.
-    root = Tk()
-    dbname = tkFileDialog.askopenfilename(parent=root, title="Select database",
-                filetypes=[('locked', '*.accde'), ('normal', '*.accdb')])
-    root.destroy()
-    # Connect to the Access database
-    connectedDB = pyodbc.connect("Driver={Microsoft Access Driver (*.mdb, *.accdb)};DBQ="+dbname+";")
-    dbcursor=connectedDB.cursor()
-    print("ConnectToAccessFile: Connected to {}".format(dbname))
-    return connectedDB, dbcursor
+        #Prompt the user for db, create connection and cursor.
+        root = Tk()
+        dbname = tkFileDialog.askopenfilename(parent=root, title="Select database",
+                    filetypes=[('locked', '*.accde'), ('normal', '*.accdb')])
+        root.destroy()
+        # Connect to the Access database
+        connectedDB = pyodbc.connect("Driver={Microsoft Access Driver (*.mdb, *.accdb)};DBQ="+dbname+";")
+        dbcursor=connectedDB.cursor()
+        print("ConnectToAccessFile: Connected to {}".format(dbname))
+        return connectedDB, dbcursor
 
 
-def waitForUser(msg="enter login credentials"):
-    #Wait for user input
-    root = Tk()
-    tkMessageBox.askokcancel(message=msg)
-    root.destroy()
+def waitForUser():
+        #Wait for user input
+        root = Tk()
+        event = tkFileDialog.askopenfilename(parent=root, title="Select database",
+                    filetypes=[('locked', '*.accde'), ('normal', '*.accdb')])
+        root.destroy()
 
 
 def makeSqlString(dictStruct):
@@ -221,26 +221,24 @@ def txDotToDbRecord(txDotRec, db):
 
 if __name__ == '__main__':
 
-    NUMBERtoProcess = 3
-    vpsBool = True # true when using VPS images
-    findWindowDelay = 1
-    SLEEPTIME = 0 #180
+    NUMBERtoProcess = 80
+    vpsBool = False
     delay=10
+    SLEEPTIME = 150 #180
     parameters = setParameters()
     parameters['operatorMessage'] = "Use debug mode, \n open VPS, new violator search window, \n open DMV window, \n run to completion"
     print parameters['operatorMessage']
     txDriver = openBrowser('https://mvinet.txdmv.gov')
-    waitForUser('enter credentials for DMV')
     if vpsBool:
         driver = openBrowser(parameters['url'])
-        waitForUser('VPS login')
+
 
     try:
         dbConnect, dbcursor = ConnectToAccessFile()
         #for row in dbcursor.columns(table='Sheet1'): # debug
         #    print row.column_name                    # debug
-        dbcursor.execute("SELECT plate FROM [list of plate without matching sheet1]") # (1),4,8,9,10, '11'  ,12
-        #dbcursor.execute("SELECT plate FROM [list of plates 2 without matching sheet1]") # 2,3,5,6,7
+        #dbcursor.execute("SELECT plate FROM [list of plate without matching sheet1]") # (1),4,8,9,10, '11'  ,12
+        dbcursor.execute("SELECT plate FROM [list of plates 7 without matching sheet1]") # 2,3,5,6,7
         lpList = []
         loopCount = 0
         while loopCount< NUMBERtoProcess:
@@ -257,11 +255,12 @@ if __name__ == '__main__':
                 break
             plateString = str(row[0])
 
-            #VPS section   *****************************************************************
             if vpsBool:
+                #VPS section   *****************************************************************
                 startPageTextLocator = (By.XPATH, '//TD/H1[contains(text(),"Violation Search")]')
-                ##startWindow = findTargetPage(driver, findWindowDelay, startPageTextLocator, "mainframe")
-                startWindow = findTargetPage(driver, findWindowDelay, startPageTextLocator)
+                # pause on next line for entry of credentials, and window navigation.
+                ##startWindow = findTargetPage(driver, findStartWindowDelay, startPageTextLocator, "mainframe")
+                startWindow = findTargetPage(driver, findStartWindowDelay, startPageTextLocator)
                 if startWindow is None:
                     print "Start Page not found."
                     break
@@ -274,22 +273,21 @@ if __name__ == '__main__':
                 text = getTextResults(driver, delay, plateString, parameters, "fraRL")
                 if text is not None: # if there is text, process it
                     sys.stdout.write("Initial # of " + plateString + ", " + str(text) + '\n')
-                    startNum = int(   #   str(text))
-                    # insert form to wait for user input
+                    startNum = int(str(text))
+                    # insert orm to wait for user input
                     # navigate to search position
                     if type(parameters['buttonLocator']) is None: # no button, start at 'top' of the page
                         driver.switch_to_default_content()
                     else: # there is a button. find it/click it/wait for page to load
                         clicked = findAndClickButton(driver, delay, parameters)
                         pageLoaded = newPageElementFound(driver, delay, None, parameters['staleLocator'])
-                    element = findElementOnPage(driver, delay, parameters['inputLocator'])
                     submitted = fillFormAndSubmit(driver, startWindow, element, plateString, parameters) # why so slow?  IeDriver64 ??
                     time.sleep(1)  #page may not be there yet!  how long to wait?
                     pageLoaded = newPageElementFound(driver, delay, (By.XPATH, '//frame[@name="fraTOP"]'), parameters['staleLocator2'])
                     foundFrame = findAndSelectFrame(driver, delay, "fraRL")
                     #time.sleep(1)  #text may not be there yet!  how long to wait?
                     text = getTextResults(driver, delay, plateString, parameters, "fraRL")
-                    endNum = int(    #  str(text))
+                    endNum = int(str(text))
                     diffNum = startNum - endNum
                     print  startNum, endNum, diffNum
                 # navigate to search position
