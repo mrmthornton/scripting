@@ -8,7 +8,7 @@
 # Author:      mthornton
 #
 # Created:     2015 AUG 01
-# Updates:     2016 MAR 03
+# Updates:     2016 OCT 14
 # Copyright:   (c) michael thornton 2015,2016
 # input(s):    (see parameters, dataInFileName)
 # output(s):   (see parameters, dataOutFileName)
@@ -36,7 +36,7 @@ def violationSearch():
     'delay' : 15,
     'url' : 'https://lprod.scip.ntta.org/scip/jsp/SignIn.jsp', # initial URL
     #'url' : 'http://intranet/SitePages', # initial URL
-    'operatorMessage' : "Use debug mode, open VPS, new violator search window, and run to completion",
+    'operatorMessage' : "Open VPS violator search window, and run to completion",
     'inputLpLocator' : (By.XPATH, '//input[@id = "P_LIC_PLATE_NBR"]'),
     'inputStateLocator' : (By.XPATH, '//select[@id = "P_LIC_PLATE_STATE"]'),
     'LpLocator' : (By.XPATH, '//td[@id = "LIC_PLATE_NBR1"]'),
@@ -128,6 +128,7 @@ if __name__ == '__main__':
     print parameters['operatorMessage']
     regexPattens = loadRegExPatterns()
     driver = openBrowser(parameters['url'])
+    waitForUser()
     vps_body(driver, parameters)
     driver.close()
 

@@ -20,6 +20,7 @@ import tkFileDialog
 import tkMessageBox
 from Tkinter import *
 from TxDot_LIB import *
+from VPS_LIB import *
 
 
 def setParameters():
@@ -117,6 +118,53 @@ def makeSqlString(dictStruct):
     SVAL = "".join(sval)
     return SQL + SVAL
 
+
+def leaseRecord():
+    leaseDictionary = { # need dictionary names and database names
+        "Completed_By":'' ,
+        "Completed_Date":'' ,
+        "Date_Received":'' ,
+        "Dealership Name":'' ,
+        "Dealership Request":'' ,
+        "Owner_Name":'' ,
+        "Address":'' ,
+        "City":'' ,
+        "State":'' ,
+        "Zip Code":'' ,
+        "License Plate":'' ,
+        "Vin Number":'' ,
+        "Reassigned":'' ,
+        "Unassigned":'' ,
+        "Sent Letter":'' ,
+        "Follow up by: Closing Comments":'' ,
+        "Paid":'' ,
+        "Already Completed":'' ,
+        "No Invoice on VPS":'' ,
+        "Created Vilotor":''
+         """
+        [Completed By],
+        [Completed Date],
+        [Date Received],
+        [Dealership Name],
+        [Dealership Request],
+        Owner_Name,
+        Address,
+        City,
+        State,
+        [Zip Code],
+        [License Plate],
+        [Vin Number],
+        Reassigned,
+        Unassigned,
+        [Sent Letter],
+        [Follow up by: Closing Comments],
+        Paid]":'' ,
+        [Already Completed],
+        [No Invoice on VPS],
+        [Created Vilotor]
+        """
+    }
+    return leaseDictionary
 
 def recordInit():
     recordDictionary = {
@@ -222,7 +270,7 @@ def txDotToDbRecord(txDotRec, db):
 if __name__ == '__main__':
 
     NUMBERtoProcess = 3
-    vpsBool = True # true when using VPS images
+    vpsBool = False # true when using VPS images
     findWindowDelay = 1
     SLEEPTIME = 0 #180
     delay=10
@@ -237,10 +285,9 @@ if __name__ == '__main__':
 
     try:
         dbConnect, dbcursor = ConnectToAccessFile()
-        #for row in dbcursor.columns(table='Sheet1'): # debug
-        #    print row.column_name                    # debug
-        dbcursor.execute("SELECT plate FROM [list of plate without matching sheet1]") # (1),4,8,9,10, '11'  ,12
-        #dbcursor.execute("SELECT plate FROM [list of plates 2 without matching sheet1]") # 2,3,5,6,7
+        for row in dbcursor.columns(table='data'): # debug
+            print row.column_name                    # debug
+        dbcursor.execute("SELECT * FROM data")
         lpList = []
         loopCount = 0
         while loopCount< NUMBERtoProcess:
@@ -274,7 +321,7 @@ if __name__ == '__main__':
                 text = getTextResults(driver, delay, plateString, parameters, "fraRL")
                 if text is not None: # if there is text, process it
                     sys.stdout.write("Initial # of " + plateString + ", " + str(text) + '\n')
-                    startNum = int(   #   str(text))
+                    startNum = int(   str(text))
                     # insert form to wait for user input
                     # navigate to search position
                     if type(parameters['buttonLocator']) is None: # no button, start at 'top' of the page
@@ -289,7 +336,7 @@ if __name__ == '__main__':
                     foundFrame = findAndSelectFrame(driver, delay, "fraRL")
                     #time.sleep(1)  #text may not be there yet!  how long to wait?
                     text = getTextResults(driver, delay, plateString, parameters, "fraRL")
-                    endNum = int(    #  str(text))
+                    endNum = int( str(text))
                     diffNum = startNum - endNum
                     print  startNum, endNum, diffNum
                 # navigate to search position

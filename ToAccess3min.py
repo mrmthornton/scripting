@@ -221,10 +221,10 @@ def txDotToDbRecord(txDotRec, db):
 
 if __name__ == '__main__':
 
-    NUMBERtoProcess = 80
+    NUMBERtoProcess = 120
     vpsBool = False
     delay=10
-    SLEEPTIME = 150 #180
+    SLEEPTIME = 120 # seconds
     parameters = setParameters()
     parameters['operatorMessage'] = "Use debug mode, \n open VPS, new violator search window, \n open DMV window, \n run to completion"
     print parameters['operatorMessage']
@@ -237,8 +237,8 @@ if __name__ == '__main__':
         dbConnect, dbcursor = ConnectToAccessFile()
         #for row in dbcursor.columns(table='Sheet1'): # debug
         #    print row.column_name                    # debug
-        #dbcursor.execute("SELECT plate FROM [list of plate without matching sheet1]") # (1),4,8,9,10, '11'  ,12
-        dbcursor.execute("SELECT plate FROM [list of plates 7 without matching sheet1]") # 2,3,5,6,7
+        dbcursor.execute("SELECT plate FROM [list of plate 8 without matching sheet1]") # (1),4,8,9,10, '11'  ,12
+        #dbcursor.execute("SELECT plate FROM [list of plates 7 without matching sheet1]") # 2,3,5,6,7
         lpList = []
         loopCount = 0
         while loopCount< NUMBERtoProcess:

@@ -19,6 +19,9 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
+import tkMessageBox
+from Tkinter import *
+
 import re
 import time
 
@@ -270,6 +273,13 @@ def returnOrClick(element, select):
 
 def timeout(msg="Took too much time!"):
     print msg
+
+def waitForUser(msg="enter login credentials"):
+    #Wait for user input
+    root = Tk()
+    tkMessageBox.askokcancel(message=msg)
+    root.destroy()
+
 
 if __name__ == '__main__':
 
