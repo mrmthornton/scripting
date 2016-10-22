@@ -86,7 +86,8 @@ def vps_body(driver, parameters):
                 count = count + 1
                 print "retrying excusal menu selection. Count: ", count
                 Selector = Select(menuElement)
-            Selector.select_by_visible_text("ZipCash; Uninvoiced") # does this need to be instanciated each time?
+            #Selector.select_by_visible_text("ZipCash; Uninvoiced") # does this need to be instanciated each time?
+            Selector.select_by_visible_text("Excused") # does this need to be instanciated each time?
 
             element = findElementOnPage(driver, delay, parameters['inputLpLocator'])
             submitted = fillFormAndSubmit(driver, startWindow, element, plateString, parameters) # why so slow?

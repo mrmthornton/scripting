@@ -45,26 +45,28 @@ def repairLineBreaks(fileString):
 
     # broken address lines ?
 
-    wordBreakPattern = re.compile(r'[A-Z]+\n [A-Z]+(,|\.|-)') # find broken words
+    wordBreakPattern = re.compile(r'[A-Z]+ *\n\s+[A-Z]+(,|\.|-)',re.MULTILINE) # find broken words
     while True:
         broken = wordBreakPattern.search(fileString)
         if broken != None:
-            ##print 'repairLineBreaks:' + broken.group()
+            print 'repairLineBreaks:' + broken.group()
             fileStringBegin = fileString[:broken.start()]
             fileStringMiddle = broken.group()
-            fileStringMiddle = fileStringMiddle.replace('\n ', '')
+            fileStringMiddle = fileStringMiddle.replace('\n', '')
+            fileStringMiddle = fileStringMiddle.replace(' ', '')
             fileStringEnd = fileString[broken.end():]
             fileString = fileStringBegin + fileStringMiddle + fileStringEnd
+            print 'repairLineBreaks:' + fileStringMiddle
         else:
             break
-    #numberBreakPattern = re.compile(r'\d{5,5}-\d*\n *\d+|\d+\n *\d*-\d{4,4}',re.MULTILINE) # find broken ZipPlus
-    numberBreakPattern = re.compile(r'\d+ *\r\n *\d*-\d{4,4}',re.MULTILINE) # find broken ZipPlus
+    numberBreakPattern = re.compile(r'\d+\s*\n\s*\d*-\d{4,4}',re.MULTILINE) # find broken ZipPlus
+    # total of 5 digits around a line break?
     zipPlusPattern = re.compile(r'\d{5,5}-\d{4,4}')
     zipCodePattern = re.compile(r'\d{5,5}')
     while True:
         broken = numberBreakPattern.search(fileString)
         if broken != None:
-            ##print 'repairLineBreaks:' + broken.group()
+            print 'repairLineBreaks:' + broken.group()
             fileStringBegin = fileString[:broken.start()]
             fileStringMiddle = broken.group()
             fileStringMiddle = fileStringMiddle.replace('\n', '')
@@ -72,24 +74,24 @@ def repairLineBreaks(fileString):
             fileStringEnd = fileString[broken.end():]
             if re.search(zipPlusPattern, fileStringMiddle) != None:
                 fileString = fileStringBegin + fileStringMiddle + fileStringEnd
-                ##print 'repairLineBreaks:' + fileStringMiddle
+                print 'repairLineBreaks:' + fileStringMiddle
         else:
             break
     #print 'repairLineBreaks:' + fileString
     return fileString
 
-def fixLine(lineString):
-    # repair lines broken with \n and/or \r and following spaces
-#    # get owner line and remove
-    ownerStartPattern = re.compile(r'OWNER')
-    ownerEndPattern = re.compile(r' RNWL RCP| PLATE AGE:| LIEN')
-    ownerStartFound = ownerStartPattern.search(typeString)
-    ownerStart = ownerStartFound.start()
-    ownerEndFound = ownerEndPattern.search(typeString)
-    ownerEnd = ownerEndFound.start()
-    ownerLine = typeString[ownerStartFound.start():ownerEndFound.start()]
-    print 'parseStandard: ' + ownerLine
-    return lineString
+#def fixLine(lineString):
+#    # repair lines broken with \n and/or \r and following spaces
+##    # get owner line and remove
+#    ownerStartPattern = re.compile(r'OWNER')
+#    ownerEndPattern = re.compile(r' RNWL RCP| PLATE AGE:| LIEN')
+#    ownerStartFound = ownerStartPattern.search(typeString)
+#    ownerStart = ownerStartFound.start()
+#    ownerEndFound = ownerEndPattern.search(typeString)
+#    ownerEnd = ownerEndFound.start()
+#    ownerLine = typeString[ownerStartFound.start():ownerEndFound.start()]
+#    print 'parseStandard: ' + ownerLine
+#    return lineString
 
 def findStartEnd(fileString,startPattern, endPattern):
     # the iterator is used to search for all possible endLoc instances,
