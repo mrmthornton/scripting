@@ -20,12 +20,8 @@ import string
 import tkMessageBox
 from Tkinter import *
 from TxDot_LIB import *
+from VPS_LIB import *
 
-def waitForUser(msg="enter login credentials"):
-    #Wait for user input
-    root = Tk()
-    tkMessageBox.askokcancel(message=msg)
-    root.destroy()
 
 if __name__ == '__main__':
     #create an instance of IE and set some options

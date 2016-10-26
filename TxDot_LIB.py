@@ -6,7 +6,7 @@
 # Author:      mthornton
 #
 # Created:     2014 NOV 24
-# Update:      2016 SEP 6
+# Update:      2016 OCT 24
 # Copyright:   (c) mthornton 2014, 2015, 2016
 #-------------------------------------------------------------------------------
 
@@ -59,10 +59,12 @@ def repairLineBreaks(fileString):
             print 'repairLineBreaks:' + fileStringMiddle
         else:
             break
-    numberBreakPattern = re.compile(r'\d+\s*\n\s*\d*-\d{4,4}',re.MULTILINE) # find broken ZipPlus
+    #numberBreakPattern = re.compile(r'\d+\s*\n\s*\d*-\d{4,4}',re.MULTILINE) # find broken ZipPlus
+    #numberBreakPattern = re.compile(r',\d{1,4}\s*\n\s*\d{2,4}',re.MULTILINE) # find broken Zip
+    numberBreakPattern = re.compile(r',\d+\s*\n\s*\d+-',re.MULTILINE) # find broken Zip
     # total of 5 digits around a line break?
     zipPlusPattern = re.compile(r'\d{5,5}-\d{4,4}')
-    zipCodePattern = re.compile(r'\d{5,5}')
+    zipCodePattern = re.compile(r',\d{5,5}')
     while True:
         broken = numberBreakPattern.search(fileString)
         if broken != None:
@@ -72,8 +74,9 @@ def repairLineBreaks(fileString):
             fileStringMiddle = fileStringMiddle.replace('\n', '')
             fileStringMiddle = fileStringMiddle.replace(' ', '')
             fileStringEnd = fileString[broken.end():]
-            if re.search(zipPlusPattern, fileStringMiddle) != None:
-                fileString = fileStringBegin + fileStringMiddle + fileStringEnd
+            #if re.search(zipPlusPattern, fileStringMiddle) != None:
+            fileString = fileStringBegin + fileStringMiddle + fileStringEnd
+            if re.search(zipCodePattern, fileString) != None:
                 print 'repairLineBreaks:' + fileStringMiddle
         else:
             break
@@ -131,8 +134,9 @@ def findResponseType(plate, fileString):
 
     # STANDARD
     targetType = 'STANDARD'
-    startPattern = re.compile('LIC ' + plate + ' [A-Z]{3,3}' + '/' '[0-9]{4,4}')
-    endPattern = re.compile(r'TITLE[.]|NON-TITLED')
+    #startPattern = re.compile('LIC ' + plate + ' [A-Z]{3,3}' + '/' '[0-9]{4,4}')
+    startPattern = re.compile('LIC ' + plate + ' [A-Z]{3,3}/[0-9]{4,4}')
+    endPattern = re.compile(r'TITLE[.]|NON-TITLED|REMARKS')
     startNum, endNum = findStartEnd(fileString,startPattern, endPattern)
     if startNum != None:
         print  'findResponseType:', targetType, plate
@@ -610,13 +614,16 @@ def query(driver, delay, plate):
 
 if __name__ == "__main__":
     # TEST 'repairLineBreaks()
-    lpList = ['06D3951', '06D5330', '06D5884', '05Y7722']
     with open('temp.txt', 'r') as infile:
+        raw = infile.readline()
+        csv.reader(substr())
+        platesCsv = csv.reader(infile.readline())
+        lpList = [plate for plate in platesCsv]
         text = infile.read()
         print text
         text = repairLineBreaks(text)
         print text
         for lp in lpList:
-            result = findResponseType('06D3951', text)
+            result = findResponseType(lp, text)
             if result is not None: print result[0]
 
