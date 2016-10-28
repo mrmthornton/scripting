@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 #-------------------------------------------------------------------------------
-# Name:        ToAccessDBOneEach
+# Name:        ToAccessDBOneEach --> ToAccess3min.py
+#              do one loop every 3 min to simulate human interaction
 # Purpose:     Read LP from a DB, gather TxDot info, if any, and combine with
 #              user input to form a complete record, write record to the DB.
 #              Commit a record before gathering more info.

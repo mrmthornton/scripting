@@ -9,6 +9,9 @@
 # modified     2016 OCT 21
 # Copyright:   (c) mthornton 2016
 #-------------------------------------------------------------------------------
+import re
+from TxDot_LIB import *
+import string
 
 linePattern = re.compile('^.+')
 wordPattern = re.compile('\w+')
@@ -20,10 +23,6 @@ reg_dtPattern = re.compile('REG DT ')
 datePattern = re.compile('[0-9]{2,2}/[0-9]{2,2}/[0-9]{4,4}') # mo/day/year
 dateYearFirstPattern = re.compile(r'\d{4,4}/\d{2,2}/\d{2,2}') # year/mo/day
 
-
-import re
-from TxDot_LIB import *
-import string
 
 def main():
 

@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 #-------------------------------------------------------------------------------
-# Name:        ToAccessDBOneEach
+# Name:        Project_TxDot.py
 # Purpose:     Read LP from a DB, gather TxDot info, if any, and combine with
 #              user input to form a complete record, write record to the DB.
 #              Commit a record before gathering more info.
@@ -8,7 +8,7 @@
 # Author:      mthornton
 #
 # Created:     2016 AUG 12
-# Update:      2016 SEP 30
+# Update:      2016 OCT 27
 # Copyright:   (c) mthornton 2016
 # educational snippits thanks to Tim Greening-Jackson, (timATgreening-jackson.com)
 #-------------------------------------------------------------------------------

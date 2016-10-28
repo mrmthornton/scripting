@@ -80,13 +80,6 @@ def ConnectToAccessFile():
     return connectedDB, dbcursor
 
 
-def waitForUser(msg="enter login credentials"):
-    #Wait for user input
-    root = Tk()
-    tkMessageBox.askokcancel(message=msg)
-    root.destroy()
-
-
 def makeSqlString(dictStruct):
     sql = []
     sval = []

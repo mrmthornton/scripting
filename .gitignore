@@ -18,6 +18,8 @@
 .metadata/
 How To Read a TXDOT.pdf
 7zip/
+.atom/
+Atom/
 cntlm/
 fiddler/
 IEDriverServer_x64_2.44.0/
