@@ -222,15 +222,18 @@ def txDotToDbRecord(txDotRec, db):
 if __name__ == '__main__':
 
     NUMBERtoProcess = 3
-    vpsBool = True # true when using VPS images
+    vpsBool = True   # true when using VPS images
+    txdotBool = False # true when using DMV records
+    dbBool = False    # true when using access file
     findWindowDelay = 1
     SLEEPTIME = 0 #180
     delay=10
     parameters = setParameters()
     parameters['operatorMessage'] = "Use debug mode, \n open VPS, new violator search window, \n open DMV window, \n run to completion"
     print parameters['operatorMessage']
-    txDriver = openBrowser('https://mvinet.txdmv.gov')
-    waitForUser('enter credentials for DMV')
+    if txdotBool:
+        txDriver = openBrowser('https://mvinet.txdmv.gov')
+        waitForUser('enter credentials for DMV')
     if vpsBool:
         driver = openBrowser(parameters['url'])
         waitForUser('VPS login')
@@ -239,7 +242,7 @@ if __name__ == '__main__':
         dbConnect, dbcursor = ConnectToAccessFile()
         #for row in dbcursor.columns(table='Sheet1'): # debug
         #    print row.column_name                    # debug
-        dbcursor.execute("SELECT plate FROM [list of plate without matching sheet1]") # (1),4,8,9,10, '11'  ,12
+        dbcursor.execute("SELECT plate FROM [list of plate 8 without matching sheet1]") # (1),4,8,9,10, '11'  ,12
         #dbcursor.execute("SELECT plate FROM [list of plates 2 without matching sheet1]") # 2,3,5,6,7
         lpList = []
         loopCount = 0
@@ -274,8 +277,8 @@ if __name__ == '__main__':
                 text = getTextResults(driver, delay, plateString, parameters, "fraRL")
                 if text is not None: # if there is text, process it
                     sys.stdout.write("Initial # of " + plateString + ", " + str(text) + '\n')
-                    startNum = int(   #   str(text))
-                    # insert form to wait for user input
+                    startNum = int( str(text))
+                    waitForUser('examine and correct images')
                     # navigate to search position
                     if type(parameters['buttonLocator']) is None: # no button, start at 'top' of the page
                         driver.switch_to_default_content()
@@ -289,7 +292,7 @@ if __name__ == '__main__':
                     foundFrame = findAndSelectFrame(driver, delay, "fraRL")
                     #time.sleep(1)  #text may not be there yet!  how long to wait?
                     text = getTextResults(driver, delay, plateString, parameters, "fraRL")
-                    endNum = int(    #  str(text))
+                    endNum = int( str(text))
                     diffNum = startNum - endNum
                     print  startNum, endNum, diffNum
                 # navigate to search position
@@ -299,66 +302,68 @@ if __name__ == '__main__':
                     clicked = findAndClickButton(driver, delay, parameters)
                     pageLoaded = newPageElementFound(driver, delay, None, parameters['staleLocator'])
 
-            #TXDOT section   *****************************************************************
-            results = query(txDriver, delay, plateString)
-            if results is not None:
-                #print results # for debug
-                fileString = repairLineBreaks(results)
-                #remove non-ascii
-                ##fileString = "".join(filter(lambda x:x in string.printable, fileString))
-            foundCurrentPlate = False
-            recordList = []
-            while True:
-                try:
-                    responseType, startNum, endNum = findResponseType(plateString, fileString)
-                except:
-                    responseType = None
-                    if foundCurrentPlate == False:
-                        print plateString, ' Plate/Pattern not found. Unable to resolve record type.'
-                        time.sleep(3)
-                    break
-                if responseType != None: # there must be a valid text record to process
-                    foundCurrentPlate = True
-                    #print 'main:', responseType, startNum, endNum # for debug
-                    typeString = fileString[startNum:endNum + 1]
-                    #print typeString # for debug
-                    fileString = fileString[:startNum] + fileString[endNum + 1:] # what is this for ?
-                    listData = parseRecord(responseType, typeString)
-                    # make txdot data record here
-                    recordList.append(listData)
-                    #print listData # for debug
-                    assert(len(listData)==12)
+            if txdotBool:
+                #TXDOT section   *****************************************************************
+                results = query(txDriver, delay, plateString)
+                if results is not None:
+                    #print results # for debug
+                    fileString = repairLineBreaks(results)
+                    #remove non-ascii
+                    ##fileString = "".join(filter(lambda x:x in string.printable, fileString))
+                foundCurrentPlate = False
+                recordList = []
+                while True:
+                    try:
+                        responseType, startNum, endNum = findResponseType(plateString, fileString)
+                    except:
+                        responseType = None
+                        if foundCurrentPlate == False:
+                            print plateString, ' Plate/Pattern not found. Unable to resolve record type.'
+                            time.sleep(3)
+                        break
+                    if responseType != None: # there must be a valid text record to process
+                        foundCurrentPlate = True
+                        #print 'main:', responseType, startNum, endNum # for debug
+                        typeString = fileString[startNum:endNum + 1]
+                        #print typeString # for debug
+                        fileString = fileString[:startNum] + fileString[endNum + 1:] # what is this for ?
+                        listData = parseRecord(responseType, typeString)
+                        # make txdot data record here
+                        recordList.append(listData)
+                        #print listData # for debug
+                        assert(len(listData)==12)
 
-            # Database section   *****************************************************************
-            for csvRecord in recordList:
-                txDotRecord = txDotDataFill(txDotDataInit(), csvRecord)
-                dbRecord = recordInit()
-                dbRecord = txDotToDbRecord(txDotRecord, dbRecord)
-                print dbRecord # for debug
-                sqlString = makeSqlString(dbRecord)
-                #print sqlString # for debug
-                sql = sqlString.format(**dbRecord)
-                """sql = "INSERT INTO Sheet1 (Plate, Plate_St, [Combined Name], Address, City, State, ZipCode, \
-                                          [Title Date], [Start Date], [End Date], \
-                                          [Vehicle Make], [Vehicle Model], [Vehicle Body], [Vehicle Year], \
-                                          [Total Image Reviewed], [Total Image corrected], Reason, \
-                                          [Time_Stamp], [Agent Initial], \
-                                          [Sent to Collections Agency],  Multiple, Unassign, [Completed: Yes / No Record], \
-                                          [E-Tags (Temporary Plates)], [Dealer Plates] \
-                                          ) \
-                            VALUES (    '{plate}', '{plate_st}', '{combined_name}', '{address}', '{city}', '{state}', {zip}, \
-                                        '{title_date}', '{start_date}', '{end_date}', \
-                                        '{make}', '{model}', '{body}', {vehicle_year},\
-                                         {images_reviewed}, {images_corrected}, '{reason}', \
-                                        '{time_stamp}', '{agent}', \
-                                         {collections}, {multiple}, {unassign}, '{completed}', \
-                                         {temp_plate}, {dealer_plate} \
-                                         ) ".format(**dbRecord)"""
-                '''"title_month":'', "title_day":'', "title_year":'','''   # where is this added ?
-                dbcursor.execute(sql)
-            print("Comitting changes")
-            dbcursor.commit()
-            time.sleep(SLEEPTIME)
+            if dbBool:
+                # Database section   *****************************************************************
+                for csvRecord in recordList:
+                    txDotRecord = txDotDataFill(txDotDataInit(), csvRecord)
+                    dbRecord = recordInit()
+                    dbRecord = txDotToDbRecord(txDotRecord, dbRecord)
+                    print dbRecord # for debug
+                    sqlString = makeSqlString(dbRecord)
+                    #print sqlString # for debug
+                    sql = sqlString.format(**dbRecord)
+                    """sql = "INSERT INTO Sheet1 (Plate, Plate_St, [Combined Name], Address, City, State, ZipCode, \
+                                              [Title Date], [Start Date], [End Date], \
+                                              [Vehicle Make], [Vehicle Model], [Vehicle Body], [Vehicle Year], \
+                                              [Total Image Reviewed], [Total Image corrected], Reason, \
+                                              [Time_Stamp], [Agent Initial], \
+                                              [Sent to Collections Agency],  Multiple, Unassign, [Completed: Yes / No Record], \
+                                              [E-Tags (Temporary Plates)], [Dealer Plates] \
+                                              ) \
+                                VALUES (    '{plate}', '{plate_st}', '{combined_name}', '{address}', '{city}', '{state}', {zip}, \
+                                            '{title_date}', '{start_date}', '{end_date}', \
+                                            '{make}', '{model}', '{body}', {vehicle_year},\
+                                             {images_reviewed}, {images_corrected}, '{reason}', \
+                                            '{time_stamp}', '{agent}', \
+                                             {collections}, {multiple}, {unassign}, '{completed}', \
+                                             {temp_plate}, {dealer_plate} \
+                                             ) ".format(**dbRecord)"""
+                    '''"title_month":'', "title_day":'', "title_year":'','''   # where is this added ?
+                    dbcursor.execute(sql)
+                print("Comitting changes")
+                dbcursor.commit()
+                time.sleep(SLEEPTIME)
 
 # from TxDot lib --> ['response type', 'plate', 'name', 'addr', 'addr2', 'city', 'state', 'zip', 'ownedStartDate', 'startDate', 'endDate', 'issued']
 #"""  ALMOST FULL WRITE TO DATABASE missing title day, month, year -->  this will never happen. some fields are exclusive of others. """
