@@ -11,7 +11,8 @@
 # Created:     2016 AUG 12
 # Update:      2016 SEP 22
 # Copyright:   (c) mthornton 2016
-# educational snippits thanks to Tim Greening-Jackson, (timATgreening-jackson.com)
+# educational snippits thanks to Tim Greening-Jackson
+# (timATgreening-jackson.com)
 #-------------------------------------------------------------------------------
 
 import datetime
@@ -225,7 +226,7 @@ if __name__ == '__main__':
     NUMBERtoProcess = 120
     vpsBool = False
     delay=10
-    SLEEPTIME = 120 # seconds
+    SLEEPTIME = 180 # seconds 180 for standard time delay
     parameters = setParameters()
     parameters['operatorMessage'] = "Use debug mode, \n open VPS, new violator search window, \n open DMV window, \n run to completion"
     print parameters['operatorMessage']
@@ -386,96 +387,3 @@ if __name__ == '__main__':
 # 'r' String (converts any Python object using repr()).
 # 's' String (converts any Python object using str()).
 # '%' No argument is converted, results in a '%' character in the result.
-
-#dbcursor.execute("DELETE * FROM {}".format(table))
-#rows = dbcursor.fetchall()
-#dbfacilities = {unicode(row[1]):row[0] for row in rows}
-#s7incidents = {unicode(row[0]):S7Incident(*row) for row in rows if incre.match(row[0])}
-#cursor.execute("SELECT DISTINCT RAISED FROM INCIDENTS")
-#s7ad1s = [S7AD1(*row) for row in rows]
-# do the SELECT @@IDENTITY to give us the autonumber index.
-
-'''
-
-params = [filter(lambda x: x in string.printable, item.text)
-          for item in row.find_all('td')]
-'''
-
-#Iterating over strings is unfortunately rather slow in Python.
-#Regular expressions are over an order of magnitude faster.
-'''
-control_chars = ''.join(map(unichr, range(0,32) + range(127,160)))
-control_char_re = re.compile('[%s]' % re.escape(control_chars))
-
-def remove_control_chars(s):
-    return control_char_re.sub('', s)
-'''
-
-class S7Incident:
-    """
-    Class containing the records downloaded from the S7.INCIDENTS table
-    """
-    def __init__(self, id_incident, priority, begin, acknowledge, diagnose,
-     workaround,fix, handoff, lro, nlro, facility, ctas, summary, raised, code):
-        self.id_incident=unicode(id_incident)
-        # a dictionary preceeding a list-comprehension
-        self.priority = {u'P1':1, u'P2':2, u'P3':3, u'P4':4, u'P5':5} [unicode(priority.upper())]
-        self.fix = fix
-        self.handoff = True if handoff else False
-        self.nlro = True if nlro else False
-        self.facility = unicode(facility)
-        self.summary = "** NONE ***" if type(summary) is NoneType else summary.replace("'","")
-        self.raised = raised.replace("'","")
-        self.code = 0 if code is None else code
-        self.dbid = None
-
-    def __repr__(self):
-        return "[{}] ID:{} P{} Prod:{} Begin:{} \
-    A:{} D:+{}s W:+{}s F:+{}s\nH/O:{} LRO:{} NLRO:{} Facility={} CTAS={}\nSummary:'{}',Raised:'{}',Code:{}"\
-            .format( self.id_incident,self.dbid, self.priority, self.production, self.begin,
-                    self.acknowledge, self.diagnose, self.workaround, self.fix,
-                    self.handoff, self.lro, self.nlro, self.facility, self.ctas,
-                    self.summary, self.raised, self.code)
-
-    def ProcessIncident(self, cursor, facilities, productions):
-        sql="""INSERT INTO INCIDENTS
-        (ID_INCIDENT, PRIORITY, FACILITY, BEGIN, ACKNOWLEDGE, DIAGNOSE, WORKAROUND, FIX, HANDOFF, SUMMARY, RAISED, CODE, PRODUCTION)
-        VALUES ('{}', {}, {}, #{}#, {}, {}, {}, {}, {}, '{}', '{}', {}, {})
-        """.format(self.id_incident, self.priority, facilities[self.facility], self.begin,
-           self.acknowledge, self.diagnose, self.workaround, self.fix,
-           self.handoff, self.summary, self.raised, self.code, self.production)
-        cursor.execute(sql)
-        cursor.execute("SELECT @@IDENTITY")
-        self.dbid = cursor.fetchone()[0]
-
-    def __repr__(self):
-        return "[{}] Date:{} Parent:{} PID:{} Amount:{} Commentary: {} "\
-           .format(self.id_ad1, self.date.strftime("%d/%m/%y"), self.ref, self.pid, self.adjustment, self.commentary)
-
-    def __repr__(self):
-        return "Period: {} GCO:{:.2f} CTA:{:.2f} SUP:{:.2f} SC1:{:.2f} SC2:{:.2f} SC3:{:.2f} AD1:{:.2f}"\
-           .format(self.start.strftime("%m/%y"), self.gco, self.cta, self.support, self.sc1, self.sc2, self.sc3, self.ad1)
-
-    def Process(self, cursor):
-        """
-        Insert in to FINANCIALS table
-        """
-        sql = "INSERT INTO FINANCIALS (BEGIN, GCO, CTA, SUPPORT, SC1, SC2, SC3, AD1) VALUES (#{}#, {}, {}, {}, {}, {}, {},{})"\
-              .format(self.begin, self.gco, self.cta, self.support, self.sc1, self.sc2, self.sc3, self.ad1)
-        cursor.execute(sql)
-
-    def __repr__(self):
-        return "{} P1:{} P2:{} CHG:{} SUC:{} INC:{} FLD:{} EGY:{}"\
-           .format(self.period.strftime("%m/%y"), self.p1ot, self.p1ot, self.changes, self.successful, self.incidents, self.failed, self.emergency)
-
-
-    def Process(self, cursor):
-        """
-        Inserts a record in to the Access database
-        (PLATE, PLATE_ST, COMBINED NAME, ADDRESS, CITY, ZIPCODE, STATE,
-         TITLE DATE, START DATE, END DATE, VEHICLE MAKE, VEHICLE MODEL, VEHICLE BODY)
-        """
-        sql = "INSERT INTO SC3 (BEGIN, P1OT, P2OT, CHANGES, SUCCESSFUL, INCIDENTS, FAILED, EMERGENCY) VALUES\
-            (#{}#, {}, {}, {}, {}, {}, {}, {})"\
-              .format(self.begin, self.p1ot, self.p2ot, self.changes, self.successful, self.incidents, self.failed, self.emergency)
-        cursor.execute(sql)

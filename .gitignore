@@ -13,12 +13,13 @@
 *.xlsx
 *.xlsm
 *.zip
+How To Read a TXDOT.pdf
+temp*
+7zip/
+.atom/
 .git/
 .idea/
 .metadata/
-How To Read a TXDOT.pdf
-7zip/
-.atom/
 Atom/
 cntlm/
 fiddler/
@@ -28,5 +29,4 @@ PortableGit/
 PortableGit-2/
 PycharmProjects/
 RemoteSystemsTempFiles/
-temp*
-
+xlwings/
