@@ -223,10 +223,10 @@ def txDotToDbRecord(txDotRec, db):
 
 if __name__ == '__main__':
 
-    NUMBERtoProcess = 120
+    NUMBERtoProcess = 53
     vpsBool = False
     delay=10
-    SLEEPTIME = 180 # seconds 180 for standard time delay
+    SLEEPTIME = 1 # seconds 180 for standard time delay
     parameters = setParameters()
     parameters['operatorMessage'] = "Use debug mode, \n open VPS, new violator search window, \n open DMV window, \n run to completion"
     print parameters['operatorMessage']

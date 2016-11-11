@@ -221,10 +221,10 @@ def txDotToDbRecord(txDotRec, db):
 
 if __name__ == '__main__':
 
-    NUMBERtoProcess = 3
-    vpsBool = True   # true when using VPS images
+    NUMBERtoProcess = 6
+    vpsBool   = True  # true when using VPS images
     txdotBool = False # true when using DMV records
-    dbBool = False    # true when using access file
+    dbBool    = False # true when using access file
     findWindowDelay = 1
     SLEEPTIME = 0 #180
     delay=10
@@ -281,7 +281,7 @@ if __name__ == '__main__':
                     waitForUser('examine and correct images')
                     # navigate to search position
                     if type(parameters['buttonLocator']) is None: # no button, start at 'top' of the page
-                        driver.switch_to_default_content()
+                        driver.switch_to_default_content()  # 'buttonLocator' : (By.XPATH,'//input[@value="Query"]'),
                     else: # there is a button. find it/click it/wait for page to load
                         clicked = findAndClickButton(driver, delay, parameters)
                         pageLoaded = newPageElementFound(driver, delay, None, parameters['staleLocator'])
@@ -372,9 +372,10 @@ if __name__ == '__main__':
         print("Closing databases")
         dbConnect.close()
         driver.close() # close browser window
-        driver.quit()  # close command window
-        txDriver.close()
-        txDriver.quit()
+        driver.quit()  # close command (cmd) window
+        if txdotBool:
+            txDriver.close()
+            txDriver.quit()
 
 # 'd' Signed integer decimal.
 # 'i' Signed integer decimal.
