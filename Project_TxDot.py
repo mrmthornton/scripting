@@ -299,6 +299,8 @@ if __name__ == '__main__':
                 if type(parameters['buttonLocator']) is None: # no button, start at 'top' of the page
                     driver.switch_to_default_content()
                 else: # there is a button. find it/click it/wait for page to load
+                    pageLoaded = newPageElementFound(driver, delay, (By.XPATH, '//frame[@name="fraTOP"]'), parameters['staleLocator2'])
+                    foundFrame = findAndSelectFrame(driver, delay, "fraRL")
                     clicked = findAndClickButton(driver, delay, parameters)
                     pageLoaded = newPageElementFound(driver, delay, None, parameters['staleLocator'])
 

@@ -223,10 +223,10 @@ def txDotToDbRecord(txDotRec, db):
 
 if __name__ == '__main__':
 
-    NUMBERtoProcess = 53
+    NUMBERtoProcess = 120
     vpsBool = False
     delay=10
-    SLEEPTIME = 1 # seconds 180 for standard time delay
+    SLEEPTIME = 120 # seconds 180 for standard time delay
     parameters = setParameters()
     parameters['operatorMessage'] = "Use debug mode, \n open VPS, new violator search window, \n open DMV window, \n run to completion"
     print parameters['operatorMessage']
@@ -366,8 +366,9 @@ if __name__ == '__main__':
     finally:
         print("Closing databases")
         dbConnect.close()
-        driver.close() # close browser window
-        driver.quit()  # close command window
+        if vpsBool:
+            driver.close() # close browser window
+            driver.quit()  # close command window
         txDriver.close()
         txDriver.quit()
 

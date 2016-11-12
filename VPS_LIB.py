@@ -61,7 +61,7 @@ def findAndSelectFrame(driver, delay, frameName):
     (A) search for target at current content
     (B1) if found return True
     (B2) if not found append all frames to local list
-    (C) loop until list is empty
+    (C) loop until list is empty or the frame is found
         (C1) pop from list
         (C2) select frame and recurse,
         (C3) end loop if recuse returns True
@@ -75,7 +75,7 @@ def findAndSelectFrame(driver, delay, frameName):
             foundFrame = WebDriverWait(driver, frameDelay).until(EC.presence_of_element_located(targetLocator))
             foundFrameName = foundFrame.get_attribute("name")
             driver.switch_to_frame(foundFrame)
-            #print "walkFrames: found target frame ", foundFrameName  # for debug purposes
+            print "walkFrames: found target frame ", foundFrameName  # for debug purposes
             return True
         except TimeoutException:
             try:
