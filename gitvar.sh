@@ -1,0 +1,4 @@
+export GIT_CURL_VERBOSE=1
+export GIT_SSL_NO_VERIFY=1
+#export GIT_HTTP_USER_AGENT=""
+export GIT_TRACE=1
