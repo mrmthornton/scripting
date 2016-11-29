@@ -6,21 +6,33 @@
 	symlinks = false
 	ignorecase = true
 	hideDotFiles = dotGitOnly
-[remote "github"]
-	url = git@github.com:mrmthornton/scripting.git
-	fetch = +refs/heads/*:refs/remotes/origin/*
-[remote "bitbucket"]
-	url = git@bitbucket.org:mrmthornton/scripting.git
-	fetch = +refs/heads/*:refs/remotes/origin/*
-[branch "master"]
-	remote = github
-	merge = refs/heads/master
+#	gitproxy = http://proxy.ntta.org:8080
+[http]
+	sslVerify = false
+	proxy = http://:@proxy.ntta.org:8080
+	emptyAuth = true
+#[remote "github"]
+#	url = git@github.com:mrmthornton/scripting.git
+#	fetch = +refs/heads/*:refs/remotes/origin/*
+#[remote "bitbucket"]
+#	url = git@bitbucket.org:mrmthornton/scripting.git
+#	fetch = +refs/heads/*:refs/remotes/origin/*
+#[branch "master"]
+#	remote = github
+#	merge = refs/heads/master
 [remote "origin"]
-	url = git@github.com:mrmthornton/scripting.git
-	url = git@bitbucket.org:mrmthornton/scripting.git
+	url = https://github.com/mrmthornton/scripting.git
+	url = https://bitbucket.org/mrmthornton/scripting.git
+[remote "github"]
+	url = https://github.com/mrmthornton/scripting.git
+[remote "bitbucket"]
+	url = https://bitbucket.org/mrmthornton/scripting.git
 [user]
 	name = mrmthornton
 	email = mrmthornton@gmail.com
+[gui]
+	wmstate = normal
+	geometry = 887x427+150+150 171 192
 [color]
 	interactive = auto
 	ui = true
