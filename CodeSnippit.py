@@ -37,7 +37,3 @@ def waitForUser(msg='huh?'):
 if __name__ == '__main__':
 
     waitForUser('Okay?')
-
-
-
-GIT_HTTP_USER_AGENT=''
