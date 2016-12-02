@@ -1,3 +1,5 @@
+import xlwings as xw
+
 #-------------------------------------------------------------------------------
 # Name:        testExcel.py
 # Purpose:
@@ -9,14 +11,8 @@
 #-------------------------------------------------------------------------------
 
 import xlwings as xw
-print xw.__path__
-xw.Range('A1').value = 'Foo 1'
-xw.Range('A1').value
-
-
-
-#def main():
-#    pass
-
-#if __name__ == '__main__':
-#    main()
+import VPS_LIB
+def main():
+    plate = xw.Range('A1').value
+    xw.Range('B1').value = plate
+    #xw.Range('B1').value
