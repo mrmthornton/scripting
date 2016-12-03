@@ -12,10 +12,12 @@ import xlwings as xw
 import VPS_LIB
 
 def world():
-    plate = xw.Range('A1').value
-    xw.Range('A1').value = plate + 1
-    xw.Range('B1').value = plate
-    #xw.Range('B1').value
+    for i in range(1,10):
+        plate = xw.Range((i,1)).value
+        xw.Range((i,2)).value = plate
+#    for plate in plates:
+#        strPlate = str(plate)
+#        xw.Range('B2').value = strPlate
 
 if __name__ == '__main__':
     world()
