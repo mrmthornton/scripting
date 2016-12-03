@@ -1,5 +1,3 @@
-import xlwings as xw
-
 #-------------------------------------------------------------------------------
 # Name:        testExcel.py
 # Purpose:
@@ -12,7 +10,12 @@ import xlwings as xw
 
 import xlwings as xw
 import VPS_LIB
-def main():
+
+def world():
     plate = xw.Range('A1').value
+    xw.Range('A1').value = plate + 1
     xw.Range('B1').value = plate
     #xw.Range('B1').value
+
+if __name__ == '__main__':
+    world()
