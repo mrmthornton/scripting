@@ -278,8 +278,8 @@ def commonCode(lpList):
     try:
         recordArray = []
         for cell in lpList:
-            cell = str(cell)
-            if cell is None or cell == "None":
+            cell = str(cell).upper()
+            if cell is None or cell == "NONE":
                 print "main() : Finished, no more LP's ."
                 break
             if cell == '#':
