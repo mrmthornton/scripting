@@ -276,11 +276,14 @@ def commonCode(lpList):
         waitForUser('VPS login')
 
     try:
+        recordArray = []
         for cell in lpList:
             cell = str(cell)
-            if cell is None:
+            if cell is None or cell == "None":
                 print "main() : Finished, no more LP's ."
                 break
+            if cell == '#':
+                continue
             plateString = cell
 
             #VPS section   *****************************************************************
@@ -364,10 +367,7 @@ def commonCode(lpList):
             if excelBool:
                 # excel section   *****************************************************************
                 for singleList in recordList:
-                    return singleList
-                    #excelRecord = excelDataFill(excelDataInit(), singleList)
-                    #print excelRecord # for debug
-                    #return excelRecord
+                    recordArray.append(singleList)
 
             if dbBool:
                 # Database section   *****************************************************************
@@ -415,13 +415,14 @@ def commonCode(lpList):
         if txdotBool:
             #txDriver.close()
             txDriver.quit()
+    return recordArray
 
 
 def excelHook():
     indexList = range(1,NUMBERtoProcess)
     plates = [str( xlwings.Range((i,1)).value ) for i in indexList]
     excelRecord = commonCode(plates)
-    excelRecord.append(excelRecord)
+    print excelRecord
     # field name-> type, plate, combined_name, address, city, state, zip, ownedStartDate, start_date, end_date
     xlwings.Range((2,2)).value = excelRecord
 
@@ -429,7 +430,7 @@ def excelHook():
 # global costants
 NUMBERtoProcess = 7
 vpsBool   = False # true when using VPS images
-txdotBool = False  # true when using DMV records
+txdotBool = True  # true when using DMV records
 excelBool = True  # true when using excel
 dbBool    = False # true when using access file
 findWindowDelay = 1
