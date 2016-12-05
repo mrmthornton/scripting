@@ -133,6 +133,54 @@ def recordInit():
     return recordDictionary
 
 
+def excelDataInit():
+    recordDictionary = {
+        "type":'',
+        "plate":'', "plate_st":'',
+        "combined_name":'',
+        "address":'', "city":'', "state":'', "zip":'',
+        "ownedStartDate":'', "title_date":'', "start_date":'', "end_date":'' ,
+        "make":'' , "model":'', "body":'', "vehicle_year":''
+        }
+    return recordDictionary
+
+
+def excelDataFill(recordDictionary, csvRecord):
+    #       0          1     2     3    4   5      6     7         8             9         10      11
+    # responseType, plate, name, addr, '', city, state, zip, ownedStartDate, startDate, endDate, issued
+        recordDictionary["type"]= csvRecord[0]
+        recordDictionary["plate"]= csvRecord[1]
+        recordDictionary["plate_st"]= 'TX'
+        recordDictionary["combined_name"] = csvRecord[2]
+        recordDictionary["address"]= csvRecord[3]
+        recordDictionary["city"]= csvRecord[5]
+        recordDictionary["state"]= csvRecord[6]
+        recordDictionary["zip"]= csvRecord[7]
+        recordDictionary['ownedStartDate']= csvRecord[8]
+        recordDictionary["start_date"]= csvRecord[9]
+        recordDictionary["end_date"]= csvRecord[10]
+        #recordDictionary["title_date"]=
+        #recordDictionary["make"]= csvRecord[x1]
+        #recordDictionary["model"]= csvRecord[x1]
+        #recordDictionary["body"]= csvRecord[x1]
+        recordDictionary["vehicle_year"]= 0
+        #recordDictionary["images_reviewed"]= csvRecord[x1]
+        #recordDictionary["images_corrected"]= csvRecord[x1]
+        #recordDictionary["reason"]= csvRecord[x1]
+        #recordDictionary["time_stamp"]= csvRecord[x1]
+        #recordDictionary["agent"]= csvRecord[x1]
+        #recordDictionary["title_month"]= csvRecord[x1]
+        #recordDictionary["title_day"]= csvRecord[x1]
+        #recordDictionary["title_year"]= csvRecord[x1]
+        #recordDictionary["collections"]= 0
+        #recordDictionary["multiple"]=
+        #recordDictionary["unassign"]=
+        #recordDictionary["completed"]=
+        #recordDictionary["temp_plate"]= csvRecord[x1]
+        #recordDictionary["dealer_plate"]= csvRecord[x1]
+        return recordDictionary
+
+
 def txDotDataInit():
     recordDictionary = {
         "type":'',
@@ -146,8 +194,9 @@ def txDotDataInit():
 
 
 def txDotDataFill(recordDictionary, csvRecord):
-    #       0          1     2     3    4   5      6     7         8             9         10      11
-    # responseType, plate, name, addr, '', city, state, zip, ownedStartDate, startDate, endDate, issued
+#      index-> 0          1     2     3    4   5      6     7         8             9         10      11
+# from txdot-> responseType, plate, name, addr, '', city, state, zip, ownedStartDate, startDate, endDate, issued
+# field name-> type, plate, combined_name, address, city, state, zip, ownedStartDate, start_date, end_date
         recordDictionary["type"]= csvRecord[0]
         recordDictionary["plate"]= csvRecord[1]
         recordDictionary["plate_st"]= 'TX'
@@ -216,7 +265,6 @@ def txDotToDbRecord(txDotRec, db):
     if txDotRec["type"]=='DEALER': db["dealer_plate"]= 1
 
     return db
-
 
 
 def commonCode(lpList):
@@ -306,9 +354,20 @@ def commonCode(lpList):
                         fileString = fileString[:startNum] + fileString[endNum + 1:] # what is this for ?
                         listData = parseRecord(responseType, typeString)
                         # make txdot data record here
-                        recordList.append(listData)
-                        #print listData # for debug
+                        recordList.append(listData) # more than one record MAY be returned
+                         #print listData # for debug
                         assert(len(listData)==12)
+
+            if not txdotBool:
+                recordList = [['response type', 'plate', 'name', 'addr', 'addr2', 'city', 'state', 'zip',\
+                              'ownedStartDate', 'startDate', 'endDate', 'issued']]
+            if excelBool:
+                # excel section   *****************************************************************
+                for singleList in recordList:
+                    return singleList
+                    #excelRecord = excelDataFill(excelDataInit(), singleList)
+                    #print excelRecord # for debug
+                    #return excelRecord
 
             if dbBool:
                 # Database section   *****************************************************************
@@ -352,22 +411,26 @@ def commonCode(lpList):
         if vpsBool:
             driver.close() # close browser window
             driver.quit()  # close command (cmd) window
+            resultBlock = results
         if txdotBool:
-            txDriver.close()
+            #txDriver.close()
             txDriver.quit()
+
 
 def excelHook():
     indexList = range(1,NUMBERtoProcess)
-    plates = [str( xlwings.Range((i,2)).value ) for i in indexList]
-    commonCode(plates)
-
-    xlwings.Range((2,2)).options(transpose=True).value = [ j+1 for j in indexList]
+    plates = [str( xlwings.Range((i,1)).value ) for i in indexList]
+    excelRecord = commonCode(plates)
+    excelRecord.append(excelRecord)
+    # field name-> type, plate, combined_name, address, city, state, zip, ownedStartDate, start_date, end_date
+    xlwings.Range((2,2)).value = excelRecord
 
 
 # global costants
 NUMBERtoProcess = 7
-vpsBool   = False  # true when using VPS images
-txdotBool = True # true when using DMV records
+vpsBool   = False # true when using VPS images
+txdotBool = False  # true when using DMV records
+excelBool = True  # true when using excel
 dbBool    = False # true when using access file
 findWindowDelay = 1
 SLEEPTIME = 0 #180
@@ -379,6 +442,7 @@ parameters['operatorMessage'] = "Use debug mode, \n open VPS, new violator searc
 
 if __name__ == '__main__':
     excelHook()
+    #commonCode(['ccy0042','dsv9060','notReal','letterO']) # for test purposes
 
 
 # 'd' Signed integer decimal.
