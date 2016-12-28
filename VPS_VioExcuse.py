@@ -52,6 +52,7 @@ def violationExcusal():
 def excuse_violation(driver, parameters):
     delay = parameters['delay']
     # pause on next line for entry of credentials, and window navigation.
+    waitForUser('VPS login / Navigate to "Violation Excusal"')
     startWindow = findTargetPage(driver, findStartWindowDelay, parameters['startPageTextLocator'], "framename")
     if startWindow is None:
         print "Start Page not found."
