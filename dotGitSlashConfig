@@ -1,28 +1,23 @@
 [core]
 	repositoryformatversion = 0
-	filemode = false
+	filemode = true
 	bare = false
 	logallrefupdates = true
 	symlinks = false
 	ignorecase = true
 	hideDotFiles = dotGitOnly
 #	gitproxy = http://proxy.ntta.org:8080
+[remote "origin"]
+	url = https://github.com/mrmthornton/scripting.git
+	url = https://bitbucket.org/mrmthornton/scripting.git
+	fetch = +refs/heads/*:refs/remotes/origin/*
+[branch "ntta"]
+	remote = origin
+	merge = refs/heads/ntta
 [http]
 	sslVerify = false
 	proxy = http://:@proxy.ntta.org:8080
 	emptyAuth = true
-#[remote "github"]
-#	url = git@github.com:mrmthornton/scripting.git
-#	fetch = +refs/heads/*:refs/remotes/origin/*
-#[remote "bitbucket"]
-#	url = git@bitbucket.org:mrmthornton/scripting.git
-#	fetch = +refs/heads/*:refs/remotes/origin/*
-#[branch "master"]
-#	remote = github
-#	merge = refs/heads/master
-[remote "origin"]
-	url = https://github.com/mrmthornton/scripting.git
-	url = https://bitbucket.org/mrmthornton/scripting.git
 [remote "github"]
 	url = https://github.com/mrmthornton/scripting.git
 [remote "bitbucket"]
