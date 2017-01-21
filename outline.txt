@@ -1,0 +1,76 @@
+it's mechanical,
+can be automated  -   pushbutton
+email not snailmail
+person looks at questionable items/decides
+database - entry very routine
+Texpress extractions - routine
+produce statistics     
+processesing overnight for routine cases
+use SQL , not RITE. using RITE is a stopgap measure.
+there are temporary tools.  until a commercial solution 
+I will stay until Legal satisfied then move on to next project.
+I have experience prototyping tools
+such tools clairify which areas are worth investment
+
+
+########### ^ outline ^ ##########################
+
+	Bankruptcy processing involves many well understood catagories of activity, many of which require little human intervention, once the catagory has been identified. 
+
+Many of these activities can be automated, and it would be advantageous to do so, since automation would reduce human error and eliminate handling time in the mail room and for the bankruptcy specialist.
+------add more activities --------
+
+The ultimate goal would be to have " routine" cases processed with a the click of button.
+(or not even click of a button)
+
+The EBN(electronic bankruptcy notficatons service) encourages the use of non-physical information transfer.  Specifically, the XML data exchange format is a mature, robust and widely used means of communication for parties receiving notifications.
+
+The use of this techonology allows an email with a link, to replace a physical letter.  It also allows the recipient to automate (efficient) storage of all documents, with a historical record.
+
+There will always be a need to a person, knowledgeable of bankruptcy, to examine cases which are non-routine.
+
+A decision maker will be freed up to carefully examine and research unusuall or novel cases, and make a decision.
+
+Our current database entries are fact based and only need human input for the comment field. ( which departments, positions use the database?)
+
+The Texpress issue, currently unresolve, would be automated.
+
+Generation of statistics would become trivial.
+
+Routine cases would be processed overnight.
+
+These tools, and in particular the user of RITE as an API, are a stopgap measure, inteded to last only until a commercial grade replacement is in place. 
+
+This level of automation can be implemented using the existing RITE system, however, SQL queries using read only access to the varous databases would increase efficiency and accuracey.  The posible databases are vps, tagstore, zipcash, dmv, txdot, usps and vendor name/address history.
+
+
+
+These are temporary tools.  until a commercial solution is implemented 
+
+I will stay until NTTA/Legal is satisfied then move on to next project.
+
+
+############ break this up into two topics.###############
+I have experience prototyping tools, and these tools fulfill the function of immediate productivity gains while helping to clarify future commercial solution choices.
+
+
+ESTIMATED TIMELINE
+proof of concept, 1 part, excusals with Texpress extraction?
+3 mo. 1hr/d  13*5 = 65
+
+
+EXPECTED PUSHBACK
+
+pushback: we have vendors looking into this
+
+response: we expect to enhance the process with vendors suppling lists corellating case numbers with customer's name and address permutations.
+
+response: we can implement a version of this now, which will help us choose among available feature and services. 
+
+
+pushback: this is an IT function
+
+response: IT has thier own focus/goals/methodologies.  We do the work, we know what is needed and useful, we can test / modify / improve.  An IT solution is not flexible.  I tried for six weeks to get the "Business Intelligence" group to grant me access to the bankruptcy database"  I have tried for three weeks to gain access to the RITE system after yielding the office to Keisha.
+
+
+
