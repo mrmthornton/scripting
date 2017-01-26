@@ -83,6 +83,8 @@ def excuse_violation(driver, parameters):
             # TABEL of name and addre
             # table of  invoice stuff
             # table of invoice details   if  non zero, excuse
+            # table of  stuff with dmv information
+            # get and save zip cash link
             # table of the rest - "Violator ID:" get next link, click. --> "Violator Details Screen"
             # click violation excuseal
 
