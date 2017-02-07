@@ -1,8 +1,7 @@
 #-------------------------------------------------------------------------------
-# Name:        VPS_ZipCash_excuse.py
-# Purpose:     Examine web pages until the VPS Violator page is found.
-#              enter a violator id search field
-#
+# Name:        VPS_VID_ZC_excuse_all.py
+# Purpose:     Examine open web pages until the "VPS Violator" page is found.
+#              enter a violator id in the search field
 #
 #
 # Author:      mthornton
