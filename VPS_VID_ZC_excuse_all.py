@@ -1,8 +1,18 @@
 #-------------------------------------------------------------------------------
 # Name:        VPS_VID_ZC_excuse_all.py
-# Purpose:     Examine open web pages until the "VPS Violator" page is found.
+# Purpose:     Examine open web pages until the VPS "Violator Maintenance" page is found.
 #              enter a violator id in the search field
+#              verify name
+#              capture LP and State
+#              check for outstanding invoice total exists
+#              capture OIT amount
+#              check for ZipCash indicator
+#              if OIT is zero, check for excusal indicator
+#              excuse invoices for etags (open page, check box, click button, wait, close page)
+#              refresh "Violator Maintenance" check OIT is zero and excusal indicator
 #
+#              add comment "Per Management ..."
+#              capture lP type and status from TxDot
 #
 # Author:      mthornton
 #
