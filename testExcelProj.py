@@ -312,7 +312,7 @@ def commonCode(lpList):
                         clicked = findAndClickButton(driver, delay, parameters)
                         pageLoaded = newPageElementFound(driver, delay, None, parameters['staleLocator'])
                     element = findElementOnPage(driver, delay, parameters['inputLocator'])
-                    submitted = fillFormAndSubmit(driver, startWindow, element, plateString, parameters) # why so slow?  IeDriver64 ??
+                    submitted = fillFormAndSubmit(driver, startWindow, element, plateString, parameters) # slow?  Use IeDriver32 !
                     time.sleep(1)  #page may not be there yet!  how long to wait?
                     pageLoaded = newPageElementFound(driver, delay, (By.XPATH, '//frame[@name="fraTOP"]'), parameters['staleLocator2'])
                     foundFrame = findAndSelectFrame(driver, delay, "fraRL")
@@ -419,16 +419,20 @@ def commonCode(lpList):
 
 
 def excelHook():
-    indexList = range(1,NUMBERtoProcess)
-    plates = [str( xlwings.Range((i,1)).value ) for i in indexList]
-    excelRecord = commonCode(plates)
-    print excelRecord
+    indexList = range(1,NUMBERtoProcess + 1)
+    rawPlatesCol = [str( xlwings.Range((i,1)).value ) for i in indexList]
+    plates = []
+    [plates.append(plate) for plate  in rawPlatesCol if plate != 'None' and plate != ""]
+    #l = len(plates)
+    #print l, plates
+    excelRecord = commonCode(plates) # common code is used by all modules (in theory), with switches for VPS, TXDOT, Excel, database(db).
+    #print excelRecord
     # field name-> type, plate, combined_name, address, city, state, zip, ownedStartDate, start_date, end_date
     xlwings.Range((2,2)).value = excelRecord
 
 
 # global costants
-NUMBERtoProcess = 7
+NUMBERtoProcess = 100
 vpsBool   = False # true when using VPS images
 txdotBool = True  # true when using DMV records
 excelBool = True  # true when using excel
