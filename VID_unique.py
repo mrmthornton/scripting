@@ -22,18 +22,16 @@ def excelHook():
     vids = []
     todo = []
     for row in rawTable:
-        vid = row[0]
+        vid = str(row[0])
         done = row[5]
-        if vids.__contains__(vid): # if it's already in the list, skip it
-            pass
-        else:
+        if vid != 'None' and (vids.__contains__(vid) == False): # if it's not in the list
             vids.append(vid)
             if done is None:
                 todo.append(vid)
 
     l1 = len(vids)
     l2 = len(todo)
-    print l1, l2, todo
+    print l1, l2, todo, vids
 #    xlwings.Range((2,2)).value = excelRecord
 
 
