@@ -35,7 +35,6 @@ def violationSearch():
     parameters = {
     'delay' : 15,
     'url' : 'https://lprod.scip.ntta.org/scip/jsp/SignIn.jsp', # initial URL
-    #'url' : 'http://intranet/SitePages', # initial URL
     'operatorMessage' : "Open VPS violator search window, and run to completion",
     'inputLpLocator' : (By.XPATH, '//input[@id = "P_LIC_PLATE_NBR"]'),
     'inputStateLocator' : (By.XPATH, '//select[@id = "P_LIC_PLATE_STATE"]'),
@@ -107,18 +106,12 @@ def vps_body(driver, parameters):
                     handle = driver.current_window_handle
                     driver.switch_to_window(handle)
                     foundFrame = findAndSelectFrame(driver, delay, "fraVF")
-                    #
-                    # Verify state and ask for user input in not correct?
-                    stateElement = findElementOnPage(driver, delay, parameters['inputStateLocator'] )
-                    select = Select(stateElement)
-                    if select.first_selected_option.text == correctState:
-                        print select.first_selected_option.text
-                        element = findElementOnPage(driver, delay, parameters['inputLpLocator'])
-                        submitted = fillFormAndSubmit(driver, startWindow, element, replacementString, parameters)
-                        time.sleep(1)  #page may not be there yet!  how long to wait?
-                        handle = driver.current_window_handle
-                        driver.switch_to_window(handle)
-                        continue
+                    element = findElementOnPage(driver, delay, parameters['inputLpLocator'])
+                    submitted = fillFormAndSubmit(driver, startWindow, element, replacementString, parameters)
+                    time.sleep(1)  #page may not be there yet!  how long to wait?
+                    handle = driver.current_window_handle
+                    driver.switch_to_window(handle)
+                    continue
                 break
             handle = driver.current_window_handle
             driver.switch_to_window(handle)
