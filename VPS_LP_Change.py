@@ -30,6 +30,13 @@ import sys
 import string
 import time
 
+import datetime
+import pyodbc
+import string
+import tkFileDialog
+import tkMessageBox
+from Tkinter import *
+import xlwings
 
 def violationSearch():
     parameters = {
@@ -53,7 +60,7 @@ def violationSearch():
     return parameters
 
 
-def vps_body(driver, parameters):
+def common_code(driver, parameters):
     delay = parameters['delay']
     startPageTextLocator = (By.XPATH, '//TD/H1[contains(text(),"Violation Search")]')
     # pause on next line for entry of credentials, and window navigation.
@@ -124,14 +131,30 @@ def vps_body(driver, parameters):
     print "main: Finished with LP_correction file."
 
 
-if __name__ == '__main__':
+def excelEntryPoint():
+    indexList = range(1,NUMBERtoProcess + 1)
+    rawPlatesCol = [str( xlwings.Range((i,1)).value ) for i in indexList]
+    plates = []
+    [plates.append(plate) for plate  in rawPlatesCol if plate != 'None' and plate != ""]
+    #l = len(plates)
+    #print l, plates
+    excelRecord = commonCode(plates) # common code is used by all modules (in theory), with switches for VPS, TXDOT, Excel, database(db).
+    #print excelRecord
+    # field name-> type, plate, combined_name, address, city, state, zip, ownedStartDate, start_date, end_date
+    xlwings.Range((2,2)).value = excelRecord
+    openRunClose()
+
+def openRunClose():
     parameters = violationSearch()
     findStartWindowDelay = 3
     print parameters['operatorMessage']
     regexPattens = loadRegExPatterns()
     driver = openBrowser(parameters['url'])
     waitForUser()
-    vps_body(driver, parameters)
+    common_code(driver, parameters)
     driver.close()
     driver.quit()
 
+
+if __name__ == '__main__':
+    excelEntryPoint()
