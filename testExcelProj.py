@@ -419,7 +419,7 @@ def commonCode(lpList):
 
 
 def excelHook():
-    indexList = range(1,NUMBERtoProcess + 1)
+    indexList = range(1,NUMBERtoProcess)
     rawPlatesCol = [str( xlwings.Range((i,1)).value ) for i in indexList]
     plates = []
     [plates.append(plate) for plate  in rawPlatesCol if plate != 'None' and plate != ""]
