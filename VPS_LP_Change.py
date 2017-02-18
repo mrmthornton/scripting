@@ -133,18 +133,6 @@ def common_code(driver, parameters, plates):
     print "main: Finished with LP_correction file."
 
 
-def excelEntryPoint():
-    indexList = range(3,NUMBERtoProcess)
-    inputArray = [str( xlwings.Range((i,1)).value ) for i in indexList]
-    plates = []
-    [plates.append(plate) for plate  in inputArray if plate != 'None' and plate != ""]
-    #l = len(plates)
-    #print l, plates
-    excelRecord = openRunClose(plates) # common code is used by all modules (in theory), with switches for VPS, TXDOT, Excel, database(db).
-    #print excelRecord
-    # field name-> type, plate, combined_name, address, city, state, zip, ownedStartDate, start_date, end_date
-    ##xlwings.Range((2,2)).value = excelRecord
-
 def openRunClose(plates):
     parameters = setParameters()
     parameters['findStartWindowDelay'] = 3
@@ -155,6 +143,25 @@ def openRunClose(plates):
     common_code(driver, parameters, plates)
     driver.close()
     driver.quit()
+
+
+def excelEntryPoint():
+    startRow = 3
+    startCol = 1
+    endRow = startRow + NUMBERtoProcess
+    endCol = 5
+    #inputArray = [str( xlwings.Range((i,1)).value ) for i in indexList]
+    #inputArray = xlwings.Range('A3:E7').options(ndim=2).value
+    inputArray = xlwings.Range((startRow,startCol),(endRow,endCol)).options(ndim=2).value
+    plates = []
+    [plates.append([str(e) for  e in plate]) for plate  in inputArray if plate[0] != 'None' and plate[0] != ""]
+    #l = len(plates)
+    #print l, plates
+    excelRecord = openRunClose(plates) # common code is used by all modules (in theory), with switches for VPS, TXDOT, Excel, database(db).
+    #print excelRecord
+    # field name-> type, plate, combined_name, address, city, state, zip, ownedStartDate, start_date, end_date
+    ##xlwings.Range((2,2)).value = excelRecord
+
 
 # global costants
 NUMBERtoProcess = 20
