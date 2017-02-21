@@ -1,9 +1,9 @@
 #-------------------------------------------------------------------------------
-# Name:        VPS_LP_Count_Images.py
-# Purpose:     Examine web pages until the VPS Violation Search page is found.
-#              enter a licence plate in the search box
-#              find the text number of images
-#              write the licence plate and number of images to the output file.
+# Name:        VPS_LP_Change.py
+# Purpose:     Examine
+#              enter a licen
+#              find
+#              write.
 #
 # Author:      mthornton
 #
