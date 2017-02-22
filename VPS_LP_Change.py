@@ -157,7 +157,7 @@ def excelEntryPoint():
     [plates.append([str(e) for  e in plate]) for plate  in inputArray if plate[0] != 'None' and plate[0] != ""]
     #l = len(plates)
     #print l, plates
-    excelRecord = openRunClose(plates) # common code is used by all modules (in theory), with switches for VPS, TXDOT, Excel, database(db).
+    excelRecord = openRunClose(plates)
     #print excelRecord
     # field name-> type, plate, combined_name, address, city, state, zip, ownedStartDate, start_date, end_date
     ##xlwings.Range((2,2)).value = excelRecord
