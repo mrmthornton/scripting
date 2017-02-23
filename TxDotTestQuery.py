@@ -33,28 +33,29 @@ class TxDotTestQuery(object):
         """The licence plate string"""
         return self._licencePlate
 
-    @x.setter
-    def x(self, value):
+    @licencePlate.setter
+    def licencePlate(self, value):
         self._licencePlate = value
 
-    @x.deleter
-    def x(self):
+    @licencePlate.deleter
+    def licencePlate(self):
         del self._licencePlate
 
-    def query(driver):
+    def query(self, driver):
         result = TxDot_LIB.query(driver, 10, self._licencePlate)
 
 
 if __name__ == '__main__':
     delay=10
-    parameters = setParameters()
+    #parameters = setParameters()
+    parameters = {}
     parameters['operatorMessage'] = "Use debug mode, \n open VPS, new violator search window, \n open DMV window, \n run to completion"
     print parameters['operatorMessage']
 
     driver = openBrowser('https://mvinet.txdmv.gov')
     waitForUser()
     singleQuery = TxDotTestQuery()
-    text = singleQuery.query()
+    text = singleQuery.query(driver)
     print text
 
 
