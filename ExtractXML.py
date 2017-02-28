@@ -12,6 +12,7 @@
 # Copyright:   (c) mthornton 2017
 #-------------------------------------------------------------------------------
 
+import sys
 
 class ExtractXML():
     def __init__(self, startText, rootElementName, file):
@@ -21,14 +22,21 @@ class ExtractXML():
 
     def extract(self):
         try:
-            with open(filename) as xmlFile:
-                while xmlFile.readline() != self.start:
-                    continue
-                while xmlFile.readline() != self.stop:
-				    print(line)
+            with open(filename) as xmlFile, open("./tempfile",'w') as outfile:
+                while self.start in xmlFile.readline():
+                    break
+                while True:
+                    line = xmlFile.readline()
+                    sys.stdout.write(line)
+                    outfile.write(line)
+                    if self.stop in line:
+                        break
         except:
-            println("file not found")
+            print("file not found")
 
+        sys.stdout.flush()
+        #outfile.flush()
+        outfile.close()
 
 
 import argparse
@@ -39,4 +47,5 @@ if __name__ == "__main__":
     args = parser.parse_args()
     filename = args.inputFile
     xml = ExtractXML("USCTbankruptcynotice", "ebn:EBNBatch", filename)
+    #xml = ExtractXML("USCTbankruptcynotice", "ebn", filename)
     xml.extract()
