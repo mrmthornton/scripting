@@ -1,6 +1,6 @@
 #-------------------------------------------------------------------------------
 # Name:        VPS_LIB.py
-# Purpose:     A library for common VPS actions.
+# Purpose:     A library for common VPS actions using Selenium WebDriver
 #
 # Author:      mthornton
 #
@@ -22,17 +22,11 @@ from selenium.webdriver.support.ui import WebDriverWait
 import tkMessageBox
 from Tkinter import *
 
+from UTIL_LIB import *
+
 import re
 import time
 
-def cleanUpString(messyString):
-    cleanString = messyString.replace(' ' , '') # remove any spaces
-    cleanString = cleanString.replace('"' , '') # remove any double quotes
-    cleanString = cleanString.replace('\t' , '') # remove any tabs
-    cleanString = cleanString.replace(',' , '\n') # replace comma with \n
-    for n in range(10):            # replace multiple newlines with a single \n
-        cleanString = cleanString.replace('\n\n' , '\n')
-    return cleanString
 
 def fillFormAndSubmit(driver, window, element, textForForm, parameters):
     if type(element) == type(None): # skip the form submission
@@ -43,6 +37,7 @@ def fillFormAndSubmit(driver, window, element, textForForm, parameters):
     element.send_keys(textForForm)
     returnOrClick(element, parameters['returnOrClick'])
     return True
+
 
 def findAndClickButton(driver, delay, parameters):
     if type(parameters['buttonLocator']) == type(None):
@@ -124,6 +119,7 @@ def findElementOnPage(driver, delay, elementLocator, window=None):
         timeout('findElementOnPage: element' + str(elementLocator) + 'not found')
         return None
 
+
 def findTargetPage(driver, delay, locator, frameName=None):
     try:
         handle = driver.current_window_handle
@@ -144,6 +140,7 @@ def findTargetPage(driver, delay, locator, frameName=None):
         return handle
     print "findTargetPage: 'target page' not found"
     return None
+
 
 def getTextResults(driver, delay, plateString, parameters, frameName=None):
     #print "getTextResults: " + driver.current_url # for debug
@@ -177,20 +174,6 @@ def getTextResults(driver, delay, plateString, parameters, frameName=None):
             return text[0]
     return None
 
-def loadRegExPatterns():
-    regex_patterns = dict(
-        linePattern=re.compile('^.+'),
-        wordPattern=re.compile('\w+'),
-        numCommaPattern=re.compile('[0-9,]+'),
-        csvPattern=re.compile('[A-Z0-9 .#&]*,'),
-        commaToEOLpattern=re.compile(',[A-Z0-9 .#&]+$'),
-        LICpattern=re.compile('^LIC '),
-        issuedPattern=re.compile('ISSUED '),
-        reg_dtPattern=re.compile('REG DT '),
-        datePattern=re.compile('[0-9]{2,2}/[0-9]{2,2}/[0-9]{4,4}'),
-        dateYearFirstPattern=re.compile(r'\d{4,4}/\d{2,2}/\d{2,2}')
-    )
-    return regex_patterns
 
 def newPageElementFound(driver, delay, frameLocator, elementlocator):
     if elementlocator is None: # skip finding text
@@ -220,6 +203,7 @@ def newPageElementFound(driver, delay, frameLocator, elementlocator):
             return None
     return None
 
+
 def newPageIsLoaded(driver, delay, currentElement): # depricated ?
     def isStale(self):
         if type(currentElement) == type(None):# when there is no element to check,
@@ -238,6 +222,7 @@ def newPageIsLoaded(driver, delay, currentElement): # depricated ?
         timeout('newPageLoaded: old page reference never went stale')
         return False
 
+
 def openBrowser(url):
     driver = webdriver.Ie()
     #driver.maximize_window()
@@ -245,6 +230,7 @@ def openBrowser(url):
     #return pyseldriver
     driver.get(url)
     return driver
+
 
 def parseString(inputString,indexPattern, targetPattern, segment="all"): # segment may be start, end, or all
     # the iterator is used to search for all possible target pattern instances
@@ -262,6 +248,7 @@ def parseString(inputString,indexPattern, targetPattern, segment="all"): # segme
                 return inputString[indexEnd:targetEnd:]
     return None
 
+
 def returnOrClick(element, select):
     if select =='return':
         element.send_keys(Keys.RETURN)
@@ -270,15 +257,6 @@ def returnOrClick(element, select):
     else:
         print "ERROR: returnOrClick:"
         print "'select' should be one of 'return' or 'click'"
-
-def timeout(msg="Took too much time!"):
-    print msg
-
-def waitForUser(msg="enter login credentials"):
-    #Wait for user input
-    root = Tk()
-    tkMessageBox.askokcancel(message=msg)
-    root.destroy()
 
 
 if __name__ == '__main__':

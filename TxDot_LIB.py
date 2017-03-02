@@ -24,6 +24,7 @@ import re
 import io
 import csv
 from VPS_LIB import *
+from UTIL_LIB import *
 
 linePattern = re.compile('^.+')
 wordPattern = re.compile('\w+')
