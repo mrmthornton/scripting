@@ -38,7 +38,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # extract just the xml from the pdf file
-    xml = extractXML("USCTbankruptcynotice", "</ebn:EBNBatch>\n", args.inputFile)
+    xml = parseXML()
     # write the xml to a file
     with open(args.outputFile, 'w') as outfile:
         outfile.writelines(xml)
