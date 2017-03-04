@@ -19,9 +19,20 @@ def extractXML(start, stop, filename):
             with open(filename) as xmlFile:
                 while start not in xmlFile.readline():
                     continue
-                allLines = [line for line in xmlFile.readlines()]
+                allLines = [line for line in xmlFile.readlines()] # side effect of previous line pointer retained
+                print len(allLines)
                 extracted = allLines[:allLines.index(stop) + 1]
                 return extracted
+        except ValueError:
+            print("can't find %s" %stop)
+
+def extractXML2(start, stop, filename):
+        try:
+            f = open(filename)
+            allLines = f.readlines()
+            f.close()
+            print len(allLines)
+            pass
         except ValueError:
             print("can't find %s" %stop)
 
@@ -29,20 +40,25 @@ def extractXML(start, stop, filename):
 import argparse
 
 if __name__ == "__main__":
-    # get two arguments
+    #  CMD --> arg1 arg2
     parser = argparse.ArgumentParser()
     parser.add_argument("inputFile")
     parser.add_argument("outputFile")
     args = parser.parse_args()
 
-    # extract just the xml from the pdf file
+    #  PDF --> XML
     xml = extractXML("USCTbankruptcynotice", "</ebn:EBNBatch>\n", args.inputFile)
-    # write the xml to a file
+    ##xml = extractXML2("USCTbankruptcynotice", "</ebn:EBNBatch>\n", args.inputFile)
+    #  XML --> file
     with open(args.outputFile, 'w') as outfile:
         outfile.writelines(xml)
-    #for line in xml:
-    #    sys.stdout.write(line)
-    #sys.stdout.flush()
+    #  file --> print()
+    ##for line in xml:
+    ##    sys.stdout.write(line)
+    ##sys.stdout.flush()
+
+    # XML --> dict()
+
 
 
 
