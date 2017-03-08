@@ -57,8 +57,5 @@ if __name__ == "__main__":
     ##    sys.stdout.write(line)
     ##sys.stdout.flush()
 
-    # XML --> dict()
-
-
 
 

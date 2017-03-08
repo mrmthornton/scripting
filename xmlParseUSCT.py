@@ -16,7 +16,7 @@ import sys
 import xml.etree.ElementTree as ET
 # https://docs.python.org/2.7/library/xml.etree.elementtree.html#module-xml.etree.ElementTree
 
-def parseXML(list):
+def parseXML(xml):
     ns={"":"urn:oasis:names:tc:legalxml-courtfiling:schema:xsd:CoreFilingMessage-4.0" ,
     	"ebn":"http://ebn.uscourts.gov/EBN-BankruptcyCase" ,
     	"xsi":"http://www.w3.org/2001/XMLSchema-instance" ,
@@ -25,7 +25,7 @@ def parseXML(list):
     	"nc":"http://niem.gov/niem/niem-core/2.0" ,
     	"s":"http://niem.gov/niem/structures/2.0",
     	}
-    tree = ET.fromstring(xmlList)
+    tree = ET.fromstringlist(xml)
     root = tree.getroot()
 
     return dict
@@ -34,25 +34,37 @@ def parseXML(list):
 #<nc:PersonName>
 #  <nc:PersonGivenName>Olive  </nc:PersonGivenName>
 #  <nc:PersonSurName>Oil  </nc:PersonSurName></nc:PersonName>
-
-
+'''
+Spivak, David I. This resource may not render correctly in a screen reader.Category Theory for Scientists (PDF - 4.2MB), 2013.
+'''
+# http://www.legalxml.org/. The Legal XML ECF standard
+# http://niem.gov. Extensions to Legal XML ECF standard to meet needs of bankruptcy noticing.
 import argparse
 
 if __name__ == "__main__":
-    # get two arguments
+    # get arguments
     parser = argparse.ArgumentParser()
     parser.add_argument("inputFile")
     parser.add_argument("outputFile")
+    parser.add_argument("--verbose")
     args = parser.parse_args()
 
-    # extract just the xml from the pdf file
-    ##xml = extractXML("USCTbankruptcynotice", "</ebn:EBNBatch>\n", args.inputFile)
-    # write the xml to a file
-    ##with open(args.outputFile, 'w') as outfile:
-    ##    outfile.writelines(xml)
-    #for line in xml:
-    #    sys.stdout.write(line)
-    #sys.stdout.flush()
+    # file --> XML
+    with open(args.inputFile) as infile:
+        xml = infile.readlines()
+
+    # XML --> (key, value)
+    usctDict = parseXML(xml)
+
+    # dict --> file
+    with open(args.outputFile, 'w') as outfile:
+        outfile.writelines(usctDict)
+
+    #  dict --> stdout
+    if args.verbose:
+        for line in xml:
+            sys.stdout.write(line)
+        sys.stdout.flush()
 
 
 
