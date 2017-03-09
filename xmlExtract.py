@@ -14,6 +14,7 @@
 
 import sys
 
+#  file --> XML
 def extractXML(start, stop, filename):
         try:
             with open(filename) as xmlFile:
@@ -40,8 +41,9 @@ def extractXML2(start, stop, filename):
 import argparse
 
 if __name__ == "__main__":
-    #  CMD --> arg1 arg2
+    #  cmd --> args
     parser = argparse.ArgumentParser()
+    parser.add_argument("--display", help='show results on stdout', action="store_true")
     parser.add_argument("inputFile")
     parser.add_argument("outputFile")
     args = parser.parse_args()
@@ -49,15 +51,18 @@ if __name__ == "__main__":
     #  PDF --> XML
     xml = extractXML("USCTbankruptcynotice", "</ebn:EBNBatch>\n", args.inputFile)
     ##xml = extractXML2("USCTbankruptcynotice", "</ebn:EBNBatch>\n", args.inputFile)
+    
     #  XML --> file
     with open(args.outputFile, 'w') as outfile:
         outfile.writelines(xml)
-    #  file --> print()
-    ##for line in xml:
-    ##    sys.stdout.write(line)
-    ##sys.stdout.flush()
+        
+    #  XML --> print()
+    if args.display: #add argument to print
+        for line in xml:
+            sys.stdout.write(line)
+        sys.stdout.flush()
 
-    # XML --> dict()
+
 
 
 
