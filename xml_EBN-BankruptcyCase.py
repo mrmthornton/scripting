@@ -87,10 +87,10 @@ base="bankruptcy:BankruptcyCaseType"
 "DocumentFilingDate"
 
 name="EBNBatchType"
-base="nc:DocumentType">
+base="nc:DocumentType"
 ref="corefiling:CoreFilingMessage"
 "BankruptcyCase" type="BankruptcyCaseType" substitutionGroup="bankruptcy:BankruptcyCase">
-"AmendedNotice"
+"AmendedNotice"  #(default prefix is nc:)
 "BankruptcyConversionDate"
 "BankruptcyObjectionDischargeDate"
 "BankruptcyObjectionConfirmationDate"
