@@ -1,0 +1,546 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+EBN extension schema to OASIS LegalXML Electronic Court Filing 4.01 specification
+-->
+<xsd:schema xmlns="http://ebn.uscourts.gov/EBN-BankruptcyCase" xmlns:ecf="urn:oasis:names:tc:legalxml-courtfiling:schema:xsd:CommonTypes-4.0" xmlns:corefiling="urn:oasis:names:tc:legalxml-courtfiling:schema:xsd:CoreFilingMessage-4.0" xmlns:j="http://niem.gov/niem/domains/jxdm/4.0" xmlns:i="http://niem.gov/niem/appinfo/2.0" xmlns:s="http://niem.gov/niem/structures/2.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:niem-xsd="http://niem.gov/niem/proxy/xsd/2.0" xmlns:nc="http://niem.gov/niem/niem-core/2.0" xmlns:filingstatus="urn:oasis:names:tc:legalxml-courtfiling:schema:xsd:FilingStatusCode-4.0" xmlns:a="urn:oasis:names:tc:legalxml-courtfiling:schema:xsd:AppInfo-4.0" xmlns:bankruptcy="urn:oasis:names:tc:legalxml-courtfiling:schema:xsd:BankruptcyCase-4.0" targetNamespace="http://ebn.uscourts.gov/EBN-BankruptcyCase" version="4.0">
+	<xsd:annotation>
+		<xsd:documentation>EBN extensions to ECF 4.0</xsd:documentation>
+		<xsd:appinfo>
+			<i:ConformantIndicator>true</i:ConformantIndicator>
+		</xsd:appinfo>
+	</xsd:annotation>
+	<xsd:import namespace="http://niem.gov/niem/niem-core/2.0" schemaLocation="constraint/niem/niem-core/2.0/niem-core.xsd"/>
+	<xsd:import namespace="http://niem.gov/niem/structures/2.0" schemaLocation="constraint/niem/structures/2.0/structures.xsd"/>
+	<xsd:import namespace="http://niem.gov/niem/appinfo/2.0" schemaLocation="constraint/niem/appinfo/2.0/appinfo.xsd"/>
+	<xsd:import namespace="http://niem.gov/niem/proxy/xsd/2.0" schemaLocation="constraint/niem/proxy/xsd/2.0/xsd.xsd"/>
+	<xsd:import namespace="http://niem.gov/niem/domains/jxdm/4.0" schemaLocation="constraint/niem/domains/jxdm/4.0/jxdm.xsd"/>
+	<xsd:import namespace="urn:oasis:names:tc:legalxml-courtfiling:schema:xsd:AppInfo-4.0" schemaLocation="common/ECF-4.0-AppInfo.xsd"/>
+	<xsd:import namespace="urn:oasis:names:tc:legalxml-courtfiling:schema:xsd:BankruptcyCase-4.0" schemaLocation="common/ECF-4.0-BankruptcyCase.xsd"/>
+	<xsd:import namespace="urn:oasis:names:tc:legalxml-courtfiling:schema:xsd:CoreFilingMessage-4.0" schemaLocation="common/ECF-4.0-CoreFilingMessage.xsd"/>
+	<xsd:complexType name="DebtorInfoType">
+		<xsd:annotation>
+			<xsd:documentation>Additional information specific to a given Debtor.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="nc:EntityType">
+				<xsd:sequence>
+					<xsd:element ref="BankruptcyDischargeDate" minOccurs="0"/>
+					<xsd:element ref="BankruptcyDismissalDate" minOccurs="0"/>
+					<xsd:element ref="BusinessTaxIdentification" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="CaseCourtEventType">
+		<xsd:annotation>
+			<xsd:documentation>Additional court events.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="nc:EntityType">
+				<xsd:sequence>
+					<xsd:element ref="CourtEventLocationText" minOccurs="0"/>
+					<xsd:element ref="j:CourtEventSchedule" minOccurs="0"/>
+					<xsd:element ref="CourtEventTypeCode" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="BankruptcyCaseType">
+		<xsd:annotation>
+			<xsd:documentation>Additional information specific to EBN cases.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="bankruptcy:BankruptcyCaseType">
+				<xsd:sequence>
+					<!-- check these constraints, which are required?  which can be used multiple times? -->
+					<xsd:element ref="AmendedNotice" minOccurs="0"/>
+					<xsd:element ref="BankruptcyFilingDate" minOccurs="0"/>
+					<xsd:element ref="DebtorInfo" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="BankruptcyConversionDate" minOccurs="0"/>
+					<xsd:element ref="BankruptcyObjectionDischargeDate" minOccurs="0"/>
+					<xsd:element ref="BankruptcyObjectionConfirmationDate" minOccurs="0"/>
+					<xsd:element ref="BankruptcyProofClaimDate" minOccurs="0"/>
+					<xsd:element ref="BankruptcyGovernmentProofClaimDate" minOccurs="0"/>
+					<xsd:element ref="BankruptcyPlan13Date" minOccurs="0"/>
+					<xsd:element ref="BankruptcyPlan12Date" minOccurs="0"/>
+					<xsd:element ref="BankruptcyPlan11Date" minOccurs="0"/>
+					<xsd:element ref="BankruptcyJointDebtorDismissalDate" minOccurs="0"/>
+					<xsd:element ref="BankruptcyMeansText" minOccurs="0"/>
+					<xsd:element ref="BankruptcyPreviousChapterStatute" minOccurs="0"/>
+					<xsd:element ref="CaseCourtEvent" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="ScheduleEvent" minOccurs="0"/>
+					<xsd:element ref="ScheduleDate" minOccurs="0"/>
+					<xsd:element ref="BankruptcyCaseDocketDate" minOccurs="0"/>
+					<xsd:element ref="BankruptcyCaseTerminatedDate" minOccurs="0"/>
+					<xsd:element ref="BankruptcyCaseReopenedDate" minOccurs="0"/>
+					<xsd:element ref="BankruptcyCaseReterminatedDate" minOccurs="0"/>
+					<xsd:element ref="BankruptcyCaseTerminatingTransactionDate" minOccurs="0"/>
+					<xsd:element ref="BankruptcyCaseCurrentEventDate" minOccurs="0"/>
+					<xsd:element ref="BankruptcyPlan11ConfirmationDate" minOccurs="0"/>
+					<xsd:element ref="BankruptcyPlan11DenialDate" minOccurs="0"/>
+					<xsd:element ref="BankruptcyPlan12ConfirmationDate" minOccurs="0"/>
+					<xsd:element ref="BankruptcyPlan12DenialDate" minOccurs="0"/>
+					<xsd:element ref="BankruptcyPlan13ConfirmationDate" minOccurs="0"/>
+					<xsd:element ref="BankruptcyPlan13DenialDate" minOccurs="0"/>
+					<xsd:element ref="BankruptcyTemporaryRestrainingOrderDate" minOccurs="0"/>
+					<xsd:element ref="BankruptcyDisclosureStatementDate" minOccurs="0"/>
+					<xsd:element ref="BankruptcyApproveDisclosureStatementDate" minOccurs="0"/>
+					<xsd:element ref="BankruptcyFirstMeetingHeldDate" minOccurs="0"/>
+					<xsd:element ref="BankruptcyFinalMeetingHeldDate" minOccurs="0"/>
+					<xsd:element ref="BankruptcyTrusteeFinalAssetReportDate" minOccurs="0"/>
+					<xsd:element ref="BankruptcyTrusteeFinalNoAssetReportDate" minOccurs="0"/>
+					<xsd:element ref="Bankruptcy12ReportDate" minOccurs="0"/>
+					<xsd:element ref="Bankruptcy13ReportDate" minOccurs="0"/>
+					<xsd:element ref="BankruptcyReaffirmationAgreementDate" minOccurs="0"/>
+					<xsd:element ref="BankruptcyReaffirmationHearingDate" minOccurs="0"/>
+					<xsd:element ref="BankruptcyAppointTrusteeDate" minOccurs="0"/>
+					<xsd:element ref="BankruptcyFinalDecreeDate" minOccurs="0"/>
+					<xsd:element ref="BankruptcyRecusalDate" minOccurs="0"/>
+					<xsd:element ref="BankruptcyOrderTransferCaseDate" minOccurs="0"/>
+					<xsd:element ref="BankruptcySummonsIssuedDate" minOccurs="0"/>
+					<xsd:element ref="BankruptcySummonsServiceExecutedDate" minOccurs="0"/>
+					<xsd:element ref="BankruptcyPreTrialOrderDate" minOccurs="0"/>
+					<xsd:element ref="BankruptcyTrialHeldDate" minOccurs="0"/>
+					<xsd:element ref="BankruptcyIncompleteFilingDueDate" minOccurs="0"/>
+					<xsd:element ref="BankruptcyPlan11DueDate" minOccurs="0"/>
+					<xsd:element ref="BankruptcyPlan12DueDate" minOccurs="0"/>
+					<xsd:element ref="BankruptcyPlan13DueDate" minOccurs="0"/>
+					<xsd:element ref="BankruptcyDisclosureStatementDueDate" minOccurs="0"/>
+					<xsd:element ref="BankruptcyBallotDueDate" minOccurs="0"/>
+					<xsd:element ref="BankruptcyObjectionToDisclosureDueDate" minOccurs="0"/>
+					<xsd:element ref="BankruptcyFinalReportDueDate" minOccurs="0"/>
+					<xsd:element ref="BankruptcyAnswerDueDate" minOccurs="0"/>
+					<xsd:element ref="BankruptcyAppellantAppealsDesignationDueDate" minOccurs="0"/>
+					<xsd:element ref="BankruptcyAppelleeAppealsDesignationDueDate" minOccurs="0"/>
+					<xsd:element ref="BankruptcyRecordOnAppealsTransmissionDueDate" minOccurs="0"/>
+					<xsd:element ref="BankruptcyDocketText" minOccurs="0"/>
+					<xsd:element ref="BankruptcyEventDocketText" minOccurs="0"/>
+					<xsd:element ref="BankruptcyLeadCaseChapterNumber" minOccurs="0"/>
+					<xsd:element ref="BankruptcyFormCodeText" minOccurs="0"/>
+					<xsd:element ref="BankruptcyFormCategory"/>
+                                        <xsd:element ref="BankruptcyFormNameText" minOccurs="0"/>
+					<xsd:element ref="BankruptcyNoticeShortNameText" minOccurs="0"/>
+					<xsd:element ref="BankruptcyShortTitle" minOccurs="0"/>
+					<xsd:element ref="CommentText" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="DocketID" minOccurs="0"/>
+                                        <xsd:element ref="NoticePageCount" minOccurs="1"/>
+					<xsd:element ref="DocketText" minOccurs="0"/>
+					<xsd:element ref="DocumentFilingDate" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="EBNBatchType">
+		<xsd:annotation>
+			<xsd:documentation>A batch of EBN notices.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="nc:DocumentType">
+				<xsd:sequence>
+					<!-- check these constraints, which are required?  which can be used multiple times? -->
+					<xsd:element ref="corefiling:CoreFilingMessage" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="BankruptcyCase" type="BankruptcyCaseType" substitutionGroup="bankruptcy:BankruptcyCase">
+		<xsd:annotation>
+			<xsd:documentation>Additional information specific to EBN cases.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="AmendedNotice" type="nc:TextType">
+		<xsd:annotation>
+			<xsd:documentation></xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BankruptcyConversionDate" type="nc:DateType">
+		<xsd:annotation>
+			<xsd:documentation>The date a case was converted to another chapter if it was converted. </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BankruptcyObjectionDischargeDate" type="nc:DateType">
+		<xsd:annotation>
+			<xsd:documentation>Date by which objections to a discharge must be filed. </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BankruptcyObjectionConfirmationDate" type="nc:DateType">
+		<xsd:annotation>
+			<xsd:documentation>Date by which objections to a confirmation must be filed. </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BankruptcyProofClaimDate" type="nc:DateType">
+		<xsd:annotation>
+			<xsd:documentation>Date by which a proof of claim must be filed. </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BankruptcyGovernmentProofClaimDate" type="nc:DateType">
+		<xsd:annotation>
+			<xsd:documentation>Date by which government agencies must file a proof of claim. </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BankruptcyPlan13Date" type="nc:DateType">
+		<xsd:annotation>
+			<xsd:documentation>The date of the Chapter 13 plan if the case is a chapter 13 case. </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BankruptcyPlan12Date" type="nc:DateType">
+		<xsd:annotation>
+			<xsd:documentation>The date of the Chapter 12 plan if the case is a chapter 12 case. </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BankruptcyPlan11Date" type="nc:DateType">
+		<xsd:annotation>
+			<xsd:documentation>The date of the Chapter 11 plan if the case is a chapter 11 case. </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BankruptcyDischargeDate" type="nc:DateType">
+		<xsd:annotation>
+			<xsd:documentation>The date the case was discharged. </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BankruptcyDismissalDate" type="nc:DateType">
+		<xsd:annotation>
+			<xsd:documentation>The date the case was dismissed. </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BusinessTaxIdentification" type="nc:IdentificationType">
+		<xsd:annotation>
+			<xsd:documentation>Business tax ID, if applicable. </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BankruptcyJointDebtorDismissalDate" type="nc:DateType">
+		<xsd:annotation>
+			<xsd:documentation>The date the joint debtor only was dismissed. </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BankruptcyMeansText" type="nc:TextType">
+		<xsd:annotation>
+			<xsd:documentation>BAPCPA presumption of abuse determination.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BankruptcyPreviousChapterStatute" type="j:StatuteType">
+		<xsd:annotation>
+			<xsd:documentation>The previous chapter if the case was converted. </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="DebtorInfo" type="DebtorInfoType">
+		<xsd:annotation>
+			<xsd:documentation>Information about a given Debtor. </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BankruptcyFormCodeText" type="nc:TextType">
+		<xsd:annotation>
+			<xsd:documentation>The form identification code. Not a standard code list. </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BankruptcyFormCategory" type="nc:TextType">
+		<xsd:annotation>
+			<xsd:documentation>The type of bankruptcy notice. </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+        <xsd:element name="BankruptcyFormNameText" type="nc:TextType">
+                <xsd:annotation>
+                        <xsd:documentation>The court-assigned form name. </xsd:documentation>
+                </xsd:annotation>
+        </xsd:element>
+	<xsd:element name="BankruptcyNoticeShortNameText" type="nc:TextType">
+		<xsd:annotation>
+			<xsd:documentation>A title for the bankruptcy notice. </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BankruptcyFilingDate" type="nc:DateType">
+		<xsd:annotation>
+			<xsd:documentation>The date at which the bankruptcy petitionn was filed. </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BankruptcyDocketText" type="nc:TextType">
+		<xsd:annotation>
+			<xsd:documentation></xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BankruptcyEventDocketText" type="nc:TextType">
+		<xsd:annotation>
+			<xsd:documentation></xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BankruptcyLeadCaseChapterNumber" type="nc:TextType">
+		<xsd:annotation>
+			<xsd:documentation></xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="CommentText" type="nc:TextType">
+		<xsd:annotation>
+			<xsd:documentation>Comment(s) supplied by customer. </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="NoticePageCount" type="nc:NumericType">
+		<xsd:annotation>
+			<xsd:documentation>The number of pages in the notice document.  Some PDF's may have multiple notices. This is not PDF page count. </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="EBNBatch" type="EBNBatchType">
+		<xsd:annotation>
+			<xsd:documentation>A batch of EBN notices.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BankruptcyCaseDocketDate" type="nc:DateType">
+	        <xsd:annotation>
+		        <xsd:documentation>A docket date for a bankruptcy case</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BankruptcyCaseTerminatedDate" type="nc:DateType">
+	        <xsd:annotation>
+                        <xsd:documentation>Date case was terminated</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BankruptcyCaseReopenedDate" type="nc:DateType">
+	        <xsd:annotation>
+		        <xsd:documentation>Date case was reopened</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BankruptcyCaseReterminatedDate" type="nc:DateType">
+	        <xsd:annotation>
+		        <xsd:documentation>Date case was re-terminated</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BankruptcyCaseTerminatingTransactionDate" type="nc:DateType">
+	        <xsd:annotation>
+		        <xsd:documentation>Date of the terminating transaction</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BankruptcyCaseCurrentEventDate" type="nc:DateType">
+	        <xsd:annotation>
+		        <xsd:documentation>Date of Event described</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BankruptcyPlan11ConfirmationDate" type="nc:DateType">
+	        <xsd:annotation>
+		        <xsd:documentation>Cofirmation Date of a Chapter 11 plan</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BankruptcyPlan11DenialDate" type="nc:DateType">
+	        <xsd:annotation>
+		        <xsd:documentation>Denial Date for a Chapter 11 plan</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BankruptcyPlan12ConfirmationDate" type="nc:DateType">
+	        <xsd:annotation>
+		        <xsd:documentation>Confirmation Date of a Chapter 12 plan</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BankruptcyPlan12DenialDate" type="nc:DateType">
+	        <xsd:annotation>
+		        <xsd:documentation>Denial Date for a Chapter 12 plan</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BankruptcyPlan13ConfirmationDate" type="nc:DateType">
+	        <xsd:annotation>
+		        <xsd:documentation>Confirmation Date of a Chapter 13 plan</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BankruptcyPlan13DenialDate" type="nc:DateType">
+	        <xsd:annotation>
+		        <xsd:documentation>Denial Date for a Chapter 13 plan</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BankruptcyTemporaryRestrainingOrderDate" type="nc:DateType">
+	        <xsd:annotation>
+		        <xsd:documentation>Date of a temporary restraining order for a case</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BankruptcyDisclosureStatementDate" type="nc:DateType">
+	        <xsd:annotation>
+		        <xsd:documentation>Date of Bankruptcy Disclosure Statement</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BankruptcyApproveDisclosureStatementDate" type="nc:DateType">
+	        <xsd:annotation>
+		        <xsd:documentation>Date of Bankruptcy Discolure Statement Approval</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BankruptcyFirstMeetingHeldDate" type="nc:DateType">
+	        <xsd:annotation>
+		        <xsd:documentation>Date of First Meeting</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BankruptcyFinalMeetingHeldDate" type="nc:DateType">
+	        <xsd:annotation>
+		        <xsd:documentation>Date of Final Meeting</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BankruptcyTrusteeFinalAssetReportDate" type="nc:DateType">
+	        <xsd:annotation>
+		        <xsd:documentation>Date of Final Trustee Asset Report</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BankruptcyTrusteeFinalNoAssetReportDate" type="nc:DateType">
+	        <xsd:annotation>
+		        <xsd:documentation>Date of Final Trustee No-Asset Report</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="Bankruptcy12ReportDate" type="nc:DateType">
+	        <xsd:annotation>
+		        <xsd:documentation>Date of Plan 12 Report</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="Bankruptcy13ReportDate" type="nc:DateType">
+	        <xsd:annotation>
+		        <xsd:documentation>Date of Plan 13 Report</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BankruptcyReaffirmationAgreementDate" type="nc:DateType">
+	        <xsd:annotation>
+		        <xsd:documentation>Date of Reaffirmation Agreement</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BankruptcyReaffirmationHearingDate" type="nc:DateType">
+	        <xsd:annotation>
+		        <xsd:documentation>Date of Reaffirmation Hearing</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BankruptcyAppointTrusteeDate" type="nc:DateType">
+	        <xsd:annotation>
+		        <xsd:documentation>Date of Trustee Appointment</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BankruptcyFinalDecreeDate" type="nc:DateType">
+	        <xsd:annotation>
+		        <xsd:documentation>Date of Final Decree</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BankruptcyRecusalDate" type="nc:DateType">
+	        <xsd:annotation>
+		        <xsd:documentation>Date of Recusal</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BankruptcyOrderTransferCaseDate" type="nc:DateType">
+	        <xsd:annotation>
+		        <xsd:documentation>Date of Order to Transfer Case</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BankruptcySummonsIssuedDate" type="nc:DateType">
+	        <xsd:annotation>
+		        <xsd:documentation>Date of Issued Summons</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BankruptcySummonsServiceExecutedDate" type="nc:DateType">
+	        <xsd:annotation>
+		        <xsd:documentation>Date of Service of an Executed Summons</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BankruptcyPreTrialOrderDate" type="nc:DateType">
+	        <xsd:annotation>
+		        <xsd:documentation>Date of Pre-trial Order</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BankruptcyTrialHeldDate" type="nc:DateType">
+	        <xsd:annotation>
+		        <xsd:documentation>Date of Held Trial</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BankruptcyIncompleteFilingDueDate" type="nc:DateType">
+	        <xsd:annotation>
+		        <xsd:documentation>Incomplete Filing Due Date</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BankruptcyPlan11DueDate" type="nc:DateType">
+	        <xsd:annotation>
+		        <xsd:documentation>Plan 11 Due Date</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BankruptcyPlan12DueDate" type="nc:DateType">
+	        <xsd:annotation>
+		        <xsd:documentation>Plan 12 Due Date</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BankruptcyPlan13DueDate" type="nc:DateType">
+	        <xsd:annotation>
+		        <xsd:documentation>Plan 13 Due Date</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BankruptcyDisclosureStatementDueDate" type="nc:DateType">
+	        <xsd:annotation>
+		        <xsd:documentation>Due Date of Disclosure Statement</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BankruptcyBallotDueDate" type="nc:DateType">
+	        <xsd:annotation>
+		        <xsd:documentation>Ballot Due Date</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BankruptcyObjectionToDisclosureDueDate" type="nc:DateType">
+	        <xsd:annotation>
+		        <xsd:documentation>Objection to Disclosure Due Date</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BankruptcyFinalReportDueDate" type="nc:DateType">
+	        <xsd:annotation>
+		        <xsd:documentation>Final Report Due Date</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BankruptcyAnswerDueDate" type="nc:DateType">
+	        <xsd:annotation>
+		        <xsd:documentation>Answer Due Date</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BankruptcyAppellantAppealsDesignationDueDate" type="nc:DateType">
+	        <xsd:annotation>
+		        <xsd:documentation>Due Date of Appellant Appeals Designation</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BankruptcyAppelleeAppealsDesignationDueDate" type="nc:DateType">
+	        <xsd:annotation>
+		        <xsd:documentation>Due Date of Appellee Appeals Designation</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BankruptcyRecordOnAppealsTransmissionDueDate" type="nc:DateType">
+	        <xsd:annotation>
+		        <xsd:documentation>Due Date for Transmission of the Record on Appeals</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="BankruptcyShortTitle" type="nc:DateType">
+	        <xsd:annotation>
+		        <xsd:documentation>Case Short Title</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+        <xsd:element name="DocumentFilingDate" type="nc:DateType">
+	        <xsd:annotation>
+		        <xsd:documentation>Filing Date for a notice event</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+        <xsd:element name="DocketID" type="nc:TextType">
+	        <xsd:annotation>
+		        <xsd:documentation>Case Docket ID</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+        <xsd:element name="DocketText" type="nc:TextType">
+	        <xsd:annotation>
+		        <xsd:documentation>Case Docket Text</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+        <xsd:element name="ScheduleDate" type="nc:DateType">
+	        <xsd:annotation>
+		        <xsd:documentation>Case Schedule Date</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+        <xsd:element name="ScheduleEvent" type="nc:TextType">
+	        <xsd:annotation>
+		        <xsd:documentation>Case Schedule Event</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="CaseCourtEvent" type="CaseCourtEventType">
+	        <xsd:annotation>
+		        <xsd:documentation>Case Court Event</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="CourtEventLocationText" type="nc:TextType">
+	        <xsd:annotation>
+		        <xsd:documentation>Location of Court Event</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="CourtEventTypeCode" type="nc:TextType">
+                <xsd:annotation>
+		        <xsd:documentation>Description of Court Event</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+</xsd:schema>
