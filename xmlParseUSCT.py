@@ -29,16 +29,20 @@ def parseXML(xmlAsList):
     tree = ET.fromstringlist(xmlAsList)
     print( type(tree))
     print tree.tag
-    print tree.text
+    #print tree.text
     print tree.attrib
-    print tree.get('key')
-    print tree.find('pattern')
-    print tree.findall('pattern')
-    print tree.findtext('pattern')
-    print tree.getchildren()
+    #print tree.get('key')
+    #print tree.find('pattern')
+    #print tree.findall('pattern')
+    #print tree.findtext('pattern')
+    #print tree.getchildren()
 #    print tree.getiterator()
-    for e in tree.iter():
-        print(e)
+
+    #for e in tree.iter():
+    #    print(e)
+    print(tree.find('{http://ebn.uscourts.gov/EBN-BankruptcyCase}NoticePageCount'))
+    print(tree.find('http://ebn.uscourts.gov/EBN-BankruptcyCase/NoticePageCount'))
+    print(tree.find('NoticePageCount'))
 
     return dict
 
@@ -69,8 +73,8 @@ if __name__ == "__main__":
     usctDict = parseXML(xmlList)
 
     # dict --> file
-##    with open(args.outputFile, 'w') as outfile:
-##        outfile.writelines(usctDict)
+#    with open(args.outputFile, 'w') as outfile:
+#        outfile.writelines(usctDict)
 
     #  dict --> stdout
     if args.verbose:
