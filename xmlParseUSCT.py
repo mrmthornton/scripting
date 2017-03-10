@@ -27,7 +27,7 @@ def parseXML(xmlAsList):
     	"s":"http://niem.gov/niem/structures/2.0",
     	}
     tree = ET.fromstringlist(xmlAsList)
-    print( type(tree))
+    print(tree)
     print tree.tag
     #print tree.text
     print tree.attrib
@@ -37,10 +37,15 @@ def parseXML(xmlAsList):
     #print tree.findtext('pattern')
     #print tree.getchildren()
 #    print tree.getiterator()
-
+    for child in tree:
+        print child.tag
     #for e in tree.iter():
     #    print(e)
-    print(tree.find('{http://ebn.uscourts.gov/EBN-BankruptcyCase}NoticePageCount'))
+    print tree.find('{urn:oasis:names:tc:legalxml-courtfiling:schema:xsd:CoreFilingMessage-4.0}CoreFilingMessage')
+    print tree.find('CoreFilingMessage',ns)
+    print tree.find('{urn:oasis:names:tc:legalxml-courtfiling:schema:xsd:CoreFilingMessage-4.0}CoreFilingMessage')
+    print(tree.find('ebn:NoticePageCount', ns))
+    print(tree.find('{ebn}NoticePageCount'))
     print(tree.find('http://ebn.uscourts.gov/EBN-BankruptcyCase/NoticePageCount'))
     print(tree.find('NoticePageCount'))
 
