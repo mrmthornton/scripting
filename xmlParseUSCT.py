@@ -14,11 +14,16 @@
 
 import sys
 import xml.etree.ElementTree as ET
+import xmlDictUSCT
 # https://docs.python.org/2.7/library/xml.etree.elementtree.html#module-xml.etree.ElementTree
 
 def parseXML(xmlAsList):
     "parse an xml document(list of strings)"
-    ns={"":"urn:oasis:names:tc:legalxml-courtfiling:schema:xsd:CoreFilingMessage-4.0" ,
+    ns = xmlDictUSCT.nameSpaceUSCT()
+    extract = xmlDictUSCT.phraseNamesUSCT()
+    
+    
+    X={"":"urn:oasis:names:tc:legalxml-courtfiling:schema:xsd:CoreFilingMessage-4.0" ,
     	"ebn":"http://ebn.uscourts.gov/EBN-BankruptcyCase" ,
     	"xsi":"http://www.w3.org/2001/XMLSchema-instance" ,
     	"bankruptcy":"urn:oasis:names:tc:legalxml-courtfiling:schema:xsd:BankruptcyCase-4.0" ,
@@ -26,6 +31,7 @@ def parseXML(xmlAsList):
     	"nc":"http://niem.gov/niem/niem-core/2.0" ,
     	"s":"http://niem.gov/niem/structures/2.0",
     	}
+    
     tree = ET.fromstringlist(xmlAsList)
     print(tree)
     print tree.tag
@@ -49,7 +55,13 @@ def parseXML(xmlAsList):
     print(tree.find('./{urn:oasis:names:tc:legalxml-courtfiling:schema:xsd:CoreFilingMessage-4.0}CoreFilingMessage'))
     print(tree.findall('.//{http://ebn.uscourts.gov/EBN-BankruptcyCase}NoticePageCount'))
     print(tree.findall('.//ebn:NoticePageCount',ns))
-    print(tree.find('NoticePageCount'))
+    print(tree.find('.//ebn:BankruptcyFilingDate/nc:Date',ns).text)
+    print(tree.find(extract['petitionDate'],ns).text)
+    print(tree.find(extract['caseNumber'],ns).text)
+    print(tree.find(extract['firstName'],ns).text)
+    #print(tree.find(extract['middleName'],ns).text)
+    print(tree.find(extract['lastName'],ns).text)
+    #print(tree.find(extract['suffix'],ns).text)
 
     debugDict = {'DebtorFirstName':'Debtor/PersonName/PersonGivenName',
                  'DebtorSurName':'Debtor/PersonaName/PersonSurName',

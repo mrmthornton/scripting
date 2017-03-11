@@ -1,19 +1,37 @@
 #-------------------------------------------------------------------------------
-# Name:        module1
+# Name:        xlmDictUSCT.py
 # Purpose:
 #
 # Author:      mthornton
 #
 # Created:     03/03/2017
+# Modified:    03/10/2017
 # Copyright:   (c) mthornton 2017
-# Licence:     <your licence>
 #-------------------------------------------------------------------------------
 
-def main():
-    pass
+def nameSpaceUSCT():
+    ns={"":"urn:oasis:names:tc:legalxml-courtfiling:schema:xsd:CoreFilingMessage-4.0" ,
+        "ebn":"http://ebn.uscourts.gov/EBN-BankruptcyCase" ,
+        "xsi":"http://www.w3.org/2001/XMLSchema-instance" ,
+        "bankruptcy":"urn:oasis:names:tc:legalxml-courtfiling:schema:xsd:BankruptcyCase-4.0" ,
+        "j":"http://niem.gov/niem/domains/jxdm/4.0" ,
+        "nc":"http://niem.gov/niem/niem-core/2.0" ,
+        "s":"http://niem.gov/niem/structures/2.0",
+        }
+    return ns
 
-if __name__ == '__main__':
-    main()
+
+def phraseNamesUSCT():
+    
+    dictUSCT = {
+        "petitionDate":'.//ebn:BankruptcyFilingDate/nc:Date',
+        "caseNumber"  :'.//nc:CaseDocketID',
+        "firstName"   :'.//nc:PersonGivenName',
+        "middleName"  :'.//nc:PersonMiddleName',
+        "lastName"    :'.//nc:PersonSurName',
+        "suffix"      :'.//nc:PersonSuffixNameText',
+        }
+    return dictUSCT
 
 '''
 <nc:DocumentPostDate>       Req     Mailing date of the notice
@@ -96,3 +114,8 @@ starts a transaction.
 
 
 '''
+def main():
+    pass
+
+if __name__ == '__main__':
+    main()
