@@ -16,7 +16,8 @@ import sys
 import xml.etree.ElementTree as ET
 # https://docs.python.org/2.7/library/xml.etree.elementtree.html#module-xml.etree.ElementTree
 
-def parseXML(xml):
+def parseXML(xmlAsList):
+    "parse an xml document(list of strings)"
     ns={"":"urn:oasis:names:tc:legalxml-courtfiling:schema:xsd:CoreFilingMessage-4.0" ,
     	"ebn":"http://ebn.uscourts.gov/EBN-BankruptcyCase" ,
     	"xsi":"http://www.w3.org/2001/XMLSchema-instance" ,
@@ -25,8 +26,30 @@ def parseXML(xml):
     	"nc":"http://niem.gov/niem/niem-core/2.0" ,
     	"s":"http://niem.gov/niem/structures/2.0",
     	}
-    tree = ET.fromstringlist(xml)
-    root = tree.getroot()
+    tree = ET.fromstringlist(xmlAsList)
+    print(tree)
+    print tree.tag
+    #print tree.text
+    print tree.attrib
+    #print tree.get('key')
+    #print tree.find('pattern')
+    #print tree.findall('pattern')
+    #print tree.findtext('pattern')
+    #print tree.getchildren()
+#    print tree.getiterator()
+    for child in tree:
+        print child.tag
+    ##for e in tree.iter():
+    ##    print(e)
+    print tree.find('{urn:oasis:names:tc:legalxml-courtfiling:schema:xsd:CoreFilingMessage-4.0}CoreFilingMessage')
+    print tree.find('CoreFilingMessage',ns)
+    print tree.find('{urn:oasis:names:tc:legalxml-courtfiling:schema:xsd:CoreFilingMessage-4.0}CoreFilingMessage')
+
+    print(tree.findall('.'))
+    print(tree.find('./{urn:oasis:names:tc:legalxml-courtfiling:schema:xsd:CoreFilingMessage-4.0}CoreFilingMessage'))
+    print(tree.findall('.//{http://ebn.uscourts.gov/EBN-BankruptcyCase}NoticePageCount'))
+    print(tree.findall('.//ebn:NoticePageCount',ns))
+    print(tree.find('NoticePageCount'))
 
     return dict
 
@@ -51,14 +74,14 @@ if __name__ == "__main__":
 
     # file --> XML
     with open(args.inputFile) as infile:
-        xml = infile.readlines()
+        xmlList = infile.readlines()
 
     # XML --> (key, value)
-    usctDict = parseXML(xml)
+    usctDict = parseXML(xmlList)
 
     # dict --> file
-    with open(args.outputFile, 'w') as outfile:
-        outfile.writelines(usctDict)
+#    with open(args.outputFile, 'w') as outfile:
+#        outfile.writelines(usctDict)
 
     #  dict --> stdout
     if args.verbose:
