@@ -51,7 +51,11 @@ def parseXML(xmlAsList):
     print(tree.findall('.//ebn:NoticePageCount',ns))
     print(tree.find('NoticePageCount'))
 
-    return dict
+    debugDict = {'DebtorFirstName':'Debtor/PersonName/PersonGivenName',
+                 'DebtorSurName':'Debtor/PersonaName/PersonSurName',
+                }
+    print(len(debugDict))
+    return {'a':'b'}
 
 # <ecf:CaseParticipant><nc:EntityPerson s:id="Debtor">
 #<nc:PersonName>
@@ -67,9 +71,9 @@ import argparse
 if __name__ == "__main__":
     # get arguments
     parser = argparse.ArgumentParser()
+    parser.add_argument("--verbose", help='show results on stdout', action="store_true")
     parser.add_argument("inputFile")
     parser.add_argument("outputFile")
-    parser.add_argument("--verbose")
     args = parser.parse_args()
 
     # file --> XML
@@ -80,13 +84,14 @@ if __name__ == "__main__":
     usctDict = parseXML(xmlList)
 
     # dict --> file
-#    with open(args.outputFile, 'w') as outfile:
-#        outfile.writelines(usctDict)
+    with open(args.outputFile, 'w') as outfile:
+        dictItems = usctDict.items()
+        outfile.writelines(str(usctDict.items()))
 
     #  dict --> stdout
     if args.verbose:
-        for line in xml:
-            sys.stdout.write(line)
+        for item in usctDict.iteritems():
+            sys.stdout.write(str(item))
         sys.stdout.flush()
 
 

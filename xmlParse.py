@@ -12,8 +12,8 @@
 # Copyright:   (c) mthornton 2017
 #-------------------------------------------------------------------------------
 
-
 import xml.etree.ElementTree as ET
+
 # https://docs.python.org/2.7/library/xml.etree.elementtree.html#module-xml.etree.ElementTree
 def nameSpace():
     return {'ebn':"http://ebn.uscourts.gov/EBN-BankruptcyCase",
@@ -71,7 +71,7 @@ if __name__ == "__main__":
     if args.display:
         print xml_string
     
-    #  XML string --> keys:values
+    #  XML string --> keys
     value_dictionary = parseXML(xml_string)
 
     #  XXXX --> file
