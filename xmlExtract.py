@@ -43,7 +43,7 @@ import argparse
 if __name__ == "__main__":
     #  cmd --> args
     parser = argparse.ArgumentParser()
-    parser.add_argument("--display", help='show results on stdout', action="store_true")
+    parser.add_argument("--verbose", help='show results on stdout', action="store_true")
     parser.add_argument("inputFile")
     parser.add_argument("outputFile")
     args = parser.parse_args()
@@ -57,7 +57,7 @@ if __name__ == "__main__":
         outfile.writelines(xml)
         
     #  XML --> print()
-    if args.display: #add argument to print
+    if args.verbose: #add argument to print
         for line in xml:
             sys.stdout.write(line)
         sys.stdout.flush()

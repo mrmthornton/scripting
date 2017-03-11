@@ -57,7 +57,7 @@ import sys
 if __name__ == "__main__":
     #  CMD --> arg1 arg2
     parser = argparse.ArgumentParser()
-    parser.add_argument("--display", help='show results on stdout', action="store_true")
+    parser.add_argument("--verbose", help='display results on stdout', action="store_true")
     parser.add_argument("inputFile")
     parser.add_argument("outputFile")
     args = parser.parse_args()
