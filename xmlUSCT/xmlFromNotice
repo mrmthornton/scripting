@@ -1,0 +1,296 @@
+<ebn:EBNBatch xmlns="urn:oasis:names:tc:legalxml-courtfiling:schema:xsd:CoreFilingMessage-4.0" xmlns:ebn="http://ebn.uscourts.gov/EBN-BankruptcyCase" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://ebn.uscourts.gov/EBN-BankruptcyCase http://ebn.uscourts.gov/EBN-BankruptcyCase/1.1/EBN-BankruptcyCase.xsd" xmlns:ecf="urn:oasis:names:tc:legalxml-courtfiling:schema:xsd:CommonTypes-4.0" xmlns:bankruptcy="urn:oasis:names:tc:legalxml-courtfiling:schema:xsd:BankruptcyCase-4.0" xmlns:j="http://niem.gov/niem/domains/jxdm/4.0" xmlns:nc="http://niem.gov/niem/niem-core/2.0" xmlns:s="http://niem.gov/niem/structures/2.0" >
+<CoreFilingMessage>
+
+<nc:DocumentIdentification>
+ <nc:IdentificationID>21-560-117225-1 </nc:IdentificationID>
+</nc:DocumentIdentification>
+<nc:DocumentPostDate>
+ <nc:DateTime>2016-06-01T12:09:40 </nc:DateTime>
+</nc:DocumentPostDate>
+<ecf:SendingMDELocationID>
+ <nc:IdentificationID>BNC </nc:IdentificationID>
+</ecf:SendingMDELocationID>
+<ecf:SendingMDEProfileCode>PDF_Embedded_XML</ecf:SendingMDEProfileCode>
+<ebn:BankruptcyCase>
+<nc:CaseTitleText>
+Olive Oil &amp;
+Herman Munster
+</nc:CaseTitleText>
+
+<nc:CaseCategoryText>BK</nc:CaseCategoryText>
+<nc:CaseDocketID>99-12345</nc:CaseDocketID>
+<j:CaseAugmentation>
+ <j:CaseCourt>
+  <nc:OrganizationIdentification>
+   <nc:IdentificationID>0970-2   </nc:IdentificationID>
+  </nc:OrganizationIdentification>
+  <nc:OrganizationLocation>
+   <nc:LocationAddress>
+    <nc:StructuredAddress>
+     <nc:LocationStreet>
+      <nc:StreetFullText>230 N 1ST AVE      </nc:StreetFullText>
+      <nc:StreetFullText>STE 101      </nc:StreetFullText>
+     </nc:LocationStreet>
+     <nc:LocationCityName>PHOENIX     </nc:LocationCityName>
+     <nc:LocationStateUSPostalServiceCode>AZ     </nc:LocationStateUSPostalServiceCode>
+     <nc:LocationPostalCode>85003-0608     </nc:LocationPostalCode>
+    </nc:StructuredAddress>
+   </nc:LocationAddress>
+  </nc:OrganizationLocation>
+  <nc:OrganizationName>United States Bankruptcy Court  </nc:OrganizationName>
+  <nc:OrganizationName>District of Arizona  </nc:OrganizationName>
+  <nc:OrganizationPrimaryContactInformation>
+   <nc:ContactTelephoneNumber>
+    <nc:FullTelephoneNumber>
+     <nc:TelephoneNumberFullID>6026824000     </nc:TelephoneNumberFullID>
+    </nc:FullTelephoneNumber>
+   </nc:ContactTelephoneNumber>
+  </nc:OrganizationPrimaryContactInformation>
+  <j:CourtName>District of Arizona  </j:CourtName>
+ </j:CaseCourt>
+<ecf:CaseCourtEvent>
+
+<j:CourtEventSchedule>
+
+<nc:ScheduleDate>
+<nc:DateTime>
+2016-04-14T10:00:00
+</nc:DateTime>
+</nc:ScheduleDate>
+</j:CourtEventSchedule>
+<ecf:ChildDocketReference/>
+<ecf:CourtEventEnteredOnDocketDate/>
+
+ <ecf:CourtEventTypeCode>Section 341 Meeting </ecf:CourtEventTypeCode>
+ <ecf:CourtEventLocationText>
+
+230 N 1st Ave, Ste 500
+Meeting Room 2
+Phoenix, AZ  85003
+
+ </ecf:CourtEventLocationText>
+</ecf:CaseCourtEvent>
+
+	<j:CaseInitiatingParty>
+		<nc:EntityPersonReference s:ref="Debtor"/>
+	</j:CaseInitiatingParty>
+	<j:CaseJudge>
+		<nc:RoleOfPersonReference s:ref="Judge"/>
+	</j:CaseJudge>
+	<j:CaseOtherEntity>
+		<nc:EntityPersonReference s:ref="Joint_Debtor"/>
+	</j:CaseOtherEntity>
+	<j:CaseOtherEntity>
+		<nc:EntityPersonReference s:ref="Notice_Recipient"/>
+	</j:CaseOtherEntity>
+	<j:CaseOtherEntity>
+		<nc:EntityPersonReference s:ref="Trustee"/>
+	</j:CaseOtherEntity>
+	<j:CaseInitiatingAttorney>
+		<nc:RoleOfPersonReference s:ref="Attorney"/>
+</j:CaseInitiatingAttorney>
+
+</j:CaseAugmentation>
+<ecf:CaseAugmentation>
+ <ecf:Alias>
+  <ecf:AliasAlternateName>
+Vegetable  Oil 
+  </ecf:AliasAlternateName>
+
+ <ecf:AliasAlternateNameTypeCode>aka</ecf:AliasAlternateNameTypeCode>
+
+	 <nc:EntityReference s:ref="Debtor"/>
+ </ecf:Alias>
+
+ <ecf:CaseParticipant><nc:EntityPerson s:id="Debtor">
+<nc:PersonName>
+
+  <nc:PersonGivenName>Olive  </nc:PersonGivenName>
+  <nc:PersonSurName>Oil  </nc:PersonSurName></nc:PersonName>
+
+  <nc:PersonTaxIdentification>
+   <nc:IdentificationID>111-99-9999   </nc:IdentificationID>
+  </nc:PersonTaxIdentification></nc:EntityPerson>
+
+  <ecf:CaseParticipantRoleCode>Debtor  </ecf:CaseParticipantRoleCode>
+  <nc:ContactInformation>
+   <nc:ContactMailingAddress>
+    <nc:StructuredAddress>
+     <nc:LocationStreet><nc:StreetFullText>
+123 Deserted Rd
+</nc:StreetFullText>
+
+     </nc:LocationStreet>
+     <nc:LocationCityName>BLACK CANYON CITY     </nc:LocationCityName>
+     <nc:LocationStateUSPostalServiceCode>AZ     </nc:LocationStateUSPostalServiceCode>
+     <nc:LocationPostalCode>85324     </nc:LocationPostalCode>
+    </nc:StructuredAddress>
+   </nc:ContactMailingAddress>
+  </nc:ContactInformation>
+ </ecf:CaseParticipant>
+ <ecf:CaseParticipant><nc:EntityPerson s:id="Joint_Debtor">
+<nc:PersonName>
+
+  <nc:PersonGivenName>Herman  </nc:PersonGivenName>
+  <nc:PersonSurName>Munster  </nc:PersonSurName></nc:PersonName>
+</nc:EntityPerson>
+
+  <ecf:CaseParticipantRoleCode>Joint_Debtor  </ecf:CaseParticipantRoleCode>
+  <nc:ContactInformation>
+   <nc:ContactMailingAddress>
+    <nc:StructuredAddress>
+    </nc:StructuredAddress>
+   </nc:ContactMailingAddress>
+  </nc:ContactInformation>
+ </ecf:CaseParticipant>
+ <ecf:CaseParticipant><ecf:EntityOrganization s:id="Notice_Recipient">
+
+  <nc:OrganizationName>MR. TXT11N
+
+  </nc:OrganizationName></ecf:EntityOrganization>
+
+  <ecf:CaseParticipantRoleCode>Notice_Recipient  </ecf:CaseParticipantRoleCode>
+  <nc:ContactInformation>
+   <nc:ContactMailingAddress>
+    <nc:StructuredAddress>
+     <nc:LocationStreet><nc:StreetFullText>
+2525 NETWORK PL
+</nc:StreetFullText>
+
+     </nc:LocationStreet>
+     <nc:LocationCityName>HERNDON     </nc:LocationCityName>
+     <nc:LocationStateUSPostalServiceCode>VA     </nc:LocationStateUSPostalServiceCode>
+     <nc:LocationPostalCode>20171-3514     </nc:LocationPostalCode>
+    </nc:StructuredAddress>
+   </nc:ContactMailingAddress>
+  </nc:ContactInformation>
+ </ecf:CaseParticipant>
+ <ecf:CaseParticipant><ecf:EntityPerson s:id="Judge">
+
+  <nc:PersonOtherIdentification>
+   <nc:IdentificationID>RJH   </nc:IdentificationID>
+   <nc:IdentificationCategoryText>Initials   </nc:IdentificationCategoryText>
+  </nc:PersonOtherIdentification></ecf:EntityPerson>
+
+  <ecf:CaseParticipantRoleCode>Judge  </ecf:CaseParticipantRoleCode>
+ </ecf:CaseParticipant><ecf:CaseParticipant>
+<nc:EntityPerson s:id="Trustee">
+
+ <nc:PersonName>
+  <nc:PersonGivenName>Donald  </nc:PersonGivenName>
+  <nc:PersonSurName>Duck  </nc:PersonSurName>
+ </nc:PersonName></nc:EntityPerson>
+
+ <ecf:CaseParticipantRoleCode>Trustee </ecf:CaseParticipantRoleCode>
+ <nc:ContactInformation>
+  <nc:ContactTelephoneNumber>
+   <nc:FullTelephoneNumber>
+    <nc:TelephoneNumberFullID>5555551212    </nc:TelephoneNumberFullID>
+   </nc:FullTelephoneNumber>
+  </nc:ContactTelephoneNumber>
+  <nc:ContactMailingAddress>
+   <nc:StructuredAddress>
+    <nc:LocationStreet><nc:StreetFullText>
+987 Pond Lane
+</nc:StreetFullText>
+
+    </nc:LocationStreet>
+    <nc:LocationCityName>WATERTOWN    </nc:LocationCityName>
+    <nc:LocationStateUSPostalServiceCode>AZ    </nc:LocationStateUSPostalServiceCode>
+   </nc:StructuredAddress>
+  </nc:ContactMailingAddress>
+ </nc:ContactInformation></ecf:CaseParticipant>
+
+ <ecf:CaseParticipant><nc:EntityPerson s:id="Attorney">
+
+  <nc:PersonName>
+   <nc:PersonGivenName>Mickey   </nc:PersonGivenName>
+   <nc:PersonSurName>Mouse   </nc:PersonSurName>
+  </nc:PersonName></nc:EntityPerson>
+
+  <ecf:CaseParticipantRoleCode>Attorney  </ecf:CaseParticipantRoleCode>
+  <nc:ContactInformation>
+   <nc:ContactTelephoneNumber>
+    <nc:FullTelephoneNumber>
+     <nc:TelephoneNumberFullID>5558675309     </nc:TelephoneNumberFullID>
+    </nc:FullTelephoneNumber>
+   </nc:ContactTelephoneNumber>
+   <nc:ContactMailingAddress>
+    <nc:StructuredAddress>
+     <nc:LocationStreet><nc:StreetFullText>
+6738 E Cave Creek Rd
+</nc:StreetFullText>
+
+     </nc:LocationStreet>
+     <nc:LocationCityName>LOGAN     </nc:LocationCityName>
+     <nc:LocationStateUSPostalServiceCode>UT     </nc:LocationStateUSPostalServiceCode>
+     <nc:LocationPostalCode>85331-8640     </nc:LocationPostalCode>
+    </nc:StructuredAddress>
+   </nc:ContactMailingAddress>
+  </nc:ContactInformation>
+ </ecf:CaseParticipant>
+</ecf:CaseAugmentation>
+<bankruptcy:AssetNoticeIndicator>false</bankruptcy:AssetNoticeIndicator>
+	<bankruptcy:NumberOfCreditorsValueLevelCode/>
+		<bankruptcy:EstimatedAssetsValueLevelCode/>
+		<bankruptcy:EstimatedDebtsValueLevelCode/>
+		<bankruptcy:SmallBusinessIndicator>false</bankruptcy:SmallBusinessIndicator>
+		<bankruptcy:Section1121eIndicator>false</bankruptcy:Section1121eIndicator>
+		<bankruptcy:DebtorTypeCode/>
+
+<bankruptcy:JointPetitionIndicator>true</bankruptcy:JointPetitionIndicator>
+	<bankruptcy:NatureOfDebtCode/>
+		<bankruptcy:VoluntaryIndicator>false</bankruptcy:VoluntaryIndicator>
+
+<bankruptcy:BankruptcyStatute>
+ <j:StatuteCodeIdentification>
+  <nc:IdentificationID>7  </nc:IdentificationID>
+ </j:StatuteCodeIdentification>
+</bankruptcy:BankruptcyStatute><bankruptcy:Debtor/>
+
+<ebn:BankruptcyFilingDate>
+ <nc:Date>2015-03-10 </nc:Date>
+</ebn:BankruptcyFilingDate>
+<ebn:DebtorInfo>
+  <nc:EntityPersonReference s:ref="Debtor"/>
+
+</ebn:DebtorInfo>
+
+	<ebn:DebtorInfo>
+<nc:EntityPersonReference s:ref="Joint_Debtor"/>
+</ebn:DebtorInfo>
+
+<ebn:BankruptcyObjectionDischargeDate>
+ <nc:Date>2015-06-13 </nc:Date>
+</ebn:BankruptcyObjectionDischargeDate>
+<ebn:BankruptcyMeansText>The presumption of abuse does not arise.</ebn:BankruptcyMeansText>
+<ebn:BankruptcyFormCodeText>9A</ebn:BankruptcyFormCodeText>
+<ebn:BankruptcyFormCategory>First Meeting Notice</ebn:BankruptcyFormCategory>
+<ebn:BankruptcyFormNameText>pdf</ebn:BankruptcyFormNameText>
+<ebn:BankruptcyNoticeShortNameText>First Meeting Notice</ebn:BankruptcyNoticeShortNameText>
+<ebn:NoticePageCount>2</ebn:NoticePageCount>
+</ebn:BankruptcyCase>
+
+<FilingConfidentialityIndicator>false</FilingConfidentialityIndicator>
+
+<FilingLeadDocument s:id="_notice">
+
+<nc:DocumentApplicationName>Ghostscript</nc:DocumentApplicationName>
+<nc:DocumentDescriptionText>Bankruptcy Notice</nc:DocumentDescriptionText>
+<nc:DocumentLanguageCode>eng</nc:DocumentLanguageCode>
+<ecf:DocumentMetadata>
+<j:RegisterActionDescriptionText/>
+<ecf:FilingAttorneyID/>
+<ecf:FilingPartyID/></ecf:DocumentMetadata>
+<ecf:DocumentRendition>
+ <ecf:DocumentRenditionMetadata>
+	<ecf:DocumentAttachment s:id="_.pdf">
+  <nc:BinaryDescriptionText>application/gs  </nc:BinaryDescriptionText>
+	<nc:BinaryLocationURI/>
+	</ecf:DocumentAttachment>
+ </ecf:DocumentRenditionMetadata>
+</ecf:DocumentRendition>
+</FilingLeadDocument>
+
+</CoreFilingMessage>
+</ebn:EBNBatch>
