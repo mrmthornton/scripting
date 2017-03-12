@@ -24,14 +24,15 @@ def recur(e):
     def recurInner(elem):
         for child in elem:
             if child is not None:
-                print "CHILD:", child, "\n\tTAG:", child.tag, "\n\t\tATTR:", child.attrib
+                print "TAG:", child.tag
+                
                 recurInner(child)
-    print "ROOT:", e, "\n\tTAG:", e.tag, "\n\t\tATTR:", e.attrib
+    print "ROOT:TAG:", e.tag
     recurInner(e)
 
 #  XML string --> keys:values
-def findNamePath(xmlstring):
-    root = ET.fromstring(xmlstring)
+def findNamePath(xml):
+    root = ET.fromstringlist(xml)
     recur(root)
     
     return dict
