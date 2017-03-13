@@ -24,10 +24,9 @@ def recur(e):
     def recurInner(elem):
         for child in elem:
             if child is not None:
-                print "TAG:", child.tag
-                
+                print child.tag.rsplit('}',1)[1], "\t", child.tag     
                 recurInner(child)
-    print "ROOT:TAG:", e.tag
+    print e.tag.rsplit('}',1)[1], "\t", e.tag  
     recurInner(e)
 
 #  XML string --> keys:values
