@@ -12,7 +12,7 @@
 
 import xml.etree.ElementTree as ET
 
-# https://docs.python.org/2.7/library/xml.etree.elementtree.html#module-xml.etree.ElementTree
+
 def nameSpace():
     return {'ebn':"http://ebn.uscourts.gov/EBN-BankruptcyCase",
             'xsi':"http://www.w3.org/2001/XMLSchema-instance",
@@ -20,33 +20,28 @@ def nameSpace():
             'j'  :"http://niem.gov/niem/domains/jxdm/4.0",
             'nc' :"http://niem.gov/niem/niem-core/2.0",
             's'  :"http://niem.gov/niem/structures/2.0" }
-def recur(e):
-    def recurInner(elem):
-        for child in elem:
-            if child is not None:
-                print child.tag.rsplit('}',1)[1], "\t", child.tag     
-                recurInner(child)
-    print e.tag.rsplit('}',1)[1], "\t", e.tag  
-    recurInner(e)
 
-#  XML string --> keys:values
+
+def recur(elem, d={}):
+    for child in elem:
+        if child is not None:
+            d.update({child.tag.rsplit('}',1)[1] : child.tag})
+            recur(child, d)
+    return d
+
+
+#  XML string --> {name:fullTag}
 def findNamePath(xml):
     root = ET.fromstringlist(xml)
-    recur(root)
-    
+    namePath = recur(root, {})
+    for key,value in namePath.items():
+        print key, "\t", value
     return dict
-#    <sometag xmlns:fake="http://fakespace.com" fake:noNamespaceSchemaLocation="someschema.xsd"
-#    <othertag xmlns:real="http://realspace.com" real:schemaLocation="schema.xsd" ???
-
-
-# <ecf:CaseParticipant><nc:EntityPerson s:id="Debtor">
-#<nc:PersonName>
-#  <nc:PersonGivenName>Olive  </nc:PersonGivenName>
-#  <nc:PersonSurName>Oil  </nc:PersonSurName></nc:PersonName>
 
 
 import argparse
 import sys
+from csv import DictReader , DictWriter
 
 if __name__ == "__main__":
     #  CMD --> arg1 arg2
@@ -59,17 +54,24 @@ if __name__ == "__main__":
     #  file --> XML
     with open(args.inputFile, 'r') as infile:
         xml = infile.readlines()
-        
-    #  file --> dict (namestring, xpath)
-    nameDict = findNamePath(xml)
-    
-    #  XXXX --> file
+
+    #  XML --> dict (name, fullTag)
+    root = ET.fromstringlist(xml)
+    namePath = recur(root, {})
+
+    #  dict --> file
     with open(args.outputFile, 'w') as outfile:
-        outfile.writelines(xml)
+        writer = DictWriter(outfile, None)
+        for item in namePath.items():
+            writer.writerow(item)
+        #outfile.writelines(namePath)
+#is-it-possible-to-keep-the-column-order-using-the-python-csv-dictreader
+#write-dict-to-csv-file-with-keys-not-in-alphabetic-order
+#https://stackoverflow.com/help/mcve
 
     #  XXXX --> print()
     if args.verbose:
-        for line in xml:
+        for line in namePath:
             sys.stdout.write(line)
         sys.stdout.flush()
 
