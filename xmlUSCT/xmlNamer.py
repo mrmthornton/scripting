@@ -61,13 +61,13 @@ if __name__ == "__main__":
 
     #  dict --> file
     with open(args.outputFile, 'w') as outfile:
-        writer = DictWriter(outfile, None)
-        for item in namePath.items():
-            writer.writerow(item)
-        #outfile.writelines(namePath)
-#is-it-possible-to-keep-the-column-order-using-the-python-csv-dictreader
-#write-dict-to-csv-file-with-keys-not-in-alphabetic-order
-#https://stackoverflow.com/help/mcve
+        writer = DictWriter(outfile, namePath.keys())
+        writer.writeheader()
+        writer.writerow(namePath)
+# is-it-possible-to-keep-the-column-order-using-the-python-csv-dictreader
+# write-dict-to-csv-file-with-keys-not-in-alphabetic-order
+# https://stackoverflow.com/help/mcve
+# https://docs.python.org/2/library/csv.html#module-csv
 
     #  XXXX --> print()
     if args.verbose:
