@@ -41,7 +41,7 @@ def findNamePath(xml):
 
 import argparse
 import sys
-from csv import DictReader , DictWriter
+from csv import DictWriter
 
 if __name__ == "__main__":
     #  CMD --> arg1 arg2
@@ -71,8 +71,8 @@ if __name__ == "__main__":
 
     #  XXXX --> print()
     if args.verbose:
-        for line in namePath:
-            sys.stdout.write(line)
+        for name in sorted(namePath.keys()):
+            sys.stdout.write(name + '\n')
         sys.stdout.flush()
 
 
