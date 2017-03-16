@@ -68,6 +68,9 @@ if __name__ == "__main__":
 # write-dict-to-csv-file-with-keys-not-in-alphabetic-order
 # https://stackoverflow.com/help/mcve
 # https://docs.python.org/2/library/csv.html#module-csv
+#Anaconda: use the Scripts\activate.bat file to set the install location into the path. 
+
+
 
     #  XXXX --> print()
     if args.verbose:
