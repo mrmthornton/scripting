@@ -64,6 +64,9 @@ def excuse_violation(driver, parameters):
             rawString = row[0]
             if rawString == "" or rawString == 0:  #end when input does not exist
                 break
+            debug = rawString[0]
+            if rawString[0] == "#":# don't process comments, index is 1 since excel adds double quote text
+                continue
             inputString = cleanUpString(rawString)
 
             # check for Violation Excusal page
@@ -118,4 +121,5 @@ if __name__ == '__main__':
     driver = openBrowser(parameters['url'])
     excuse_violation(driver, parameters)
     driver.close()
+    driver.quit()
 
