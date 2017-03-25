@@ -51,9 +51,11 @@ def excuse_violation(driver, parameters):
     delay = parameters['delay']
     # pause on next line for entry of credentials, and window navigation.
     waitForUser('VPS login')
-    startPageTextLocator = (By.XPATH, '//TD/H1[contains(text(),"ThisWillNeverBeFount")]')
+    startPageTextLocator = (By.XPATH, '//TD/H1[contains(text(),"ThisWillNeverBeFound")]')
+    count = 0
     while True:
         touchWindows = findTargetPage(driver, findStartWindowDelay, startPageTextLocator)
+        count = count + 1; print count + 1
         time.sleep(10*60)
 
 
