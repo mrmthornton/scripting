@@ -184,7 +184,7 @@ def txDotDataFill(recordDictionary, csvRecord):
         return recordDictionary
 
 
-def txDotToDbRecord(txDotRec, db):
+def ToDbRecord(txDotRec, db):
     if txDotRec["type"]=='NORECORD': db["completed"]='NO RECORD'
     else: db["completed"]='YES'
     db["plate"] = txDotRec["plate"]
@@ -202,7 +202,7 @@ def txDotToDbRecord(txDotRec, db):
     #db["model"] = txDotRec["model"]
     #db["body"] = txDotRec["body"]
     #db["vehicle_year"] = txDotRec["vehicle_year"]
-    #db["images_reviewed"] = txDotRec["images_reviewed"]
+    db["images_reviewed"] = 10
     #db["images_corrected"] = txDotRec["images_corrected"]
     #db["reason"] = txDotRec["reason"]
     db["time_stamp"] = time.strftime("%m/%d/%Y %I:%M:%S %p") # month, day, long year, 12 hr, AM/PM
@@ -225,12 +225,15 @@ if __name__ == '__main__':
 
     NUMBERtoProcess = 10
     vpsBool = False
+    txBool = True
+    dbBool = True
     delay=10
     SLEEPTIME = 5 # seconds 180 for standard time delay
     parameters = setParameters()
     parameters['operatorMessage'] = "Use debug mode, \n open VPS, new violator search window, \n open DMV window, \n run to completion"
     print parameters['operatorMessage']
-    txDriver = openBrowser('https://mvinet.txdmv.gov')
+    if txBool:
+        txDriver = openBrowser('https://mvinet.txdmv.gov')
     if vpsBool:
         driver = openBrowser(parameters['url'])
 
@@ -239,8 +242,8 @@ if __name__ == '__main__':
         dbConnect, dbcursor = ConnectToAccessFile()
         #for row in dbcursor.columns(table='Sheet1'): # debug
         #    print row.column_name                    # debug
-        dbcursor.execute("SELECT plate FROM [list of plate 4 without matching sheet1]") # (1),4,8,9,10, '11'  ,12
-        #dbcursor.execute("SELECT plate FROM [list of plates 7 without matching sheet1]") # 2,3,5,6,7
+        #dbcursor.execute("SELECT plate FROM [list of plate 4 without matching sheet1]") # (1),4,8,9,10, '11'  ,12
+        dbcursor.execute("SELECT plate FROM [list of plates 3 without matching sheet1]") # 2,3,5,6,7
         lpList = []
         loopCount = 0
         while loopCount< NUMBERtoProcess:
@@ -333,7 +336,7 @@ if __name__ == '__main__':
             for csvRecord in recordList:
                 txDotRecord = txDotDataFill(txDotDataInit(), csvRecord)
                 dbRecord = recordInit()
-                dbRecord = txDotToDbRecord(txDotRecord, dbRecord)
+                dbRecord = ToDbRecord(txDotRecord, dbRecord)
                 print dbRecord # for debug
                 sqlString = makeSqlString(dbRecord)
                 #print sqlString # for debug
@@ -369,8 +372,9 @@ if __name__ == '__main__':
         if vpsBool:
             driver.close() # close browser window
             driver.quit()  # close command window
-        txDriver.close()
-        txDriver.quit()
+        if txBool:
+            txDriver.close()
+            txDriver.quit()
 
 # 'd' Signed integer decimal.
 # 'i' Signed integer decimal.
