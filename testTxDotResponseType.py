@@ -1,14 +1,14 @@
 #-------------------------------------------------------------------------------
-# Name:        TxDotToCSV
-# Purpose:     gather output from TXDMV RTS database, parse the raw text,
-#              and save to CSV text file
+# Name:        testTxDotResponse
+# Purpose:     input reponses from TX DMV RTS database, in raw text format.
+#
 # Author:      mthornton
 #
-# Created:     2014 NOV 24
-# Updates:     2016 FEB 11
-# Copyright:   (c) mthornton 2014, 2015, 2016
-# input(s)
-# output(s)
+# Created:     2017 MAR 31
+# Updates:     2017 MAR 31
+# Copyright:   (c) mthornton 2017
+# input(s)     tempResponseTypes.txt
+# output(s)    tempResponseResults.txt
 #-------------------------------------------------------------------------------
 
 import re
@@ -16,24 +16,24 @@ import io
 import csv
 import string
 
-from TxDot_LIB import findResponseType
+from TxDot_LIB import findResponseType, cleanUpString
 
 def main():
+    # move to LIB ??
+    with open('tempResponseResults.txt', 'a') as outfile, \
+         open('tempResponseTypes.txt', 'r') as infile, \
+         open('tempPlates.txt', 'r') as platefile:
 
-    with open('plates.csv', 'r') as plateFile:
-        csvInput = csv.reader(plateFile)
-        plates = [row[0] for row in csvInput]
-
-    with open('dataCSV.txt', 'a') as outfile, open('txdotText.txt', 'a') as rawTextFile:
         outfile.truncate()
-        rawTextFile.truncate()
+        plates = platefile.readlines()
+
         for plate in plates:
-            results = query(driver, delay, plate)
+            plate = plate.strip()
+            results = infile.read()
             if results is not None:
-                print results # for debug
-                rawTextFile.write(results)
-                rawTextFile.write('\n\n------------------------------------\n\n')
+                #print results # for debug
                 fileString = repairLineBreaks(results)
+                print fileString # for debug
             foundCurrentPlate = False
             while True:
                 try:
@@ -44,26 +44,21 @@ def main():
                         print "\n", plate, ' Plate/Pattern not found'
                         outfile.write(',' + plate + ' Plate/Pattern not found\n')
                     break
-                if responseType != None:
+                if responseType is not None:
                     foundCurrentPlate = True
-                    #print 'main:', responseType, startNum, endNum
+                    print 'main:', responseType, startNum, endNum
+                    # save only the 'core' string
                     typeString = fileString[startNum:endNum + 1]
-                    #print typeString
+                    print typeString # for debug
+                    # remove the current working string from the larger string
                     fileString = fileString[:startNum] + fileString[endNum + 1:]
                     listData = parseRecord(responseType, typeString)
                     csvString = csvStringFromList(listData)
                     outfile.write(csvString)
         outfile.write('----------------\n')
         outfile.flush()
-    print "main: Finished parsing TxDot file."
+    print "main: Finished."
 
 
 if __name__ == '__main__':
-    #create an instance of IE and set some options
-    driver = webdriver.Ie()
-    delay=10
-    url = 'https://mvinet.txdmv.gov'
-    driver.get(url)
     main()
-    driver.exit()
-    driver.close()

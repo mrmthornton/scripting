@@ -284,7 +284,7 @@ def commonCode(lpList):
                 break
             if cell == '#':
                 continue
-            plateString = cell
+            plateString = cell.strip()
 
             #VPS section   *****************************************************************
             if vpsBool:

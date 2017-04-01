@@ -166,7 +166,7 @@ def findResponseType(plate, fileString):
     startPattern = re.compile(r'SELECTION REQUEST:\s+TEMPORARY TAG\s+' + plate)
     endPattern = re.compile(r',\w{2,2},\d{5,5}')  # ,ST,Zip
     startNum, endNum = findStartEnd(fileString,startPattern, endPattern)
-    if startNum != None:
+    if startNum is not None:
         print  'findResponseType:', targetType, plate
         return [targetType, startNum, endNum]
 
