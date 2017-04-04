@@ -19,7 +19,7 @@ import string
 from TxDot_LIB import findResponseType, cleanUpString
 
 def main():
-    # move to LIB ??
+    # move to LIB ?? as
     with open('tempResponseResults.txt', 'a') as outfile, \
          open('tempResponseTypes.txt', 'r') as infile, \
          open('tempPlates.txt', 'r') as platefile:
@@ -29,11 +29,13 @@ def main():
 
         for plate in plates:
             plate = plate.strip()
+            if plate is None or plate == "":
+                break
             results = infile.read()
-            if results is not None:
-                #print results # for debug
+            if (results is not None and results != ""):
+                ##print "main: ", results # for debug
                 fileString = repairLineBreaks(results)
-                print fileString # for debug
+                ##print "main: ", fileString # for debug
             foundCurrentPlate = False
             while True:
                 try:
@@ -49,10 +51,11 @@ def main():
                     print 'main:', responseType, startNum, endNum
                     # save only the 'core' string
                     typeString = fileString[startNum:endNum + 1]
-                    print typeString # for debug
-                    # remove the current working string from the larger string
+                    ##print "main: ", typeString # for debug
+                    #remove the current working string from the larger string
                     fileString = fileString[:startNum] + fileString[endNum + 1:]
                     listData = parseRecord(responseType, typeString)
+                    print "main: ", listData # for debug
                     csvString = csvStringFromList(listData)
                     outfile.write(csvString)
         outfile.write('----------------\n')
