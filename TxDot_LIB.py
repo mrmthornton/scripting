@@ -216,7 +216,8 @@ def findResponseType(plate, fileString):
 
 # parseRecord() calls the appropriate 'parse<RESPONSETYPE>()',
 # which returns a list of strings as follows:
-# ['response type', 'plate', 'name', 'addr', 'addr2', 'city', 'state', 'zip', 'ownedStartDate', 'startDate', 'endDate', 'issued']
+# ['response type', 'plate', 'name', 'addr', 'addr2', 'city', 'state', 'zip', 'ownedStartDate', 'startDate', 'endDate', 'issued',
+#   yr, mak, modl, styl, vin]
 # Other than 'response type' and 'plate', the strings may be empty.
 def parseRecord(responseType, typeString):
     if responseType == 'NORECORD':
@@ -319,6 +320,20 @@ def parseStandard(responseType, typeString):
         typeString = typeString[nextRemove.end():]
         nextDate = datePattern.search(typeString)
         ownedStartDate = nextDate.group()
+    # get YR MAK MODL STYL VIN
+#    yr, mak, modl, styl, vin = getYMMSV(typeString)
+    yrPattern = re.compile('(?<=YR:)\d{4}')
+    yr = yrPattern.search(typeString).group()
+    makPattern = re.compile('(?<=MAK:)\w+')
+    mak = makPattern.search(typeString).group()
+    modlPattern = re.compile('(?<=MODL:)\w+')
+    mod = modlPattern.search(typeString).group()
+    stylPattern = re.compile('(?<=STYL:)\w+')
+    styl = stylPattern.search(typeString).group()
+    vinPattern = re.compile('(?<=VIN: )\w+')
+    vin = vinPattern.search(typeString).group()
+
+
     # get owner and remove
     ownerPattern = re.compile('OWNER\s+')
     nextRemove = ownerPattern.search(typeString)
@@ -387,7 +402,8 @@ def parseStandard(responseType, typeString):
             city = Rcity
             state = Rstate
             zip = Rzip
-    return [responseType, plate.strip(), name.strip(), addr.strip(), addr2.strip(), city.strip(), state.strip(), zip, ownedStartDate, '', '', '']
+    return [responseType, plate.strip(), name.strip(), addr.strip(), addr2.strip(), city.strip(), state.strip(), zip, ownedStartDate, '', '', '',
+            yr, mak, modl, styl, vin]
 
 def parseTxirp(responseType, typeString):
     #remove first word and get plate

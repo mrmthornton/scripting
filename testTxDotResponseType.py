@@ -5,7 +5,7 @@
 # Author:      mthornton
 #
 # Created:     2017 MAR 31
-# Updates:     2017 MAR 31
+# Updates:     2017 APR 04
 # Copyright:   (c) mthornton 2017
 # input(s)     tempResponseTypes.txt
 # output(s)    tempResponseResults.txt
@@ -16,7 +16,7 @@ import io
 import csv
 import string
 
-from TxDot_LIB import findResponseType, cleanUpString
+from TxDot_LIB import findResponseType, cleanUpString, repairLineBreaks, parseRecord, csvStringFromList
 
 def main():
     # move to LIB ?? as
@@ -61,7 +61,6 @@ def main():
         outfile.write('----------------\n')
         outfile.flush()
     print "main: Finished."
-
 
 if __name__ == '__main__':
     main()
