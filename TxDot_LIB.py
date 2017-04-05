@@ -23,8 +23,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 import re
 import io
 import csv
-from VPS_LIB import *
-from UTIL_LIB import *
+import VPS_LIB
+import UTIL_LIB
 
 linePattern = re.compile('^.+')
 wordPattern = re.compile('\w+')
@@ -37,7 +37,7 @@ datePattern = re.compile('[0-9]{2,2}/[0-9]{2,2}/[0-9]{4,4}') # mo/day/year
 dateYearFirstPattern = re.compile(r'\d{4,4}/\d{2,2}/\d{2,2}') # year/mo/day
 
 def repairLineBreaks(fileString):
-    #broken keywords words have a pattern of
+    # broken keywords words have a pattern of
     # partial-word, newline(\n) white-space, partial word, identifier(, . -)
 
     # broken ZipPlus numbers have a pattern of
@@ -50,14 +50,14 @@ def repairLineBreaks(fileString):
     while True:
         broken = wordBreakPattern.search(fileString)
         if broken != None:
-            print 'repairLineBreaks:' + broken.group()
+            print('repairLineBreaks:' , broken.group())
             fileStringBegin = fileString[:broken.start()]
             fileStringMiddle = broken.group()
             fileStringMiddle = fileStringMiddle.replace('\n', '')
             fileStringMiddle = fileStringMiddle.replace(' ', '')
             fileStringEnd = fileString[broken.end():]
             fileString = fileStringBegin + fileStringMiddle + fileStringEnd
-            print 'repairLineBreaks:' + fileStringMiddle
+            print('repairLineBreaks:' , fileStringMiddle)
         else:
             break
     #numberBreakPattern = re.compile(r'\d+\s*\n\s*\d*-\d{4,4}',re.MULTILINE) # find broken ZipPlus
@@ -69,7 +69,7 @@ def repairLineBreaks(fileString):
     while True:
         broken = numberBreakPattern.search(fileString)
         if broken != None:
-            print 'repairLineBreaks:' + broken.group()
+            print('repairLineBreaks:' , broken.group())
             fileStringBegin = fileString[:broken.start()]
             fileStringMiddle = broken.group()
             fileStringMiddle = fileStringMiddle.replace('\n', '')
@@ -78,7 +78,7 @@ def repairLineBreaks(fileString):
             #if re.search(zipPlusPattern, fileStringMiddle) != None:
             fileString = fileStringBegin + fileStringMiddle + fileStringEnd
             if re.search(zipCodePattern, fileString) != None:
-                print 'repairLineBreaks:' + fileStringMiddle
+                print('repairLineBreaks:' + fileStringMiddle)
         else:
             break
 ##    #print 'repairLineBreaks:' + fileString
@@ -120,7 +120,7 @@ def findResponseType(plate, fileString):
     endPattern = re.compile('NO RECORD IN RTS DATABASE')
     startNum, endNum = findStartEnd(fileString,startPattern, endPattern)
     if startNum != None:
-        print  'findResponseType:', targetType, plate
+        print('findResponseType:', targetType, plate)
         return [targetType, startNum, endNum]
 
     # DEALER
@@ -130,7 +130,7 @@ def findResponseType(plate, fileString):
     #endPattern = re.compile('CODE ' + '[A-Z]{2,2}' + '[\s]+' + '[0-9]+')
     startNum, endNum = findStartEnd(fileString,startPattern, endPattern)
     if startNum != None:
-        print  'findResponseType:', targetType, plate
+        print('findResponseType:', targetType, plate)
         return [targetType, startNum, endNum]
 
     # STANDARD
@@ -140,7 +140,7 @@ def findResponseType(plate, fileString):
     endPattern = re.compile(r'TITLE[.]|NON-TITLED|REMARKS')
     startNum, endNum = findStartEnd(fileString,startPattern, endPattern)
     if startNum != None:
-        print  'findResponseType:', targetType, plate
+        print('findResponseType:', targetType, plate)
         return [targetType, startNum, endNum]
 
     # TXIRP
@@ -149,7 +149,7 @@ def findResponseType(plate, fileString):
     endPattern = re.compile('REMARKS')
     startNum, endNum = findStartEnd(fileString,startPattern, endPattern)
     if startNum != None:
-        print  'findResponseType:', targetType, plate
+        print('findResponseType:', targetType, plate)
         return [targetType, startNum, endNum]
 
     # PERMIT
@@ -158,7 +158,7 @@ def findResponseType(plate, fileString):
     permitEndPattern = re.compile('ISSUING OFFICE: ')
     startNum, endNum = findStartEnd(fileString,permitStartPattern, permitEndPattern)
     if startNum != None:
-        print  'findResponseType:', targetType, plate
+        print('findResponseType:', targetType, plate)
         return [targetType, startNum, endNum]
 
     # TEMPORARY
@@ -167,7 +167,7 @@ def findResponseType(plate, fileString):
     endPattern = re.compile(r',\w{2,2},\d{5,5}')  # ,ST,Zip
     startNum, endNum = findStartEnd(fileString,startPattern, endPattern)
     if startNum is not None:
-        print  'findResponseType:', targetType, plate
+        print('findResponseType:', targetType, plate)
         return [targetType, startNum, endNum]
 
     # SPECIAL
@@ -176,7 +176,7 @@ def findResponseType(plate, fileString):
     endPattern = re.compile(r'CODE XYZ')
     startNum, endNum = findStartEnd(fileString,startPattern, endPattern)
     if startNum != None:
-        print  'findResponseType:', targetType, plate
+        print('findResponseType:', targetType, plate)
         return [targetType, startNum, endNum]
 
     # PLACARD
@@ -185,7 +185,7 @@ def findResponseType(plate, fileString):
     endPattern = re.compile('DISABLED PERSON#:\s+\d+')
     startNum, endNum = findStartEnd(fileString,startPattern, endPattern)
     if startNum != None:
-        print  'findResponseType:', targetType, plate
+        print('findResponseType:', targetType, plate)
         return [targetType, startNum, endNum]
 
     # CANCELED
@@ -210,7 +210,7 @@ def findResponseType(plate, fileString):
         foundEnd = canceledEndPattern.search(fileString[startNum:])
         endNum = foundEnd.end()
         endNum += startNum
-        print  'findResponseType:', targetType, plate
+        print ('findResponseType:', targetType, plate)
         return [targetType, startNum, endNum]
     return None
 
@@ -327,7 +327,7 @@ def parseStandard(responseType, typeString):
     makPattern = re.compile('(?<=MAK:)\w+')
     mak = makPattern.search(typeString).group()
     modlPattern = re.compile('(?<=MODL:)\w+')
-    mod = modlPattern.search(typeString).group()
+    modl = modlPattern.search(typeString).group()
     stylPattern = re.compile('(?<=STYL:)\w+')
     styl = stylPattern.search(typeString).group()
     vinPattern = re.compile('(?<=VIN: )\w+')
@@ -599,7 +599,7 @@ def csvStringFromList(listData):
     return csvString
 
 def timeout():
-    print "TxDotQuery: timeout!"
+    print("TxDotQuery: timeout!")
     quit()
 
 
@@ -610,7 +610,7 @@ def query(driver, delay, plate):
     plateSubmitElement = findElementOnPage(driver, delay, plateSubmitLocator)
 
     if plateSubmitElement is None:
-        print "query: plate submission form not found on page"
+        print("query: plate submission form not found on page")
         return None
     plateSubmitElement.clear()
     plateSubmitElement.send_keys(plate)
@@ -624,7 +624,7 @@ def query(driver, delay, plate):
         textElement = findElementOnPage(driver, delay, elemLocator)
         uText = textElement.text
     except TimeoutException:
-        print "ERROR: Timeout, record LP may not match input LP"
+        print("ERROR: Timeout, record LP may not match input LP")
         return None
     plateSubmitElement.clear() # does this need to be cleaned to be found?
     return str(uText)
@@ -637,10 +637,10 @@ if __name__ == "__main__":
         platesCsv = csv.reader(infile.readline())
         lpList = [plate for plate in platesCsv]
         text = infile.read()
-        print text
+        print(text)
         text = repairLineBreaks(text)
-        print text
+        print(text)
         for lp in lpList:
             result = findResponseType(lp, text)
-            if result is not None: print result[0]
+            if result is not None: print(result[0])
 

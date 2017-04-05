@@ -22,7 +22,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 import tkMessageBox
 from Tkinter import *
 
-from UTIL_LIB import *
+import UTIL_LIB
 
 import re
 import time
@@ -32,7 +32,7 @@ def fillFormAndSubmit(driver, window, element, textForForm, parameters):
     if type(element) == type(None): # skip the form submission
         return False
     #assert(driver.current_window_handle == window)
-    #print "fillFormAndSubmit: " + driver.current_url # for debug purposes
+    #print("fillFormAndSubmit: " , driver.current_url) # for debug purposes
     element.clear()
     element.send_keys(textForForm)
     returnOrClick(element, parameters['returnOrClick'])
@@ -45,7 +45,7 @@ def findAndClickButton(driver, delay, parameters):
     try:
         button = WebDriverWait(driver, delay).until(EC.presence_of_element_located(parameters['buttonLocator']))
     except TimeoutException:
-        print "findAndClickButton: button not found."
+        print("findAndClickButton: button not found.")
         return False
     button.click()
     return True
@@ -70,7 +70,7 @@ def findAndSelectFrame(driver, delay, frameName):
             foundFrame = WebDriverWait(driver, frameDelay).until(EC.presence_of_element_located(targetLocator))
             foundFrameName = foundFrame.get_attribute("name")
             driver.switch_to_frame(foundFrame)
-            print "walkFrames: found target frame ", foundFrameName  # for debug purposes
+            print("walkFrames: found target frame ", foundFrameName)  # for debug purposes
             return True
         except TimeoutException:
             try:
@@ -79,13 +79,13 @@ def findAndSelectFrame(driver, delay, frameName):
                 return False
             for frame in frames:
                 frameList.append(frame)
-            print "findAndSelectFrame: creating framelist: length of ", len(frameList)
+            print("findAndSelectFrame: creating framelist: length of ", len(frameList))
             while True:
                 try:
                     nextParentFrame = frameList.pop()
                     nextParentFrameName = nextParentFrame.get_attribute("name")
                     driver.switch_to_frame(nextParentFrame)
-                    print "walkFrames: next parent is ", nextParentFrameName
+                    print("walkFrames: next parent is ", nextParentFrameName)
                     if walkFrames(targetLocator, nextParentFrame):
                         return True
                     if parentFrame is None:
@@ -93,16 +93,16 @@ def findAndSelectFrame(driver, delay, frameName):
                     else:
                         driver.switch_to_frame(parentFrame)
                 except IndexError :
-                    print "findAndSelectFrame: ", targetLocator, " not found."
+                    print("findAndSelectFrame: ", targetLocator, " not found.")
                     return False
 
     targetLocator = None
     # build the target locator from the argument
     if frameName is None: return False
     locatorText = '//frame[@name="' + frameName + '"]'
-    # print locatorText
+    # print(locatorText)
     targetLocator =  (By.XPATH, '//frame[@name="' + frameName + '"]' )
-    # print targetLocator
+    # print(targetLocator)
     return walkFrames(targetLocator, None)
 
 
@@ -111,7 +111,7 @@ def findElementOnPage(driver, delay, elementLocator, window=None):
         return None
     if window is not None:
         driver.switch_to_window(window) # switch to window if supplied
-        print "findElementOnPage: switched to target window"
+        print("findElementOnPage: switched to target window")
     try:
         element = WebDriverWait(driver, delay).until(EC.presence_of_element_located(elementLocator))
         return element
@@ -124,26 +124,26 @@ def findTargetPage(driver, delay, locator, frameName=None):
     try:
         handle = driver.current_window_handle
     except NoSuchWindowException:
-        print "findTargetPage: nothing to process, all windows finished?"
+        print("findTargetPage: nothing to process, all windows finished?")
         return None
     handles = driver.window_handles
     for handle in handles:  # test each window for target
         driver.switch_to_window(handle)
         foundFrame = findAndSelectFrame(driver, delay, frameName)
-        print "findTargetPage: Searching for  ", locator # for debug purposes
+        print("findTargetPage: Searching for  ", locator) # for debug purposes
         try:
             elems = WebDriverWait(driver, delay).until(EC.presence_of_all_elements_located(locator))
         except TimeoutException:
             timeout('findTargetPage: locator element not found')
             continue
-        #print "findTargetPage: found '", element.text, "'" # for debug purposes
+        #print("findTargetPage: found '", element.text, "'") # for debug purposes
         return handle
-    print "findTargetPage: 'target page' not found"
+    print("findTargetPage: 'target page' not found"
     return None
 
 
 def getTextResults(driver, delay, plateString, parameters, frameName=None):
-    #print "getTextResults: " + driver.current_url # for debug
+    #print("getTextResults: " + driver.current_url) # for debug
     text_regex = parameters['resultIndexParameters']['regex']
     pattern = re.compile(text_regex)
     if parameters['outputLocator']== None: # skip finding text
@@ -161,7 +161,7 @@ def getTextResults(driver, delay, plateString, parameters, frameName=None):
         try:
             elemText = resultElement.text
         except StaleElementReferenceException:
-            print "getTextResults: stale text element"
+            print("getTextResults: stale text element")
             elemText = ""  # reset the element text and continue
 
         if elemText == 'No Records returned':
@@ -170,7 +170,7 @@ def getTextResults(driver, delay, plateString, parameters, frameName=None):
             return elemText
         text = pattern.findall(elemText)
         if len(text):
-            #print "getTextResults", text # for debug
+            #print("getTextResults", text) # for debug
             return text[0]
     return None
 
@@ -187,7 +187,7 @@ def newPageElementFound(driver, delay, frameLocator, elementlocator):
             else:
                 return False
         except TimeoutException:
-            print "newPageElementFound/findAndSelectFrame: ", frameLocator, " not found."
+            print("newPageElementFound/findAndSelectFrame: ", frameLocator, " not found.")
             return False
     try:
         while True:
@@ -196,7 +196,7 @@ def newPageElementFound(driver, delay, frameLocator, elementlocator):
                 driver.switch_to_default_content()
                 return True
             except TimeoutException:
-                print 'newPageElementFound: ',elementlocator, 'element not found'
+                print('newPageElementFound: ',elementlocator, 'element not found')
                 # select the proper frame before the 'continue'
                 continue
     except TimeoutException:
@@ -238,13 +238,13 @@ def parseString(inputString,indexPattern, targetPattern, segment="all"): # segme
     if found != None:
         indexStart = found.start()
         indexEnd = found.end()
-        #print "parseString: found start", indexStart #debug statement
+        #print("parseString: found start", indexStart) #debug statement
         iterator = targetPattern.finditer(inputString)
         for found in iterator:
             if found.start() > indexStart and found != None:
                 targetStart = found.start()
                 targetEnd = found.end()
-                #print "parseString: found end", targetStart #debug statement
+                #print("parseString: found end", targetStart) #debug statement
                 return inputString[indexEnd:targetEnd:]
     return None
 
@@ -255,8 +255,8 @@ def returnOrClick(element, select):
     elif select == 'click':
         element.click()
     else:
-        print "ERROR: returnOrClick:"
-        print "'select' should be one of 'return' or 'click'"
+        print("ERROR: returnOrClick:")
+        print("'select' should be one of 'return' or 'click'")
 
 
 if __name__ == '__main__':
@@ -288,4 +288,4 @@ if __name__ == '__main__':
     #getTextResults()
     #driver.close()
     driver.quit()
-    print "FINISHED"
+    print("FINISHED")

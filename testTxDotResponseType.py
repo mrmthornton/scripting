@@ -33,9 +33,9 @@ def main():
                 break
             results = infile.read()
             if (results is not None and results != ""):
-                ##print "main: ", results # for debug
+                ##print("main: ", results) # for debug
                 fileString = repairLineBreaks(results)
-                ##print "main: ", fileString # for debug
+                ##print("main: ", fileString) # for debug
             foundCurrentPlate = False
             while True:
                 try:
@@ -43,24 +43,24 @@ def main():
                 except:
                     responseType = None
                     if foundCurrentPlate == False:
-                        print "\n", plate, ' Plate/Pattern not found'
+                        print("\n", plate, ' Plate/Pattern not found')
                         outfile.write(',' + plate + ' Plate/Pattern not found\n')
                     break
                 if responseType is not None:
                     foundCurrentPlate = True
-                    print 'main:', responseType, startNum, endNum
+                    print('main:', responseType, startNum, endNum)
                     # save only the 'core' string
                     typeString = fileString[startNum:endNum + 1]
-                    ##print "main: ", typeString # for debug
+                    ##print("main: ", typeString) # for debug
                     #remove the current working string from the larger string
                     fileString = fileString[:startNum] + fileString[endNum + 1:]
                     listData = parseRecord(responseType, typeString)
-                    print "main: ", listData # for debug
+                    print("main: ", listData) # for debug
                     csvString = csvStringFromList(listData)
                     outfile.write(csvString)
         outfile.write('----------------\n')
         outfile.flush()
-    print "main: Finished."
+    print("main: Finished.")
 
 if __name__ == '__main__':
     main()
