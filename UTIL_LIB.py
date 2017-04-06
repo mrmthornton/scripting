@@ -10,12 +10,11 @@
 #-------------------------------------------------------------------------------
 
 
-import tkMessageBox
-from Tkinter import *
-
 import re
+from selenium import webdriver
 import time
-
+from Tkinter import *
+import tkMessageBox
 
 def cleanUpString(messyString):
     cleanString = messyString.replace(' ' , '') # remove any spaces
@@ -41,6 +40,15 @@ def loadRegExPatterns():
         dateYearFirstPattern=re.compile(r'\d{4,4}/\d{2,2}/\d{2,2}')
     )
     return regex_patterns
+
+
+def openBrowser(url):
+    driver = webdriver.Ie()
+    #driver.maximize_window()
+    #pyseldriver.get(url)
+    #return pyseldriver
+    driver.get(url)
+    return driver
 
 
 def parseString(inputString,indexPattern, targetPattern, segment="all"): # segment may be start, end, or all

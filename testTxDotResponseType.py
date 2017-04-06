@@ -16,7 +16,8 @@ import io
 import csv
 import string
 
-from TxDot_LIB import findResponseType, cleanUpString, repairLineBreaks, parseRecord, csvStringFromList
+from TxDot_LIB import findResponseType, repairLineBreaks, parseRecord, csvStringFromList
+from UTIL_LIB import cleanUpString
 
 def main():
     # move to LIB ?? as

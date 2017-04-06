@@ -23,7 +23,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 import re
 import io
 import csv
-import VPS_LIB
+from VPS_LIB import fillFormAndSubmit, findAndClickButton, findAndSelectFrame, findElementOnPage, findTargetPage
+from VPS_LIB import getTextResults, newPageElementFound, newPageIsLoaded, parseString, returnOrClick
 import UTIL_LIB
 
 linePattern = re.compile('^.+')
@@ -103,12 +104,12 @@ def findStartEnd(fileString,startPattern, endPattern):
     found = startPattern.search(fileString)
     if found != None:
         startLoc = found.start()
-        #print "findStartEnd: found start", startLoc
+        #print("findStartEnd: found start", startLoc)
         iterator = endPattern.finditer(fileString)
         for found in iterator:
             if found.start() > startLoc and found != None:
                 endLoc = found.end()
-                #print "findStartEnd: found end", endLoc
+                #print("findStartEnd: found end", endLoc)
                 return [startLoc,endLoc]
     return [None, None]
 
@@ -300,6 +301,25 @@ def parseDealer(responseType, typeString):
     typeString =  typeString[nextWord.end() + 1:]
     return [responseType, plate.strip(), name.strip(), addr.strip(), '', city.strip(), state.strip(), zip, '', '', '', '']
 
+def year(stringText):
+    yrPattern = re.compile('(?<=YR:)\d{4}')
+    return yrPattern.search(stringText).group()
+def make(stringText):
+    makPattern = re.compile('(?<=MAK:)\w+')
+    return makPattern.search(stringText).group()
+def model(stringText):
+    modlPattern = re.compile('(?<=MODL:)\w+')
+    modl = modlPattern.search(stringText)
+    if modl:
+        return modl.group()
+    return ""
+def style(stringText):
+    stylPattern = re.compile('(?<=STYL:)\w+')
+    return stylPattern.search(stringText).group()
+def vinNumber(stringText):
+    vinPattern = re.compile('(?<=VIN: )\w+')
+    return vinPattern.search(stringText).group()
+
 def parseStandard(responseType, typeString):
     # remove header
     header = LICpattern.search(typeString)
@@ -320,20 +340,12 @@ def parseStandard(responseType, typeString):
         typeString = typeString[nextRemove.end():]
         nextDate = datePattern.search(typeString)
         ownedStartDate = nextDate.group()
-    # get YR MAK MODL STYL VIN
-#    yr, mak, modl, styl, vin = getYMMSV(typeString)
-    yrPattern = re.compile('(?<=YR:)\d{4}')
-    yr = yrPattern.search(typeString).group()
-    makPattern = re.compile('(?<=MAK:)\w+')
-    mak = makPattern.search(typeString).group()
-    modlPattern = re.compile('(?<=MODL:)\w+')
-    modl = modlPattern.search(typeString).group()
-    stylPattern = re.compile('(?<=STYL:)\w+')
-    styl = stylPattern.search(typeString).group()
-    vinPattern = re.compile('(?<=VIN: )\w+')
-    vin = vinPattern.search(typeString).group()
 
-
+    yr = year(typeString)
+    mak = make(typeString)
+    modl = model(typeString)
+    styl = style(typeString)
+    vin = vinNumber(typeString)
     # get owner and remove
     ownerPattern = re.compile('OWNER\s+')
     nextRemove = ownerPattern.search(typeString)

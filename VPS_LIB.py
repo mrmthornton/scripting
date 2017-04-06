@@ -138,7 +138,7 @@ def findTargetPage(driver, delay, locator, frameName=None):
             continue
         #print("findTargetPage: found '", element.text, "'") # for debug purposes
         return handle
-    print("findTargetPage: 'target page' not found"
+    print("findTargetPage: 'target page' not found")
     return None
 
 
@@ -221,15 +221,6 @@ def newPageIsLoaded(driver, delay, currentElement): # depricated ?
     except TimeoutException:
         timeout('newPageLoaded: old page reference never went stale')
         return False
-
-
-def openBrowser(url):
-    driver = webdriver.Ie()
-    #driver.maximize_window()
-    #pyseldriver.get(url)
-    #return pyseldriver
-    driver.get(url)
-    return driver
 
 
 def parseString(inputString,indexPattern, targetPattern, segment="all"): # segment may be start, end, or all

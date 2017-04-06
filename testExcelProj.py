@@ -13,13 +13,15 @@
 
 import datetime
 import pyodbc
+from selenium.webdriver.common.by import By
 import string
 import tkFileDialog
 import tkMessageBox
+import time
 from Tkinter import *
-from TxDot_LIB import *
+from TxDot_LIB import query, repairLineBreaks
+from UTIL_LIB import openBrowser
 import xlwings
-
 
 def setParameters():
     parameters = {
@@ -359,7 +361,7 @@ def commonCode(lpList):
                         # make txdot data record here
                         recordList.append(listData) # more than one record MAY be returned
                          #print listData # for debug
-                        assert(len(listData)==12)
+                        assert(len(listData)==12 or len(listData)==17)
 
             if not txdotBool:
                 recordList = [['response type', 'plate', 'name', 'addr', 'addr2', 'city', 'state', 'zip',\
