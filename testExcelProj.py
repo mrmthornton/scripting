@@ -19,7 +19,7 @@ import tkFileDialog
 import tkMessageBox
 import time
 from Tkinter import *
-from TxDot_LIB import query, repairLineBreaks
+from TxDot_LIB import query, repairLineBreaks, findResponseType, parseRecord
 from UTIL_LIB import openBrowser
 import xlwings
 
@@ -404,8 +404,6 @@ def commonCode(lpList):
                 time.sleep(SLEEPTIME)
 
 # from TxDot lib --> ['response type', 'plate', 'name', 'addr', 'addr2', 'city', 'state', 'zip', 'ownedStartDate', 'startDate', 'endDate', 'issued']
-#"""  ALMOST FULL WRITE TO DATABASE missing title day, month, year -->  this will never happen. some fields are exclusive of others. """
-
     finally:
         if dbBool:
             print("Closing databases")
@@ -428,13 +426,13 @@ def excelHook():
     #l = len(plates)
     #print l, plates
     excelRecord = commonCode(plates) # common code is used by all modules (in theory), with switches for VPS, TXDOT, Excel, database(db).
-    #print excelRecord
+    print("excelHook, full record: ", excelRecord)
     # field name-> type, plate, combined_name, address, city, state, zip, ownedStartDate, start_date, end_date
     xlwings.Range((2,2)).value = excelRecord
 
 
 # global costants
-NUMBERtoProcess = 100
+NUMBERtoProcess = 25
 vpsBool   = False # true when using VPS images
 txdotBool = True  # true when using DMV records
 excelBool = True  # true when using excel
