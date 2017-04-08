@@ -544,7 +544,7 @@ def parseTemporary(responseType, typeString):
     # get zip
     nextWord = wordPattern.search(typeString)
     zip = nextWord.group()
-    return [responseType, plate.strip(), name.strip(), addr.strip(), '', city.strip(), state.strip(), zip, '', startDate, endDate, '']
+    return [responseType, plate.strip(), name.strip(), addr.strip(), '', city.strip(), state.strip(), zip, '', startDate, endDate, '','','','','','']
 
     # SPECIAL
 def parseSpecial(responseType, typeString):
@@ -592,7 +592,7 @@ def parseCanceled(responseType, typeString):
     plate = plateCancel.group()[:-6]
     # pass to parseStandard, since the format is the same
     parsedList = parseStandard(responseType, typeString)
-    parsedList[1] = plate.strip()
+    parsedList[1] = plate.strip() # replace the "standard" plate with the canceled !!!the dates must be compared!!!
     return parsedList
 
 
