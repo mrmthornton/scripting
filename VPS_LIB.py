@@ -5,7 +5,7 @@
 # Author:      mthornton
 #
 # Created:     2015 AUG 01
-# Updates:     2016 MAR 03
+# Updates:     2017 APR 08
 # Copyright:   (c) michael thornton 2015
 #-------------------------------------------------------------------------------
 
@@ -22,7 +22,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 import tkMessageBox
 from Tkinter import *
 
-import UTIL_LIB
+from UTIL_LIB import cleanUpString, openBrowser, timeout
 
 import re
 import time

@@ -5,24 +5,20 @@
 # Author:      mthornton
 #
 # Created:     2017 MAR 31
-# Updates:     2017 APR 04
+# Updates:     2017 APR 04temp
 # Copyright:   (c) mthornton 2017
 # input(s)     tempResponseTypes.txt
 # output(s)    tempResponseResults.txt
 #-------------------------------------------------------------------------------
 
-import re
-import io
-import csv
-import string
 
 from TxDot_LIB import findResponseType, repairLineBreaks, parseRecord, csvStringFromList
-from UTIL_LIB import cleanUpString
+
 
 def main():
     # move to LIB ?? as
     with open('tempResponseResults.txt', 'a') as outfile, \
-         open('tempResponseTypes.txt', 'r') as infile, \
+         open('testCasesNoPii.txt', 'r') as infile, \
          open('tempPlates.txt', 'r') as platefile:
 
         outfile.truncate()
@@ -44,7 +40,7 @@ def main():
                 except:
                     responseType = None
                     if foundCurrentPlate == False:
-                        print("\n", plate, ' Plate/Pattern not found')
+                        print("main: ", plate, ' Plate/Pattern not found')
                         outfile.write(',' + plate + ' Plate/Pattern not found\n')
                     break
                 if responseType is not None:

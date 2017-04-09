@@ -6,7 +6,7 @@
 # Author:      mthornton
 #
 # Created:     2014 NOV 24
-# Update:      2016 OCT 24
+# Updates:     2017 APR 08
 # Copyright:   (c) mthornton 2014, 2015, 2016
 #-------------------------------------------------------------------------------
 
@@ -20,9 +20,10 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
-import re
-import io
 import csv
+import io
+import re
+from Tkinter import Tk
 from VPS_LIB import fillFormAndSubmit, findAndClickButton, findAndSelectFrame, findElementOnPage, findTargetPage
 from VPS_LIB import getTextResults, newPageElementFound, newPageIsLoaded, parseString, returnOrClick
 import UTIL_LIB
@@ -35,7 +36,9 @@ LICpattern = re.compile('^LIC ')
 issuedPattern = re.compile('ISSUED ')
 reg_dtPattern = re.compile('REG DT ')
 datePattern = re.compile('[0-9]{2,2}/[0-9]{2,2}/[0-9]{4,4}') # mo/day/year
-dateYearFirstPattern = re.compile(r'\d{4,4}/\d{2,2}/\d{2,2}') # year/mo/day
+dateYearFirstPattern = re.compile(r'\d{4,4}/\d{2,2}/\d{2,2}') # year/mo/day 
+zipPlusPattern = re.compile(r'\d{5,5}-\d{4,4}')
+zipCodePattern = re.compile(r',\d{5,5}|\s+\w{2,2}\s+\d{5,5}')  # commaZIP or spaceSTspaceZIP
 
 def repairLineBreaks(fileString):
     # broken keywords words have a pattern of
@@ -65,8 +68,6 @@ def repairLineBreaks(fileString):
     #numberBreakPattern = re.compile(r',\d{1,4}\s*\n\s*\d{2,4}',re.MULTILINE) # find broken Zip
     numberBreakPattern = re.compile(r',\d+\s*\n\s*\d+-',re.MULTILINE) # find broken Zip
     # total of 5 digits around a line break?
-    zipPlusPattern = re.compile(r'\d{5,5}-\d{4,4}')
-    zipCodePattern = re.compile(r',\d{5,5}')
     while True:
         broken = numberBreakPattern.search(fileString)
         if broken != None:
@@ -174,7 +175,7 @@ def findResponseType(plate, fileString):
     # SPECIAL
     targetType = 'SPECIAL'
     startPattern = re.compile(r'SPECIAL PLATE\s+' + plate)
-    endPattern = re.compile(r'CODE XYZ')
+    endPattern = zipCodePattern
     startNum, endNum = findStartEnd(fileString,startPattern, endPattern)
     if startNum != None:
         print('findResponseType:', targetType, plate)
@@ -215,7 +216,7 @@ def findResponseType(plate, fileString):
         return [targetType, startNum, endNum]
     return None
 
-# parseRecord() calls the appropriate 'parse<RESPONSETYPE>()',
+# parseRecord() calls the appropriate 'parse<RESPONSETYPE>()' function,
 # which returns a list of strings as follows:
 # ['response type', 'plate', 'name', 'addr', 'addr2', 'city', 'state', 'zip', 'ownedStartDate', 'startDate', 'endDate', 'issued',
 #   yr, mak, modl, styl, vin]
@@ -642,10 +643,12 @@ def query(driver, delay, plate):
     return str(uText)
 
 if __name__ == "__main__":
+    print("TxDot_LIB:main: TESTING TxDot_LIB")
+    '''
     # TEST 'repairLineBreaks()
     with open('temp.txt', 'r') as infile:
         raw = infile.readline()
-        csv.reader(substr())
+        #csv.reader(substr())
         platesCsv = csv.reader(infile.readline())
         lpList = [plate for plate in platesCsv]
         text = infile.read()
@@ -655,4 +658,4 @@ if __name__ == "__main__":
         for lp in lpList:
             result = findResponseType(lp, text)
             if result is not None: print(result[0])
-
+    '''

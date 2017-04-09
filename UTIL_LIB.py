@@ -5,15 +5,17 @@
 # Author:      mthornton
 #
 # Created:     2015 AUG 01
-# Updates:     2017 FEB 20
+# Updates:     2017 APR 08
 # Copyright:   (c) michael thornton 2015, 2016, 2017
 #-------------------------------------------------------------------------------
 
 
 import re
-from selenium import webdriver
+from selenium import webdriver 
 import time
-from Tkinter import *
+
+from Tkinter import Tk
+#import tkMessageBox
 import tkMessageBox
 
 def cleanUpString(messyString):

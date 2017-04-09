@@ -18,6 +18,7 @@ import string
 import tkFileDialog
 import tkMessageBox
 import time
+from tk import tkFileDialog
 from Tkinter import *
 from TxDot_LIB import query, repairLineBreaks, findResponseType, parseRecord
 from UTIL_LIB import openBrowser
