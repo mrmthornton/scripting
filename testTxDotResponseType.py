@@ -5,15 +5,12 @@
 # Author:      mthornton
 #
 # Created:     2017 MAR 31
-# Updates:     2017 APR 04temp
+# Updates:     2017 APR 09
 # Copyright:   (c) mthornton 2017
-# input(s)     tempResponseTypes.txt
-# output(s)    tempResponseResults.txt
+#
 #-------------------------------------------------------------------------------
 
-
 from TxDot_LIB import findResponseType, repairLineBreaks, parseRecord, csvStringFromList
-
 
 def main():
     # move to LIB ?? as
