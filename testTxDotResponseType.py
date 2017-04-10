@@ -17,9 +17,13 @@ from TxDot_LIB import findResponseType, repairLineBreaks, parseRecord, csvString
 
 def main():
     # move to LIB ?? as
-    with open('tempResponseResults.txt', 'a') as outfile, \
-         open('testCasesNoPii.txt', 'r') as infile, \
-         open('tempPlates.txt', 'r') as platefile:
+    inputFileName = 'testCasesNoPii.txt'
+    plateFileName = 'platesNoPii.txt'
+    outputFileName = 'tempResponseResults.txt'
+    
+    with open(outputFileName, 'a') as outfile, \
+         open(inputFileName, 'r') as infile, \
+         open(plateFileName, 'r') as platefile:
 
         outfile.truncate()
         plates = platefile.readlines()
