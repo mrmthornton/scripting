@@ -273,16 +273,16 @@ SELECTION REQUEST: TEMPORARY TAG  55K0747
 
 ---------------------- embedded \n problem-------------               
  
- LIC 123456T JAN/2015 OLD # 60093K JAN/2015 EWT  1490 GWT   3850
+ LIC 123456T JAN/2015 OLD # 60000K JAN/2015 EWT  1490 GWT   3850
  TRLR PLT, STKR            REG CLASS  37   $ 56.00 ROCKWALL CNTY
  TITLE 12345678901234567 ISSUED            ODOMETER N/A REG DT 02/18/2014
  YR:1998 MAK:CMT  MODL:M16 BDY STYL:VN VEH CLS:S-MISC     SALE PRC:     $100.00
  VIN: 12345678901234567 BODY VIN: N/A COLOR: WHITE 
- PREV OWN  BTA INC,ROCKWALL,TX                    
- OWNER     ACTION COMMERCIAL SERVICES LLC,MICHAEL PRIMEAUX,4418 ST HWY 276,,RO
-           CKWALL,TX,75032
+ PREV OWN  ACME CORP,ROCKWALL,TX                    
+ OWNER     ACME SERVICES,MICHELE OBAMA,4444 ST HWY 111,,RO
+           CKWALL,TX,75001
  PLATE AGE:  0  LAST ACTIVITY 02/19/2014 REPL   OFC: 199
- REMARKS PLATE 60093K CANCELLED ON 2014/02/18.DATE OF ASSIGNMENT:2014/02/14.N
+ REMARKS PLATE 60000K CANCELLED ON 2014/02/18.DATE OF ASSIGNMENT:2014/02/14.N
  ON-TITLED-VEHICLE.
 
 
@@ -313,7 +313,7 @@ SELECTION REQUEST: TEMPORARY TAG  55K0747
  REMARKS ACTUAL MILEAGE.DATE OF ASSIGNMENT:2013/10/14.SPECIAL PLATE.PAPER TIT
  LE.
 
- 
+
 ------ apartment ? ----special issue plate?------------
 
  2014 11 RTS SPECIAL PLATE OINKY                          
@@ -328,23 +328,23 @@ SELECTION REQUEST: TEMPORARY TAG  55K0747
 
  SELECTION REQUEST:  PERMIT 566666G      PERMIT ISSUANCE ID: 04333141771123046
         
- 30 DAY PERMIT:      566666G  VALID:2014/05/14 12:30:39--2014/06/13 23:59:59   
+ 30 DAY PERMIT:      566666G  VALID:2015/09/23 12:30:39--2015/10/22 23:59:59   
  APPLICANT NAME :    PAMELA ANDERSON                          
                      1 BEAUTY RD                           
                      HOLLYWOOD CA 91234                                             
  1995 CHEVROLET VN 
  VIN: 123VIN12345678901                       
  ISSUING OFFICE: OTHER COUNTY 
- 
+
 -----------city parse problem------------------------
-  
- 2015 12 DEALER            8E4321                         
+
+ 2017 06 DEALER            8E4321                         
   ISSUED TO
   WHAT A BUSINESS               
   7777 US HIGHWAY 77 S          
   OVER THERE            TX   77777
   MASTER DEALER NUMBER P111111      
-  PLATE EXPIRES: 2015/12  PLATE STATUS: CURRENT            
+  PLATE EXPIRES: 2017/06  PLATE STATUS: CURRENT            
   CODE DL          116    
 
 -------------------------------------------------------------------------------- 
@@ -360,4 +360,5 @@ VALID:11/23/2009--05/2010
  DALLAS COUNTY
  TX DL OF DISABLED PERSON#: 12345678                    
 
---------------------------------------------------------------------------------
+ -------------------------------------------------------------------------------- 
+ 
