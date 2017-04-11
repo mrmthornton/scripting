@@ -18,8 +18,9 @@ import string
 import tkFileDialog
 import tkMessageBox
 import time
-from tk import tkFileDialog
-from Tkinter import *
+#python 3 ? #from tk import tkFileDialog
+import tkFileDialog
+from Tkinter import Tk
 from TxDot_LIB import query, repairLineBreaks, findResponseType, parseRecord
 from UTIL_LIB import openBrowser
 import xlwings
