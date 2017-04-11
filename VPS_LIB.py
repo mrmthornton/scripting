@@ -20,7 +20,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
 import tkMessageBox
-from Tkinter import *
+#from Tkinter import *
 
 from UTIL_LIB import cleanUpString, openBrowser, timeout
 

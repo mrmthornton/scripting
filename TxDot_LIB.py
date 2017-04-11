@@ -10,23 +10,24 @@
 # Copyright:   (c) mthornton 2014, 2015, 2016
 #-------------------------------------------------------------------------------
 
-from selenium import webdriver
-from selenium.common.exceptions import NoSuchFrameException
-from selenium.common.exceptions import NoSuchWindowException
+#from selenium import webdriver
+#from selenium.common.exceptions import NoSuchFrameException
+#from selenium.common.exceptions import NoSuchWindowException
 from selenium.common.exceptions import TimeoutException
-from selenium.common.exceptions import StaleElementReferenceException
+#from selenium.common.exceptions import StaleElementReferenceException
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
+#from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
-import csv
-import io
+#import csv
+#import io
 import re
-from Tkinter import Tk
-from VPS_LIB import fillFormAndSubmit, findAndClickButton, findAndSelectFrame, findElementOnPage, findTargetPage
-from VPS_LIB import getTextResults, newPageElementFound, newPageIsLoaded, parseString, returnOrClick
-import UTIL_LIB
+#from Tkinter import Tk
+from VPS_LIB import findElementOnPage
+#from VPS_LIB import fillFormAndSubmit, findAndClickButton, findAndSelectFrame, findTargetPage
+#from VPS_LIB import getTextResults, newPageElementFound, newPageIsLoaded, parseString, returnOrClick
+#import UTIL_LIB
 
 linePattern = re.compile('^.+')
 wordPattern = re.compile('\w+')
@@ -217,7 +218,7 @@ def findResponseType(plate, fileString):
 
 # parseRecord() calls the appropriate 'parse<RESPONSETYPE>()' function,
 # which returns a list of strings as follows:
-# ['response type', 'plate', 'name', 'addr', 'addr2', 'city', 'state', 'zip', 'ownedStartDate', 'startDate', 'endDate', 'issued',
+# ['response type', 'plate', 'name', 'addr', 'addr2', 'city', 'state', 'zipCode', 'ownedStartDate', 'startDate', 'endDate', 'issued',
 #   yr, mak, modl, styl, vin]
 # Other than 'response type' and 'plate', the strings may be empty.
 def parseRecord(responseType, typeString):
@@ -295,11 +296,11 @@ def parseDealer(responseType, typeString):
         typeString =  typeString[nextWord.end() + 1:]
     else:
         state = word
-    #get zip
+    #get zipCode
     nextWord = wordPattern.search(typeString)
-    zip = nextWord.group()
+    zipCode = nextWord.group()
     typeString =  typeString[nextWord.end() + 1:]
-    return [responseType, plate.strip(), name.strip(), addr.strip(), '', city.strip(), state.strip(), zip, '', '', '', '','','','','','']
+    return [responseType, plate.strip(), name.strip(), addr.strip(), '', city.strip(), state.strip(), zipCode, '', '', '', '','','','','','']
 
 def year(stringText):
     yrPattern = re.compile('(?<=YR:)\d{4}')
@@ -373,9 +374,9 @@ def parseStandard(responseType, typeString):
     nextCsv = csvPattern.search(typeString)
     state = nextCsv.group().replace(',' , '')
     typeString = typeString[nextCsv.end():]
-    # get zip
+    # get zipCode
     nextWord = wordPattern.search(typeString)
-    zip = nextWord.group().replace(',' , '')
+    zipCode = nextWord.group().replace(',' , '')
     # check for RNWL RCP entries and replace OWNER entries
     renewalPattern = re.compile('RNWL RCP\s+')
     nextRemove = renewalPattern.search(typeString)
@@ -400,7 +401,7 @@ def parseStandard(responseType, typeString):
         nextCsv = csvPattern.search(typeString)
         Rstate = nextCsv.group().replace(',' , '')
         typeString = typeString[nextCsv.end():]
-        # get zip
+        # get zipCode
         nextWord = wordPattern.search(typeString)
         Rzip = nextWord.group().replace(',' , '')
         # replace renewal information with owner informaton,
@@ -413,8 +414,8 @@ def parseStandard(responseType, typeString):
             addr2 = Raddr2
             city = Rcity
             state = Rstate
-            zip = Rzip
-    return [responseType, plate.strip(), name.strip(), addr.strip(), addr2.strip(), city.strip(), state.strip(), zip, ownedStartDate,
+            zipCode = Rzip
+    return [responseType, plate.strip(), name.strip(), addr.strip(), addr2.strip(), city.strip(), state.strip(), zipCode, ownedStartDate,
             '', '', '', yr, mak, modl, styl, vin]
 
 def parseTxirp(responseType, typeString):
@@ -433,7 +434,7 @@ def parseTxirp(responseType, typeString):
     commaToZipPattern = re.compile(',[A-Z]{2,2}\s+[0-9]{5,5}')
     #get state and zip and split
     stateAndZip = commaToZipPattern.search(addrString)#why not ,toEOL?
-    state, zip = stateAndZip.group().split()
+    state, zipCode = stateAndZip.group().split()
     state = state.replace(',' , '')
     addrString = addrString[:stateAndZip.start()]
     #get city and remove
@@ -449,7 +450,7 @@ def parseTxirp(responseType, typeString):
     #get name
     name = addrString.replace(',' , '')
     name = name.replace('.' , '')
-    return [responseType, plate.strip(), name.strip(), addr.strip(), '', city.strip(), state.strip(), zip, '', '', '' , '','','','','','']
+    return [responseType, plate.strip(), name.strip(), addr.strip(), '', city.strip(), state.strip(), zipCode, '', '', '' , '','','','','','']
 
 def parsePermit(responseType, typeString):
     # find header and remove
@@ -485,15 +486,15 @@ def parsePermit(responseType, typeString):
     stateAndZipPattern = re.compile('[A-Z]{2,2}\s+[0-9]{5,5}')
     found = stateAndZipPattern.search(typeString)
     if found != None:
-        state, zip = found.group().split()
+        state, zipCode = found.group().split()
         city = typeString[:found.start()]
     # if addr2 line is city, state, zip
     else:
         found = stateAndZipPattern.search(addr2)
         if found != None:
-            state, zip = found.group().split()
+            state, zipCode = found.group().split()
             city = addr2[:found.start()]
-    return [responseType, plate.strip(), name.strip(), addr.strip(), '', city.strip(), state, zip, '', '', '', issued,'','','','','']
+    return [responseType, plate.strip(), name.strip(), addr.strip(), '', city.strip(), state, zipCode, '', '', '', issued,'','','','','']
 
 def parseTemporary(responseType, typeString):
     # find header and remove
@@ -543,8 +544,8 @@ def parseTemporary(responseType, typeString):
         typeString = typeString[nextCsv.end():]
     # get zip
     nextWord = wordPattern.search(typeString)
-    zip = nextWord.group()
-    return [responseType, plate.strip(), name.strip(), addr.strip(), '', city.strip(), state.strip(), zip, '', startDate, endDate,
+    zipCode = nextWord.group()
+    return [responseType, plate.strip(), name.strip(), addr.strip(), '', city.strip(), state.strip(), zipCode, '', startDate, endDate,
             '','','','','','']
 
     # SPECIAL
@@ -576,15 +577,15 @@ def parseSpecial(responseType, typeString):
     stateAndZipPattern = re.compile('[A-Z]{2,2}\s+[0-9]{5,5}')
     found = stateAndZipPattern.search(typeString)
     if found != None:
-        state, zip = found.group().split()
+        state, zipCode = found.group().split()
         city = typeString[:found.start()]
     # if addr2 line is city, state, zip
     else:
         found = stateAndZipPattern.search(addr2)
         if found != None:
-            state, zip = found.group().split()
+            state, zipCode = found.group().split()
             city = addr2[:found.start()]
-    return [responseType, plate.strip(), name.strip(), addr.strip(), '', city.strip(), state.strip(), zip, '', '', '', '' ,'','','','','']
+    return [responseType, plate.strip(), name.strip(), addr.strip(), '', city.strip(), state.strip(), zipCode, '', '', '', '' ,'','','','','']
 
 def parseCanceled(responseType, typeString):
     #save the plate

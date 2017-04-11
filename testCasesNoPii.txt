@@ -300,7 +300,6 @@ SELECTION REQUEST: TEMPORARY TAG  55K0747
  13-1869
 
 --------------------------------------------------------------------------------
----new format , personalized ? or line break in keyword TITLE. ?---------------------------
 
  LIC PERSON AUG/2015 OLD # PERSON AUG/2014 EWT  4500 GWT   5500
  PERSONALIZED PLT, STKR            REG CLASS  35  $ 104.25 COLLIN CNTY
