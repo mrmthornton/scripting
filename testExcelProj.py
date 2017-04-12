@@ -273,8 +273,9 @@ def txDotToDbRecord(txDotRec, db):
 
 def commonCode(lpList):
     if txdotBool:
-        txDriver = openBrowser('https://mvinet.txdmv.gov')
-        waitForUser('enter credentials for DMV')
+        #txDriver = openBrowser('https://mvinet.txdmv.gov')
+        txDriver = openBrowser('https://ssoextprd.txdmv.gov/sso/UI/Login?goto=http%3A%2F%2Fmvinet.txdmv.gov%2Fmvdi%2Fmvdi.html')
+        waitForUser('enter credentials for DMV and navigate to single plate inquiry')
     if vpsBool:
         driver = openBrowser(parameters['url'])
         waitForUser('VPS login')
@@ -471,7 +472,6 @@ if __name__ == '__main__':
 
 
 '''
-
 params = [filter(lambda x: x in string.printable, item.text)
           for item in row.find_all('td')]
 '''
@@ -485,5 +485,3 @@ control_char_re = re.compile('[%s]' % re.escape(control_chars))
 def remove_control_chars(s):
     return control_char_re.sub('', s)
 '''
-
-
