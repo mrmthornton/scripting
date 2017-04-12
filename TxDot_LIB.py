@@ -200,6 +200,7 @@ def findResponseType(plate, fileString):
     # examine all start-positions for closest, but not past canceled-position
     if found != None:
         startCancel = found.start()
+        print("TxDot_LIB: findResponseType: cancel found at: ", startCancel)
         startNumbers = canceledStartPattern.finditer(fileString)
         startNum = 0
         for e in startNumbers:

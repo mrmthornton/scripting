@@ -46,14 +46,14 @@ def main():
                     break
                 if responseType is not None:
                     foundCurrentPlate = True
-                    print('main:', responseType, startNum, endNum)
+                    print('main: type, start, end: ', responseType, startNum, endNum)
                     # save only the 'core' string
-                    typeString = fileString[startNum:endNum + 1]
-                    ##print("main: ", typeString) # for debug
+                    typeString = fileString[startNum:endNum + 1] # extract the string for the specific type
+                    print("main: typestring: ", typeString) # for debug
                     #remove the current working string from the larger string
-                    fileString = fileString[:startNum] + fileString[endNum + 1:]
+                    fileString = fileString[:startNum] + fileString[endNum + 1:] #the rest of the original string
                     listData = parseRecord(responseType, typeString)
-                    print("main: ", listData) # for debug
+                    print("main: listdata: ", listData) # for debug
                     csvString = csvStringFromList(listData)
                     outfile.write(csvString)
         outfile.write('----------------\n')
