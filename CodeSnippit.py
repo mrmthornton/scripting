@@ -34,18 +34,7 @@ def testTime():
     longyear = time.strftime("%d/%m/%Y %I:%M:%S %p")
 
 
-# snippet of code for pausing to wait for user interaction
-from Tkinter import Tk
-import tkMessageBox
-def waitForUser(msg='huh?'):
-    root = Tk()
-    tkMessageBox.askyesno(message=msg)
-    root.destroy()
-
-if __name__ == '__main__':
-
-    #waitForUser('Okay?')
-    
+def testPermutaionPattern():
     from UTIL_LIB import permutationPattern
     licencePlate = "loseit"
     io10Pattern = permutationPattern(licencePlate)
@@ -67,5 +56,22 @@ if __name__ == '__main__':
     found = io10Pattern.search("N0O0DLE")
     if found:
         print(found.start(),found.end())
+    found = io10Pattern.search("NO0ODLE")
+    if found:
+        print(found.start(),found.end())
     pass
+
+# snippet of code for pausing to wait for user interaction
+from Tkinter import Tk
+import tkMessageBox
+def waitForUser(msg='huh?'):
+    root = Tk()
+    tkMessageBox.askyesno(message=msg)
+    root.destroy()
+
+if __name__ == '__main__':
+
+    #waitForUser('Okay?')
+    testPermutaionPattern()
+
     

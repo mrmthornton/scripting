@@ -83,11 +83,10 @@ def permutationPattern(lp):
         if nextChar=='1' or nextChar=='I':
             nextChar = "[1I]"
         l.append(nextChar)
-    #l.append("'")
-    print("UTIL_LIB:permutatinPattern: ", l)
+    #print("UTIL_LIB:permutatinPattern:list: ", l) # for debug
     i = iter(l)
     regexString = "".join(i)
-    print("UTIL_LIB:permutatinPattern:regexString: ", regexString)
+    #print("UTIL_LIB:permutatinPattern:regexString: ", regexString) # for debug
     return re.compile(regexString)
         
     
