@@ -625,7 +625,7 @@ def query(driver, delay, plate):
     plateSubmitElement = findElementOnPage(driver, delay, plateSubmitLocator)
 
     if plateSubmitElement is None:
-        print("query: plate submission form not found on page")
+        print("TxDot_LIB:query: plate submission form not found on page")
         return None
     plateSubmitElement.clear()
     plateSubmitElement.send_keys(plate)
