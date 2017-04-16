@@ -209,7 +209,7 @@ def findResponseType(plate, fileString):
         ##print("findResponseType:CANCELED: ",fileString[startCancel:])
         foundEnd = canceledEndPattern.search(fileString[startCancel:])
         endNum = foundEnd.end() + startCancel
-        print ('findResponseType:', targetType, plate)
+        #print ('findResponseType:', targetType, plate)
         return [targetType, startNum, endNum]
     return None
 
@@ -588,9 +588,9 @@ def parseSpecial(responseType, typeString):
     #CANCELED
 def parseCanceled(responseType, typeString):
     #save the plate
-    plateCanceledPattern = re.compile(r'\w+[ ]*CANCEL')
-    plateCancel = plateCanceledPattern.search(typeString)
-    plate = plateCancel.group()[:-6]  # TODO group(1)
+    plateCanceledPattern = re.compile(r'(\w+)[ ]*CANCEL')
+    found = plateCanceledPattern.search(typeString)
+    plate = found.group(1)
     # pass to parseStandard, since the format is the same
     parsedList = parseStandard(responseType, typeString)
     parsedList[1] = plate.strip() # replace the "standard" plate with the canceled !!!the dates must be compared!!!

@@ -23,17 +23,19 @@ def main():
          open(plateFileName, 'r') as platefile:
 
         outfile.truncate()
-        plates = platefile.readlines()
 
+        results = infile.read()
+        if (results is not None and results != ""):
+            ##print("main: ", results) # for debug
+            fileString = repairLineBreaks(results)
+            ##print("main: ", fileString) # for debug
+            
+        plates = platefile.readlines()  
         for plate in plates:
             plate = plate.strip()
             if plate is None or plate == "":
                 break
-            results = infile.read()  # TODO move outside loop
-            if (results is not None and results != ""):
-                ##print("main: ", results) # for debug
-                fileString = repairLineBreaks(results)
-                ##print("main: ", fileString) # for debug
+            
             foundCurrentPlate = False
             while True:
                 try:
@@ -53,6 +55,7 @@ def main():
                     #remove the current working string from the larger string
                     fileString = fileString[:startNum] + fileString[endNum + 1:] #the rest of the original string
                     listData = parseRecord(responseType, typeString)
+                    assert(len(listData)==17)
                     print("main: listdata: ", listData) # for debug
                     csvString = csvStringFromList(listData)
                     outfile.write(csvString)
