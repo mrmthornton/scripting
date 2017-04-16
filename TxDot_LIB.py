@@ -17,26 +17,20 @@ from selenium.common.exceptions import TimeoutException
 #from selenium.common.exceptions import StaleElementReferenceException
 from selenium.webdriver.common.by import By
 #from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import WebDriverWait
+#from selenium.webdriver.support import expected_conditions as EC
+#from selenium.webdriver.support.ui import WebDriverWait
 from UTIL_LIB import permutationPattern
 
-#import csv
 #import io
 import re
 #from Tkinter import Tk
 from VPS_LIB import findElementOnPage
-#from VPS_LIB import fillFormAndSubmit, findAndClickButton, findAndSelectFrame, findTargetPage
-#from VPS_LIB import getTextResults, newPageElementFound, newPageIsLoaded, parseString, returnOrClick
-#import UTIL_LIB
 
-linePattern = re.compile('^.+')
-wordPattern = re.compile('\w+')
-csvPattern = re.compile('[A-Z0-9 .#&]*,')
-commaToEOLpattern = re.compile(',[A-Z0-9 .#&]+$')
-LICpattern = re.compile(r'LIC ([A-Z0-9]{1,10}) [A-Z]{3,3}/[0-9]{4,4}')
-# LICpattern = re.compile('^[ ]?LIC ') 
-# LICpattern = re.compile('^LIC ') 
+linePattern = re.compile('^.+') # from start of line to newline(\n)
+wordPattern = re.compile('\w+') # any non-whitespace
+csvPattern = re.compile('[A-Z0-9 .#&]*,') #   almost-anything followed by a comma
+commaToEOLpattern = re.compile(',[A-Z0-9 .#&]+$') # comma almost-anything end-of-line
+LICpattern = re.compile(r'LIC ([A-Z0-9]{1,10}) [A-Z]{3,3}/[0-9]{4,4}')# group(1) is the LP
 issuedPattern = re.compile('ISSUED ')
 reg_dtPattern = re.compile('REG DT ')
 datePattern = re.compile('[0-9]{2,2}/[0-9]{2,2}/[0-9]{4,4}') # mo/day/year
@@ -125,7 +119,7 @@ def findResponseType(plate, fileString):
     endPattern = re.compile('NO RECORD IN RTS DATABASE')
     startNum, endNum = findStartEnd(fileString,startPattern, endPattern)
     if startNum != None:
-        print('findResponseType:', targetType, plate)
+        #print('TxDot_LIB: findResponseType::', targetType, plate)
         return [targetType, startNum, endNum]
 
     # DEALER
@@ -135,7 +129,7 @@ def findResponseType(plate, fileString):
     #endPattern = re.compile('CODE ' + '[A-Z]{2,2}' + '[\s]+' + '[0-9]+')
     startNum, endNum = findStartEnd(fileString,startPattern, endPattern)
     if startNum != None:
-        print('findResponseType:', targetType, plate)
+        #print('TxDot_LIB: findResponseType::', targetType, plate)
         return [targetType, startNum, endNum]
 
     # STANDARD
@@ -145,7 +139,7 @@ def findResponseType(plate, fileString):
     endPattern = re.compile(r'TITLE[D.]')
     startNum, endNum = findStartEnd(fileString,startPattern, endPattern)
     if startNum != None:
-        print('findResponseType:', targetType, plate)
+        #print('TxDot_LIB: findResponseType::', targetType, plate)
         return [targetType, startNum, endNum]
 
     # TXIRP
@@ -154,7 +148,7 @@ def findResponseType(plate, fileString):
     endPattern = re.compile('REMARKS')
     startNum, endNum = findStartEnd(fileString,startPattern, endPattern)
     if startNum != None:
-        print('findResponseType:', targetType, plate)
+        #print('TxDot_LIB: findResponseType::', targetType, plate)
         return [targetType, startNum, endNum]
 
     # PERMIT
@@ -163,7 +157,7 @@ def findResponseType(plate, fileString):
     permitEndPattern = re.compile('ISSUING OFFICE: ')
     startNum, endNum = findStartEnd(fileString,permitStartPattern, permitEndPattern)
     if startNum != None:
-        print('findResponseType:', targetType, plate)
+        #print('TxDot_LIB: findResponseType::', targetType, plate)
         return [targetType, startNum, endNum]
 
     # TEMPORARY
@@ -172,7 +166,7 @@ def findResponseType(plate, fileString):
     endPattern = re.compile(r',\w{2,2},\d{5,5}')  # ,ST,Zip
     startNum, endNum = findStartEnd(fileString,startPattern, endPattern)
     if startNum is not None:
-        print('findResponseType:', targetType, plate)
+        #print('TxDot_LIB: findResponseType::', targetType, plate)
         return [targetType, startNum, endNum]
 
     # SPECIAL
@@ -181,7 +175,7 @@ def findResponseType(plate, fileString):
     endPattern = zipCodePattern
     startNum, endNum = findStartEnd(fileString,startPattern, endPattern)
     if startNum != None:
-        print('findResponseType:', targetType, plate)
+        #print('TxDot_LIB: findResponseType::', targetType, plate)
         return [targetType, startNum, endNum]
 
     # PLACARD
@@ -190,7 +184,7 @@ def findResponseType(plate, fileString):
     endPattern = re.compile('DISABLED PERSON#:\s+\d+')
     startNum, endNum = findStartEnd(fileString,startPattern, endPattern)
     if startNum != None:
-        print('findResponseType:', targetType, plate)
+        #print('TxDot_LIB: findResponseType::', targetType, plate)
         return [targetType, startNum, endNum]
 
     # CANCELED
@@ -202,26 +196,19 @@ def findResponseType(plate, fileString):
     # Examine all start-positions for closest, but not past canceled-position
     if found != None:
         startCancel = found.start()
-        print("TxDot_LIB: findResponseType: cancel found at: ", startCancel)
-        if startCancel < 800:
+        #print("TxDot_LIB: findResponseType: cancel found at: ", startCancel)
+        if startCancel < 800:  # make this more obvious, what is the purpose.
             startSearchAt = 0
         else: 
             startSearchAt = startCancel-800
         ##print("findResponseType:CANCELED: ",fileString[startSearchAt:])
-        startNumbers = canceledStartPattern.finditer(fileString[startSearchAt:])
-        currentStartNum = 0
-        for e in startNumbers:
-            num = e.start()
-            if num < startCancel and num > currentStartNum:
-                currentStartNum = num
-            else:
-                startNum = currentStartNum
-                break
+        found = canceledStartPattern.search(fileString[startSearchAt:])
+        startNum = found.start() + startSearchAt
+        
         # find the end position
         ##print("findResponseType:CANCELED: ",fileString[startCancel:])
         foundEnd = canceledEndPattern.search(fileString[startCancel:])
-        endNum = foundEnd.end()
-        endNum += startCancel
+        endNum = foundEnd.end() + startCancel
         print ('findResponseType:', targetType, plate)
         return [targetType, startNum, endNum]
     return None
@@ -598,11 +585,12 @@ def parseSpecial(responseType, typeString):
             city = addr2[:found.start()]
     return [responseType, plate.strip(), name.strip(), addr.strip(), '', city.strip(), state.strip(), zipCode, '', '', '', '' ,'','','','','']
 
+    #CANCELED
 def parseCanceled(responseType, typeString):
     #save the plate
     plateCanceledPattern = re.compile(r'\w+[ ]*CANCEL')
     plateCancel = plateCanceledPattern.search(typeString)
-    plate = plateCancel.group()[:-6]
+    plate = plateCancel.group()[:-6]  # TODO group(1)
     # pass to parseStandard, since the format is the same
     parsedList = parseStandard(responseType, typeString)
     parsedList[1] = plate.strip() # replace the "standard" plate with the canceled !!!the dates must be compared!!!
@@ -613,13 +601,9 @@ def csvStringFromList(listData):
     csvString = ''
     for stringValue in listData:
         # remove any commas that may be part of the text,
-        # since the delimiter is a comma.
-        stringValue = stringValue.replace(',' , '') # remove any commas
+        # since the new delimiter will be a comma, 
+        stringValue = stringValue.replace(',' , '')
         csvString += stringValue + ', '
-    if listData[0] == "NORECORD":
-        csvString += "NORECORD"
-    if listData[0] == "PLACARD":
-        csvString += "PLACARD"
     csvString += '\n'
     return csvString
 
