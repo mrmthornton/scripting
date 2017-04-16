@@ -19,6 +19,7 @@ from selenium.webdriver.common.by import By
 #from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
+from UTIL_LIB import permutationPattern
 
 #import csv
 #import io
@@ -33,7 +34,9 @@ linePattern = re.compile('^.+')
 wordPattern = re.compile('\w+')
 csvPattern = re.compile('[A-Z0-9 .#&]*,')
 commaToEOLpattern = re.compile(',[A-Z0-9 .#&]+$')
-LICpattern = re.compile('^LIC ')
+LICpattern = re.compile(r'LIC ([A-Z0-9]{1,10}) [A-Z]{3,3}/[0-9]{4,4}')
+# LICpattern = re.compile('^[ ]?LIC ') 
+# LICpattern = re.compile('^LIC ') 
 issuedPattern = re.compile('ISSUED ')
 reg_dtPattern = re.compile('REG DT ')
 datePattern = re.compile('[0-9]{2,2}/[0-9]{2,2}/[0-9]{4,4}') # mo/day/year
@@ -139,7 +142,7 @@ def findResponseType(plate, fileString):
     targetType = 'STANDARD'
     #startPattern = re.compile('LIC ' + plate + ' [A-Z]{3,3}' + '/' '[0-9]{4,4}')
     startPattern = re.compile('LIC ' + plate + ' [A-Z]{3,3}/[0-9]{4,4}')
-    endPattern = re.compile(r'TITLE[.]|NON-TITLED|REMARKS')
+    endPattern = re.compile(r'TITLE[D.]')
     startNum, endNum = findStartEnd(fileString,startPattern, endPattern)
     if startNum != None:
         print('findResponseType:', targetType, plate)
@@ -192,27 +195,33 @@ def findResponseType(plate, fileString):
 
     # CANCELED
     targetType = 'CANCELED'
-    canceledPattern = re.compile(plate + '[ ]*' + '(CANCELED|CANCELLED)')
-    canceledStartPattern = re.compile('LIC ' + '[A-Z0-9]+' + ' [A-Z]{3,3}' + '/' '[0-9]{4,4}')
-    canceledEndPattern = re.compile('TITLE' + '[.]')
+    canceledPattern = re.compile(plate + '[ ]*(CANCELED|CANCELLED)')
+    canceledStartPattern = re.compile(r'LIC [A-Z0-9]{1,10} [A-Z]{3,3}/[0-9]{4,4}')
+    canceledEndPattern = re.compile('TITLE[D.]')
     found = canceledPattern.search(fileString)
-    #foundtemp = found.group()     # found at least one cancelel pattern  # is this needed?
-    # examine all start-positions for closest, but not past canceled-position
+    # Examine all start-positions for closest, but not past canceled-position
     if found != None:
         startCancel = found.start()
         print("TxDot_LIB: findResponseType: cancel found at: ", startCancel)
-        startNumbers = canceledStartPattern.finditer(fileString)
-        startNum = 0
+        if startCancel < 800:
+            startSearchAt = 0
+        else: 
+            startSearchAt = startCancel-800
+        ##print("findResponseType:CANCELED: ",fileString[startSearchAt:])
+        startNumbers = canceledStartPattern.finditer(fileString[startSearchAt:])
+        currentStartNum = 0
         for e in startNumbers:
             num = e.start()
-            if num < startCancel and num > startNum:
-                startNum = num
+            if num < startCancel and num > currentStartNum:
+                currentStartNum = num
             else:
+                startNum = currentStartNum
                 break
         # find the end position
-        foundEnd = canceledEndPattern.search(fileString[startNum:])
+        ##print("findResponseType:CANCELED: ",fileString[startCancel:])
+        foundEnd = canceledEndPattern.search(fileString[startCancel:])
         endNum = foundEnd.end()
-        endNum += startNum
+        endNum += startCancel
         print ('findResponseType:', targetType, plate)
         return [targetType, startNum, endNum]
     return None
@@ -325,10 +334,11 @@ def vinNumber(stringText):
 def parseStandard(responseType, typeString):
     # remove header
     header = LICpattern.search(typeString)
-    typeString = typeString[header.end():]
-    nextWord = wordPattern.search(typeString)
+    ##typeString = typeString[header.end():]
+    ##nextWord = wordPattern.search(typeString)
     # get plate and remove
-    plate = nextWord.group()
+    plate = header.group(1)
+    #plate = nextWord.group()
     typeString = typeString[header.end():]
     # get ISSUED date and remove
     nextRemove = issuedPattern.search(typeString)
@@ -590,7 +600,7 @@ def parseSpecial(responseType, typeString):
 
 def parseCanceled(responseType, typeString):
     #save the plate
-    plateCanceledPattern = re.compile(r'\w+' + '[ ]*' + 'CANCEL')
+    plateCanceledPattern = re.compile(r'\w+[ ]*CANCEL')
     plateCancel = plateCanceledPattern.search(typeString)
     plate = plateCancel.group()[:-6]
     # pass to parseStandard, since the format is the same
@@ -632,16 +642,20 @@ def query(driver, delay, plate):
     plateSubmitElement.send_keys('\n')
 
     elemLocator =  (By.XPATH, '//div[@style="font-family: Courier New;"]')
-    # wait until text element is rendered
+    # wait until an lp match is found
     try:
-        #WebDriverWait(driver, delay).until(EC.text_to_be_present_in_element_value(elemLocator,plate))
-        WebDriverWait(driver, delay).until(EC.text_to_be_present_in_element(elemLocator,plate))
-        textElement = findElementOnPage(driver, delay, elemLocator)
-        uText = textElement.text
+        ##WebDriverWait(driver, delay).until(EC.text_to_be_present_in_element_value(elemLocator,plate))
+        #WebDriverWait(driver, delay).until(EC.text_to_be_present_in_element(elemLocator,plate))
+        ambiguousPattern = permutationPattern(plate)
+        while True:
+            textElement = findElementOnPage(driver, delay, elemLocator)
+            uText = textElement.text
+            found = ambiguousPattern.search(uText)
+            if found: break
     except TimeoutException:
-        print("ERROR: Timeout, record LP may not match input LP")
+        print("ERROR: Timeout, input licence plate may not match the record.")
         return None
-    plateSubmitElement.clear() # does this need to be cleaned to be found?
+    plateSubmitElement.clear() # does this need to be cleared ?
     return str(uText)
 
 if __name__ == "__main__":

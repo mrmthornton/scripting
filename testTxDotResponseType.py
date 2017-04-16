@@ -41,7 +41,7 @@ def main():
                 except:
                     responseType = None
                     if foundCurrentPlate == False:
-                        print("main: ", plate, ' Plate/Pattern not found')
+                        print('main: Searching for plate "', plate, '". Plate or Pattern not found.')
                         outfile.write(',' + plate + ' Plate/Pattern not found\n')
                     break
                 if responseType is not None:

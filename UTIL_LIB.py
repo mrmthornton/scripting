@@ -89,17 +89,31 @@ def permutationPattern(lp):
     #print("UTIL_LIB:permutatinPattern:regexString: ", regexString) # for debug
     return re.compile(regexString)
         
-    
-    
-    
-    """
-    return a generator of permutations,
-    using both 'o' and 0, or 'i' and 1,
-    for each instance of either.
-    For example 'LOSE IT' results becomes a list
-    [l0se1t, lose1t, l0seIt, loseIt]
-    """
-    
+def testPermutaionPattern():
+    licencePlate = "loseit"
+    io10Pattern = permutationPattern(licencePlate)
+    found = io10Pattern.search("LOSEIT")
+    if found:
+        print(found.start(),found.end())
+    found = io10Pattern.search("L0SEIT")
+    if found:
+        print(found.start(),found.end())
+    found = io10Pattern.search("LOSE1T")
+    if found:
+        print(found.start(),found.end())
+    found = io10Pattern.search("L0SE1T")
+    if found:
+        print(found.start(),found.end())
+        
+    licencePlate = "nooodle"
+    io10Pattern = permutationPattern(licencePlate)
+    found = io10Pattern.search("N0O0DLE")
+    if found:
+        print(found.start(),found.end())
+    found = io10Pattern.search("NO0ODLE")
+    if found:
+        print(found.start(),found.end())
+    pass   
 
 
 def timeout(msg="Took too much time!"):
@@ -114,5 +128,5 @@ def waitForUser(msg="enter login credentials"):
 
 
 if __name__ == '__main__':
-    pass
+    testPermutaionPattern()
 
