@@ -5,14 +5,14 @@
 # Author:      mthornton
 #
 # Created:     2015 AUG 01
-# Updates:     2017 APR 08
+# Updates:     2017 APR 13
 # Copyright:   (c) michael thornton 2015, 2016, 2017
 #-------------------------------------------------------------------------------
 
 
 import re
 from selenium import webdriver 
-import time
+#import time
 
 from Tkinter import Tk
 #import tkMessageBox
@@ -23,7 +23,7 @@ def cleanUpString(messyString):
     cleanString = cleanString.replace('"' , '') # remove any double quotes
     cleanString = cleanString.replace('\t' , '') # remove any tabs
     cleanString = cleanString.replace(',' , '\n') # replace comma with \n
-    for n in range(10):            # replace multiple newlines with a single \n
+    for _ in range(10):            # replace multiple newlines with a single \n
         cleanString = cleanString.replace('\n\n' , '\n')
     return cleanString
 
@@ -63,11 +63,57 @@ def parseString(inputString,indexPattern, targetPattern, segment="all"): # segme
         iterator = targetPattern.finditer(inputString)
         for found in iterator:
             if found.start() > indexStart and found != None:
-                targetStart = found.start()
+                #targetStart = found.start()
                 targetEnd = found.end()
                 #print "parseString: found end", targetStart #debug statement
                 return inputString[indexEnd:targetEnd:]
     return None
+
+
+def permutationPattern(lp):
+    """
+    return a compiled regex which matches on either 'o' or 0, or 'i' or 1,
+    for each position where any of these four characters are found.
+    """
+    lp = lp.upper()
+    l = []
+    for nextChar in lp:
+        if nextChar=='0' or nextChar=='O':
+            nextChar = "[0O]"
+        if nextChar=='1' or nextChar=='I':
+            nextChar = "[1I]"
+        l.append(nextChar)
+    #print("UTIL_LIB:permutatinPattern:list: ", l) # for debug
+    i = iter(l)
+    regexString = "".join(i)
+    #print("UTIL_LIB:permutatinPattern:regexString: ", regexString) # for debug
+    return re.compile(regexString)
+        
+def testPermutaionPattern():
+    licencePlate = "loseit"
+    io10Pattern = permutationPattern(licencePlate)
+    found = io10Pattern.search("LOSEIT")
+    if found:
+        print(found.start(),found.end())
+    found = io10Pattern.search("L0SEIT")
+    if found:
+        print(found.start(),found.end())
+    found = io10Pattern.search("LOSE1T")
+    if found:
+        print(found.start(),found.end())
+    found = io10Pattern.search("L0SE1T")
+    if found:
+        print(found.start(),found.end())
+        
+    licencePlate = "nooodle"
+    io10Pattern = permutationPattern(licencePlate)
+    found = io10Pattern.search("N0O0DLE")
+    if found:
+        print(found.start(),found.end())
+    found = io10Pattern.search("NO0ODLE")
+    if found:
+        print(found.start(),found.end())
+    pass   
 
 
 def timeout(msg="Took too much time!"):
@@ -82,5 +128,5 @@ def waitForUser(msg="enter login credentials"):
 
 
 if __name__ == '__main__':
-    pass
+    testPermutaionPattern()
 

@@ -17,23 +17,20 @@ from selenium.common.exceptions import TimeoutException
 #from selenium.common.exceptions import StaleElementReferenceException
 from selenium.webdriver.common.by import By
 #from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import WebDriverWait
+#from selenium.webdriver.support import expected_conditions as EC
+#from selenium.webdriver.support.ui import WebDriverWait
+from UTIL_LIB import permutationPattern
 
-#import csv
 #import io
 import re
 #from Tkinter import Tk
 from VPS_LIB import findElementOnPage
-#from VPS_LIB import fillFormAndSubmit, findAndClickButton, findAndSelectFrame, findTargetPage
-#from VPS_LIB import getTextResults, newPageElementFound, newPageIsLoaded, parseString, returnOrClick
-#import UTIL_LIB
 
-linePattern = re.compile('^.+')
-wordPattern = re.compile('\w+')
-csvPattern = re.compile('[A-Z0-9 .#&]*,')
-commaToEOLpattern = re.compile(',[A-Z0-9 .#&]+$')
-LICpattern = re.compile('^LIC ')
+linePattern = re.compile('^.+') # from start of line to newline(\n)
+wordPattern = re.compile('\w+') # any non-whitespace
+csvPattern = re.compile('[A-Z0-9 .#&]*,') #   almost-anything followed by a comma
+commaToEOLpattern = re.compile(',[A-Z0-9 .#&]+$') # comma almost-anything end-of-line
+LICpattern = re.compile(r'LIC ([A-Z0-9]{1,10}) [A-Z]{3,3}/[0-9]{4,4}')# group(1) is the LP
 issuedPattern = re.compile('ISSUED ')
 reg_dtPattern = re.compile('REG DT ')
 datePattern = re.compile('[0-9]{2,2}/[0-9]{2,2}/[0-9]{4,4}') # mo/day/year
@@ -122,7 +119,7 @@ def findResponseType(plate, fileString):
     endPattern = re.compile('NO RECORD IN RTS DATABASE')
     startNum, endNum = findStartEnd(fileString,startPattern, endPattern)
     if startNum != None:
-        print('findResponseType:', targetType, plate)
+        #print('TxDot_LIB: findResponseType::', targetType, plate)
         return [targetType, startNum, endNum]
 
     # DEALER
@@ -132,17 +129,17 @@ def findResponseType(plate, fileString):
     #endPattern = re.compile('CODE ' + '[A-Z]{2,2}' + '[\s]+' + '[0-9]+')
     startNum, endNum = findStartEnd(fileString,startPattern, endPattern)
     if startNum != None:
-        print('findResponseType:', targetType, plate)
+        #print('TxDot_LIB: findResponseType::', targetType, plate)
         return [targetType, startNum, endNum]
 
     # STANDARD
     targetType = 'STANDARD'
     #startPattern = re.compile('LIC ' + plate + ' [A-Z]{3,3}' + '/' '[0-9]{4,4}')
     startPattern = re.compile('LIC ' + plate + ' [A-Z]{3,3}/[0-9]{4,4}')
-    endPattern = re.compile(r'TITLE[.]|NON-TITLED|REMARKS')
+    endPattern = re.compile(r'TITLE[D.]')
     startNum, endNum = findStartEnd(fileString,startPattern, endPattern)
     if startNum != None:
-        print('findResponseType:', targetType, plate)
+        #print('TxDot_LIB: findResponseType::', targetType, plate)
         return [targetType, startNum, endNum]
 
     # TXIRP
@@ -151,7 +148,7 @@ def findResponseType(plate, fileString):
     endPattern = re.compile('REMARKS')
     startNum, endNum = findStartEnd(fileString,startPattern, endPattern)
     if startNum != None:
-        print('findResponseType:', targetType, plate)
+        #print('TxDot_LIB: findResponseType::', targetType, plate)
         return [targetType, startNum, endNum]
 
     # PERMIT
@@ -160,7 +157,7 @@ def findResponseType(plate, fileString):
     permitEndPattern = re.compile('ISSUING OFFICE: ')
     startNum, endNum = findStartEnd(fileString,permitStartPattern, permitEndPattern)
     if startNum != None:
-        print('findResponseType:', targetType, plate)
+        #print('TxDot_LIB: findResponseType::', targetType, plate)
         return [targetType, startNum, endNum]
 
     # TEMPORARY
@@ -169,7 +166,7 @@ def findResponseType(plate, fileString):
     endPattern = re.compile(r',\w{2,2},\d{5,5}')  # ,ST,Zip
     startNum, endNum = findStartEnd(fileString,startPattern, endPattern)
     if startNum is not None:
-        print('findResponseType:', targetType, plate)
+        #print('TxDot_LIB: findResponseType::', targetType, plate)
         return [targetType, startNum, endNum]
 
     # SPECIAL
@@ -178,7 +175,7 @@ def findResponseType(plate, fileString):
     endPattern = zipCodePattern
     startNum, endNum = findStartEnd(fileString,startPattern, endPattern)
     if startNum != None:
-        print('findResponseType:', targetType, plate)
+        #print('TxDot_LIB: findResponseType::', targetType, plate)
         return [targetType, startNum, endNum]
 
     # PLACARD
@@ -187,33 +184,32 @@ def findResponseType(plate, fileString):
     endPattern = re.compile('DISABLED PERSON#:\s+\d+')
     startNum, endNum = findStartEnd(fileString,startPattern, endPattern)
     if startNum != None:
-        print('findResponseType:', targetType, plate)
+        #print('TxDot_LIB: findResponseType::', targetType, plate)
         return [targetType, startNum, endNum]
 
     # CANCELED
     targetType = 'CANCELED'
-    canceledPattern = re.compile(plate + '[ ]*' + '(CANCELED|CANCELLED)')
-    canceledStartPattern = re.compile('LIC ' + '[A-Z0-9]+' + ' [A-Z]{3,3}' + '/' '[0-9]{4,4}')
-    canceledEndPattern = re.compile('TITLE' + '[.]')
+    canceledPattern = re.compile(plate + '[ ]*(CANCELED|CANCELLED)')
+    canceledStartPattern = re.compile(r'LIC [A-Z0-9]{1,10} [A-Z]{3,3}/[0-9]{4,4}')
+    canceledEndPattern = re.compile('TITLE[D.]')
     found = canceledPattern.search(fileString)
-    #foundtemp = found.group()     # found at least one cancelel pattern  # is this needed?
-    # examine all start-positions for closest, but not past canceled-position
+    # Examine all start-positions for closest, but not past canceled-position
     if found != None:
         startCancel = found.start()
-        print("TxDot_LIB: findResponseType: cancel found at: ", startCancel)
-        startNumbers = canceledStartPattern.finditer(fileString)
-        startNum = 0
-        for e in startNumbers:
-            num = e.start()
-            if num < startCancel and num > startNum:
-                startNum = num
-            else:
-                break
+        #print("TxDot_LIB: findResponseType: cancel found at: ", startCancel)
+        if startCancel < 800:  # make this more obvious, what is the purpose.
+            startSearchAt = 0
+        else: 
+            startSearchAt = startCancel-800
+        ##print("findResponseType:CANCELED: ",fileString[startSearchAt:])
+        found = canceledStartPattern.search(fileString[startSearchAt:])
+        startNum = found.start() + startSearchAt
+        
         # find the end position
-        foundEnd = canceledEndPattern.search(fileString[startNum:])
-        endNum = foundEnd.end()
-        endNum += startNum
-        print ('findResponseType:', targetType, plate)
+        ##print("findResponseType:CANCELED: ",fileString[startCancel:])
+        foundEnd = canceledEndPattern.search(fileString[startCancel:])
+        endNum = foundEnd.end() + startCancel
+        #print ('findResponseType:', targetType, plate)
         return [targetType, startNum, endNum]
     return None
 
@@ -325,10 +321,11 @@ def vinNumber(stringText):
 def parseStandard(responseType, typeString):
     # remove header
     header = LICpattern.search(typeString)
-    typeString = typeString[header.end():]
-    nextWord = wordPattern.search(typeString)
+    ##typeString = typeString[header.end():]
+    ##nextWord = wordPattern.search(typeString)
     # get plate and remove
-    plate = nextWord.group()
+    plate = header.group(1)
+    #plate = nextWord.group()
     typeString = typeString[header.end():]
     # get ISSUED date and remove
     nextRemove = issuedPattern.search(typeString)
@@ -588,11 +585,12 @@ def parseSpecial(responseType, typeString):
             city = addr2[:found.start()]
     return [responseType, plate.strip(), name.strip(), addr.strip(), '', city.strip(), state.strip(), zipCode, '', '', '', '' ,'','','','','']
 
+    #CANCELED
 def parseCanceled(responseType, typeString):
     #save the plate
-    plateCanceledPattern = re.compile(r'\w+' + '[ ]*' + 'CANCEL')
-    plateCancel = plateCanceledPattern.search(typeString)
-    plate = plateCancel.group()[:-6]
+    plateCanceledPattern = re.compile(r'(\w+)[ ]*CANCEL')
+    found = plateCanceledPattern.search(typeString)
+    plate = found.group(1)
     # pass to parseStandard, since the format is the same
     parsedList = parseStandard(responseType, typeString)
     parsedList[1] = plate.strip() # replace the "standard" plate with the canceled !!!the dates must be compared!!!
@@ -603,13 +601,9 @@ def csvStringFromList(listData):
     csvString = ''
     for stringValue in listData:
         # remove any commas that may be part of the text,
-        # since the delimiter is a comma.
-        stringValue = stringValue.replace(',' , '') # remove any commas
+        # since the new delimiter will be a comma, 
+        stringValue = stringValue.replace(',' , '')
         csvString += stringValue + ', '
-    if listData[0] == "NORECORD":
-        csvString += "NORECORD"
-    if listData[0] == "PLACARD":
-        csvString += "PLACARD"
     csvString += '\n'
     return csvString
 
@@ -625,23 +619,27 @@ def query(driver, delay, plate):
     plateSubmitElement = findElementOnPage(driver, delay, plateSubmitLocator)
 
     if plateSubmitElement is None:
-        print("query: plate submission form not found on page")
+        print("TxDot_LIB:query: plate submission form not found on page")
         return None
     plateSubmitElement.clear()
     plateSubmitElement.send_keys(plate)
     plateSubmitElement.send_keys('\n')
 
     elemLocator =  (By.XPATH, '//div[@style="font-family: Courier New;"]')
-    # wait until text element is rendered
+    # wait until an lp match is found
     try:
-        #WebDriverWait(driver, delay).until(EC.text_to_be_present_in_element_value(elemLocator,plate))
-        WebDriverWait(driver, delay).until(EC.text_to_be_present_in_element(elemLocator,plate))
-        textElement = findElementOnPage(driver, delay, elemLocator)
-        uText = textElement.text
+        ##WebDriverWait(driver, delay).until(EC.text_to_be_present_in_element_value(elemLocator,plate))
+        #WebDriverWait(driver, delay).until(EC.text_to_be_present_in_element(elemLocator,plate))
+        ambiguousPattern = permutationPattern(plate)
+        while True:
+            textElement = findElementOnPage(driver, delay, elemLocator)
+            uText = textElement.text
+            found = ambiguousPattern.search(uText)
+            if found: break
     except TimeoutException:
-        print("ERROR: Timeout, record LP may not match input LP")
+        print("ERROR: Timeout, input licence plate may not match the record.")
         return None
-    plateSubmitElement.clear() # does this need to be cleaned to be found?
+    plateSubmitElement.clear() # does this need to be cleared ?
     return str(uText)
 
 if __name__ == "__main__":
