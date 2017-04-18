@@ -13,8 +13,7 @@
 #from selenium import webdriver
 #from selenium.common.exceptions import NoSuchFrameException
 #from selenium.common.exceptions import NoSuchWindowException
-from selenium.common.exceptions import TimeoutException
-#from selenium.common.exceptions import StaleElementReferenceException
+from selenium.common.exceptions import TimeoutException, StaleElementReferenceException
 from selenium.webdriver.common.by import By
 #from selenium.webdriver.common.keys import Keys
 #from selenium.webdriver.support import expected_conditions as EC
@@ -199,12 +198,12 @@ def findResponseType(plate, fileString):
         #print("TxDot_LIB: findResponseType: cancel found at: ", startCancel)
         if startCancel < 800:  # make this more obvious, what is the purpose.
             startSearchAt = 0
-        else: 
+        else:
             startSearchAt = startCancel-800
         ##print("findResponseType:CANCELED: ",fileString[startSearchAt:])
         found = canceledStartPattern.search(fileString[startSearchAt:])
         startNum = found.start() + startSearchAt
-        
+
         # find the end position
         ##print("findResponseType:CANCELED: ",fileString[startCancel:])
         foundEnd = canceledEndPattern.search(fileString[startCancel:])
@@ -601,7 +600,7 @@ def csvStringFromList(listData):
     csvString = ''
     for stringValue in listData:
         # remove any commas that may be part of the text,
-        # since the new delimiter will be a comma, 
+        # since the new delimiter will be a comma,
         stringValue = stringValue.replace(',' , '')
         csvString += stringValue + ', '
     csvString += '\n'
@@ -632,8 +631,11 @@ def query(driver, delay, plate):
         #WebDriverWait(driver, delay).until(EC.text_to_be_present_in_element(elemLocator,plate))
         ambiguousPattern = permutationPattern(plate)
         while True:
-            textElement = findElementOnPage(driver, delay, elemLocator)
-            uText = textElement.text
+            try:
+                textElement = findElementOnPage(driver, delay, elemLocator)
+                uText = textElement.text
+            except StaleElementReferenceException:
+                continue
             found = ambiguousPattern.search(uText)
             if found: break
     except TimeoutException:
