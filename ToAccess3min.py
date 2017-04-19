@@ -16,11 +16,16 @@
 #-------------------------------------------------------------------------------
 
 import datetime
-import pyodbc
+from 
+from selenium.webdriver.common.by import By
 import string
+import time
 import tkFileDialog
-from Tkinter import *
-from TxDot_LIB import *
+from Tkinter import Tk
+from TxDot_LIB import  csvStringFromList, findResponseType, parseRecord, query, repairLineBreaks
+from UTIL_LIB import openBrowser
+from VPS_LIB import getTextResults, fillFormAndSubmit, findAndClickButton, findAndSelectFrame,\
+                    findElementOnPage, findTargetPage, newPageElementFound
 
 
 def setParameters():
@@ -264,10 +269,10 @@ if __name__ == '__main__':
                 #VPS section   *****************************************************************
                 startPageTextLocator = (By.XPATH, '//TD/H1[contains(text(),"Violation Search")]')
                 # pause on next line for entry of credentials, and window navigation.
-                ##startWindow = findTargetPage(driver, findStartWindowDelay, startPageTextLocator, "mainframe")
-                startWindow = findTargetPage(driver, findStartWindowDelay, startPageTextLocator)
+                ##startWindow = findTargetPage(driver, delay, startPageTextLocator, "mainframe")
+                startWindow = findTargetPage(driver, delay, startPageTextLocator)
                 if startWindow is None:
-                    print "Start Page not found."
+                    print "main: Start Page not found."
                     break
                 element = findElementOnPage(driver, delay, parameters['inputLocator'])
                 submitted = fillFormAndSubmit(driver, startWindow, element, plateString, parameters) # why so slow?  IeDriver64 ??
@@ -277,7 +282,7 @@ if __name__ == '__main__':
                 #time.sleep(1)  #text may not be there yet!  how long to wait?
                 text = getTextResults(driver, delay, plateString, parameters, "fraRL")
                 if text is not None: # if there is text, process it
-                    sys.stdout.write("Initial # of " + plateString + ", " + str(text) + '\n')
+                    stdout.write("Initial # of " + plateString + ", " + str(text) + '\n')
                     startNum = int(str(text))
                     # insert orm to wait for user input
                     # navigate to search position

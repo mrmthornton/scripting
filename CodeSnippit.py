@@ -1,9 +1,11 @@
 # snippet of code for filtering html text into printable text.
 
+
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
+import string
 from UTIL_LIB import timeout
 
 def printableText(driver, delay, aString, ouputFileHandle):
@@ -41,6 +43,11 @@ def waitForUser(msg='huh?'):
     root = Tk()
     tkMessageBox.askyesno(message=msg)
     root.destroy()
+
+def removeNonPrintable(anyString):
+    """remove non-ascii"""
+    return("".join(filter(lambda x:x in string.printable, anyString)))
+
 
 if __name__ == '__main__':
 
