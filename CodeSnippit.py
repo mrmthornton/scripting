@@ -1,6 +1,6 @@
 # snippet of code for filtering html text into printable text.
 
-
+import re
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
@@ -43,8 +43,12 @@ def waitForUser(msg='huh?'):
     root = Tk()
     tkMessageBox.askyesno(message=msg)
     root.destroy()
-
+ 
 def removeNonPrintable(anyString):
+    """remove unicode non-printable"""
+    pattern = re.compile('[\W]+', re.UNICODE)
+    pattern.sub('', anyString) 
+    #pattern.sub('', string.printable) 
     """remove non-ascii"""
     return("".join(filter(lambda x:x in string.printable, anyString)))
 

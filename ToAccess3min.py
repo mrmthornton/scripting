@@ -9,14 +9,14 @@
 # Author:      mthornton
 #
 # Created:     2016 AUG 12
-# Update:      2016 SEP 22
-# Copyright:   (c) mthornton 2016
+# Update:      2017 APR 19
+# Copyright:   (c) mthornton 2016, 2017
 # educational snippits thanks to Tim Greening-Jackson
 # (timATgreening-jackson.com)
 #-------------------------------------------------------------------------------
 
 import datetime
-from 
+import pyodbc
 from selenium.webdriver.common.by import By
 import string
 import time
@@ -282,7 +282,7 @@ if __name__ == '__main__':
                 #time.sleep(1)  #text may not be there yet!  how long to wait?
                 text = getTextResults(driver, delay, plateString, parameters, "fraRL")
                 if text is not None: # if there is text, process it
-                    stdout.write("Initial # of " + plateString + ", " + str(text) + '\n')
+                    ##stdout.write("Initial # of " + plateString + ", " + str(text) + '\n')
                     startNum = int(str(text))
                     # insert orm to wait for user input
                     # navigate to search position
@@ -310,19 +310,19 @@ if __name__ == '__main__':
             #TXDOT section   *****************************************************************
             results = query(txDriver, delay, plateString)
             if results is not None:
-                #print results # for debug
-                fileString = repairLineBreaks(results)
+                fileString = repairLineBreaks(results[0])
+                DMVplate = results[1]
                 #remove non-ascii
                 ##fileString = "".join(filter(lambda x:x in string.printable, fileString))
             foundCurrentPlate = False
             recordList = []
             while True:
                 try:
-                    responseType, startNum, endNum = findResponseType(plateString, fileString)
+                    responseType, startNum, endNum = findResponseType(DMVplate, fileString)
                 except:
                     responseType = None
                     if foundCurrentPlate == False:
-                        print plateString, ' Plate/Pattern not found. Unable to resolve record type.'
+                        print DMVplate, ' Plate/Pattern not found. Unable to resolve record type.'
                         time.sleep(3)
                     break
                 if responseType != None: # there must be a valid text record to process
