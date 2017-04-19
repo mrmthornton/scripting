@@ -11,7 +11,7 @@
 
 
 import re
-from selenium import webdriver 
+from selenium import webdriver
 #import time
 
 from Tkinter import Tk
@@ -76,7 +76,7 @@ def permutationPattern(lp):
     for each position where any of these four characters are found.
     """
     lp = lp.upper()
-    l = []
+    l = ['(']
     for nextChar in lp:
         if nextChar=='0' or nextChar=='O':
             nextChar = "[0O]"
@@ -84,17 +84,19 @@ def permutationPattern(lp):
             nextChar = "[1I]"
         l.append(nextChar)
     #print("UTIL_LIB:permutatinPattern:list: ", l) # for debug
+    l.append(')')
     i = iter(l)
     regexString = "".join(i)
-    #print("UTIL_LIB:permutatinPattern:regexString: ", regexString) # for debug
+    print("UTIL_LIB:permutatinPattern:regexString: ", regexString) # for debug
     return re.compile(regexString)
-        
+
 def testPermutaionPattern():
     licencePlate = "loseit"
     io10Pattern = permutationPattern(licencePlate)
     found = io10Pattern.search("LOSEIT")
     if found:
         print(found.start(),found.end())
+        print(found.group())
     found = io10Pattern.search("L0SEIT")
     if found:
         print(found.start(),found.end())
@@ -104,16 +106,16 @@ def testPermutaionPattern():
     found = io10Pattern.search("L0SE1T")
     if found:
         print(found.start(),found.end())
-        
+
     licencePlate = "nooodle"
     io10Pattern = permutationPattern(licencePlate)
     found = io10Pattern.search("N0O0DLE")
     if found:
         print(found.start(),found.end())
-    found = io10Pattern.search("NO0ODLE")
+    found = io10Pattern.search("I am a NOO0DLE")
     if found:
         print(found.start(),found.end())
-    pass   
+    pass
 
 
 def timeout(msg="Took too much time!"):

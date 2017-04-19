@@ -297,7 +297,7 @@ def commonCode(lpList):
                 ##startWindow = findTargetPage(driver, findWindowDelay, startPageTextLocator, "mainframe")
                 startWindow = findTargetPage(driver, findWindowDelay, startPageTextLocator)
                 if startWindow is None:
-                    print "Start Page not found."
+                    print "commonCode: Start Page not found."
                     break
                 element = findElementOnPage(driver, delay, parameters['inputLocator'])
                 submitted = fillFormAndSubmit(driver, startWindow, element, plateString, parameters) # why so slow?  IeDriver64 ??
@@ -338,20 +338,23 @@ def commonCode(lpList):
             if txdotBool:
                 #TXDOT section   *****************************************************************
                 results = query(txDriver, delay, plateString)
-                if results is not None:
+                DMVtext = results[0]
+                DMVplate = results[1]
+                if DMVtext is not None:
                     #print results # for debug
-                    fileString = repairLineBreaks(results)
+                    fileString = repairLineBreaks(DMVtext)
+                    #fileString = repairLineBreaks([0])
                     #remove non-ascii
                     ##fileString = "".join(filter(lambda x:x in string.printable, fileString))
                 foundCurrentPlate = False
                 recordList = []
                 while True:
                     try:
-                        responseType, startNum, endNum = findResponseType(plateString, fileString)
+                        responseType, startNum, endNum = findResponseType(DMVplate, fileString)
                     except:
                         responseType = None
                         if foundCurrentPlate == False:
-                            print plateString, ' Plate/Pattern not found. Unable to resolve record type.'
+                            print plateString, DMVplate, 'commonCode: Plate/DMVplate not found. Unable to resolve record type.'
                             time.sleep(3)
                         break
                     if responseType != None: # there must be a valid text record to process

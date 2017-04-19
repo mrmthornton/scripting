@@ -196,10 +196,10 @@ def findResponseType(plate, fileString):
     if found != None:
         startCancel = found.start()
         #print("TxDot_LIB: findResponseType: cancel found at: ", startCancel)
-        if startCancel < 800:  # make this more obvious, what is the purpose.
+        if startCancel < 1000:  # make this more obvious, what is the purpose.
             startSearchAt = 0
         else:
-            startSearchAt = startCancel-800
+            startSearchAt = startCancel-1000
         ##print("findResponseType:CANCELED: ",fileString[startSearchAt:])
         found = canceledStartPattern.search(fileString[startSearchAt:])
         startNum = found.start() + startSearchAt
@@ -626,10 +626,8 @@ def query(driver, delay, plate):
 
     elemLocator =  (By.XPATH, '//div[@style="font-family: Courier New;"]')
     # wait until an lp match is found
+    ambiguousPattern = permutationPattern(plate)
     try:
-        ##WebDriverWait(driver, delay).until(EC.text_to_be_present_in_element_value(elemLocator,plate))
-        #WebDriverWait(driver, delay).until(EC.text_to_be_present_in_element(elemLocator,plate))
-        ambiguousPattern = permutationPattern(plate)
         while True:
             try:
                 textElement = findElementOnPage(driver, delay, elemLocator)
@@ -637,12 +635,15 @@ def query(driver, delay, plate):
             except StaleElementReferenceException:
                 continue
             found = ambiguousPattern.search(uText)
-            if found: break
+            if found is not None:
+                correctPlate = found.group()
+                break
+            continue
     except TimeoutException:
         print("ERROR: Timeout, input licence plate may not match the record.")
         return None
     plateSubmitElement.clear() # does this need to be cleared ?
-    return str(uText)
+    return (str(uText), correctPlate)
 
 if __name__ == "__main__":
     print("TxDot_LIB:main: TESTING TxDot_LIB")
