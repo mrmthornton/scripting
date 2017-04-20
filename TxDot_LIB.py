@@ -10,20 +10,13 @@
 # Copyright:   (c) mthornton 2014, 2015, 2016
 #-------------------------------------------------------------------------------
 
-#from selenium import webdriver
-#from selenium.common.exceptions import NoSuchFrameException
-#from selenium.common.exceptions import NoSuchWindowException
+
+import re
 from selenium.common.exceptions import TimeoutException, StaleElementReferenceException
 from selenium.webdriver.common.by import By
-#from selenium.webdriver.common.keys import Keys
-#from selenium.webdriver.support import expected_conditions as EC
-#from selenium.webdriver.support.ui import WebDriverWait
 from UTIL_LIB import permutationPattern
-
-#import io
-import re
-#from Tkinter import Tk
 from VPS_LIB import findElementOnPage
+
 
 linePattern = re.compile('^.+') # from start of line to newline(\n)
 wordPattern = re.compile('\w+') # any non-whitespace
@@ -36,6 +29,14 @@ datePattern = re.compile('[0-9]{2,2}/[0-9]{2,2}/[0-9]{4,4}') # mo/day/year
 dateYearFirstPattern = re.compile(r'\d{4,4}/\d{2,2}/\d{2,2}') # year/mo/day
 zipPlusPattern = re.compile(r'\d{5,5}-\d{4,4}')
 zipCodePattern = re.compile(r',\d{5,5}|\s+\w{2,2}\s+\d{5,5}')  # commaZIP or spaceSTspaceZIP
+
+
+def findAmbiguousPlates(plate,text):
+    platesPattern = permutationPattern(plate)
+    foundIter = platesPattern.finditer(text)
+    plateGen = (e.group() for e in foundIter)
+    for foundPlate in plateGen: print("TxDot_LIB:findAmbiguousPlates: ", foundPlate) # debug 
+    return plateGen
 
 def repairLineBreaks(fileString):
     # broken keywords words have a pattern of
