@@ -153,7 +153,7 @@ def txDotDataFill(recordDictionary, csvRecord):
         recordDictionary["plate_st"]= 'TX'
         recordDictionary["combined_name"] = csvRecord[2]
         recordDictionary["address"]= csvRecord[3]
-        #recordDictionary["addr2"]= csvRecord[4]
+        recordDictionary["addr2"]= csvRecord[4]
         recordDictionary["city"]= csvRecord[5]
         recordDictionary["state"]= csvRecord[6]
         recordDictionary["zip"]= csvRecord[7]
@@ -332,7 +332,7 @@ if __name__ == '__main__':
                             #print listData # for debug
                 else:
                     recordList = [['response type', plateString, 'name', 'addr', 'addr2', 'city', 'state', '75000',\
-                                 '1/1/2000', '1/4/2000', '1/2/2000', '','year','make','model','style','vin']]
+                                 '', '1/4/2000', '1/2/2000', '','year','make','model','style','vin']]
 
                 # Database Write section   *****************************************************************
                 if dbBool:
