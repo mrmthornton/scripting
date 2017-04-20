@@ -153,7 +153,7 @@ def txDotDataFill(recordDictionary, csvRecord):
         recordDictionary["plate_st"]= 'TX'
         recordDictionary["combined_name"] = csvRecord[2]
         recordDictionary["address"]= csvRecord[3]
-        recordDictionary["addr2"]= csvRecord[4]
+        #recordDictionary["addr2"]= csvRecord[4]
         recordDictionary["city"]= csvRecord[5]
         recordDictionary["state"]= csvRecord[6]
         recordDictionary["zip"]= csvRecord[7]

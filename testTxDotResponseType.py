@@ -32,7 +32,7 @@ def main():
             
         plates = platefile.readlines()  
         for plate in plates:
-            plate = plate.strip()
+            plate = plate.strip().upper()
             if plate is None or plate == "":
                 break
             
