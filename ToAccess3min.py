@@ -23,7 +23,7 @@ import time
 import tkFileDialog
 from Tkinter import Tk
 from TxDot_LIB import  csvStringFromList, findResponseType, parseRecord, query, repairLineBreaks
-from UTIL_LIB import openBrowser
+from UTIL_LIB import openBrowser, waitForUser
 from VPS_LIB import getTextResults, fillFormAndSubmit, findAndClickButton, findAndSelectFrame,\
                     findElementOnPage, findTargetPage, newPageElementFound
 
@@ -83,14 +83,6 @@ def ConnectToAccessFile():
         dbcursor=connectedDB.cursor()
         print("ConnectToAccessFile: Connected to {}".format(dbname))
         return connectedDB, dbcursor
-
-
-def waitForUser():
-        #Wait for user input
-        root = Tk()
-        event = tkFileDialog.askopenfilename(parent=root, title="Select database",
-                    filetypes=[('locked', '*.accde'), ('normal', '*.accdb')])
-        root.destroy()
 
 
 def makeSqlString(dictStruct):
@@ -161,19 +153,19 @@ def txDotDataFill(recordDictionary, csvRecord):
         recordDictionary["plate_st"]= 'TX'
         recordDictionary["combined_name"] = csvRecord[2]
         recordDictionary["address"]= csvRecord[3]
+        #recordDictionary["addr2"]= csvRecord[4]
         recordDictionary["city"]= csvRecord[5]
         recordDictionary["state"]= csvRecord[6]
         recordDictionary["zip"]= csvRecord[7]
         recordDictionary['ownedStartDate']= csvRecord[8]
         recordDictionary["start_date"]= csvRecord[9]
         recordDictionary["end_date"]= csvRecord[10]
-        #recordDictionary["title_date"]=
-        #recordDictionary["make"]= csvRecord[x1]
-        #recordDictionary["model"]= csvRecord[x1]
-        #recordDictionary["body"]= csvRecord[x1]
-        recordDictionary["vehicle_year"]= 0
-        #recordDictionary["images_reviewed"]= csvRecord[x1]
-        #recordDictionary["images_corrected"]= csvRecord[x1]
+        recordDictionary["title_date"]=csvRecord[11]
+        recordDictionary["vehicle_year"]= csvRecord[12]
+        recordDictionary["make"]= csvRecord[13]
+        recordDictionary["model"]= csvRecord[14]
+        recordDictionary["body"]= csvRecord[15]
+        recordDictionary["vin"]= csvRecord[16]
         #recordDictionary["reason"]= csvRecord[x1]
         #recordDictionary["time_stamp"]= csvRecord[x1]
         #recordDictionary["agent"]= csvRecord[x1]
@@ -199,14 +191,13 @@ def ToDbRecord(txDotRec, db):
     db["city"] = txDotRec["city"]
     db["state"]= txDotRec["state"]
     if txDotRec["zip"]!='': db["zip"] = int(txDotRec["zip"])
-    #db["title_date"] = txDotRec["title_date"]
-    db["title_date"] = ''
+    db["title_date"] = txDotRec["title_date"]
     if txDotRec["start_date"]!='': db["start_date"] = txDotRec["start_date"]
     if txDotRec["end_date"]!='': db["end_date"] = txDotRec["end_date"]
-    #db["make"] = txDotRec["make"]
-    #db["model"] = txDotRec["model"]
-    #db["body"] = txDotRec["body"]
-    #db["vehicle_year"] = txDotRec["vehicle_year"]
+    db["make"] = txDotRec["make"]
+    db["model"] = txDotRec["model"]
+    db["body"] = txDotRec["body"]
+    db["vehicle_year"] = txDotRec["vehicle_year"]
     db["images_reviewed"] = 10
     #db["images_corrected"] = txDotRec["images_corrected"]
     #db["reason"] = txDotRec["reason"]
@@ -230,153 +221,166 @@ if __name__ == '__main__':
 
     NUMBERtoProcess = 10
     vpsBool = False
-    txBool = True
+    txBool = False
     dbBool = True
     delay=10
-    SLEEPTIME = 5 # seconds 180 for standard time delay
+    SLEEPTIME = 0 # seconds 180 for standard time delay
     parameters = setParameters()
     parameters['operatorMessage'] = "Use debug mode, \n open VPS, new violator search window, \n open DMV window, \n run to completion"
     print parameters['operatorMessage']
     if txBool:
         txDriver = openBrowser('https://mvinet.txdmv.gov')
+        waitForUser('enter DMV credentials,\nnavigate to single entry page.')
     if vpsBool:
         driver = openBrowser(parameters['url'])
-
-
+        waitForUser('login to VPS,\nopen violator maintenance')
     try:
-        dbConnect, dbcursor = ConnectToAccessFile()
-        #for row in dbcursor.columns(table='Sheet1'): # debug
-        #    print row.column_name                    # debug
-        #dbcursor.execute("SELECT plate FROM [list of plate 4 without matching sheet1]") # (1),4,8,9,10, '11'  ,12
-        dbcursor.execute("SELECT plate FROM [list of plates 3 without matching sheet1]") # 2,3,5,6,7
-        lpList = []
-        loopCount = 0
-        while loopCount< NUMBERtoProcess:
-            lpRecord = dbcursor.fetchone()
-            if lpRecord is None:
-                print "main() : Finished, no more input records."
-                break
-            lpList.append(lpRecord)
-            loopCount += 1
-
-        for row in lpList:
-            if row is None:
-                print "main() : Finished, no more LP's ."
-                break
-            plateString = str(row[0])
-
-            if vpsBool:
-                #VPS section   *****************************************************************
-                startPageTextLocator = (By.XPATH, '//TD/H1[contains(text(),"Violation Search")]')
-                # pause on next line for entry of credentials, and window navigation.
-                ##startWindow = findTargetPage(driver, delay, startPageTextLocator, "mainframe")
-                startWindow = findTargetPage(driver, delay, startPageTextLocator)
-                if startWindow is None:
-                    print "main: Start Page not found."
+        # Database Read section   *****************************************************************
+        if dbBool:
+            dbConnect, dbcursor = ConnectToAccessFile()
+            #for row in dbcursor.columns(table='Sheet1'): # debug
+            #    print row.column_name                    # debug
+            #dbcursor.execute("SELECT plate FROM [list of plate 4 without matching sheet1]") # (1),4,8,9,10, '11'  ,12
+            dbcursor.execute("SELECT plate FROM [list of plates 5 without matching sheet1]") # 2,3,5,6,7
+            lpList = []
+            loopCount = 0
+            while loopCount< NUMBERtoProcess:
+                lpRecord = dbcursor.fetchone()
+                if lpRecord is None:
+                    print "main() : Finished, no more input records."
                     break
-                element = findElementOnPage(driver, delay, parameters['inputLocator'])
-                submitted = fillFormAndSubmit(driver, startWindow, element, plateString, parameters) # why so slow?  IeDriver64 ??
-                time.sleep(1)  #page may not be there yet!  how long to wait?
-                pageLoaded = newPageElementFound(driver, delay, (By.XPATH, '//frame[@name="fraTOP"]'), parameters['staleLocator2'])
-                foundFrame = findAndSelectFrame(driver, delay, "fraRL")
-                #time.sleep(1)  #text may not be there yet!  how long to wait?
-                text = getTextResults(driver, delay, plateString, parameters, "fraRL")
-                if text is not None: # if there is text, process it
-                    ##stdout.write("Initial # of " + plateString + ", " + str(text) + '\n')
-                    startNum = int(str(text))
-                    # insert orm to wait for user input
-                    # navigate to search position
-                    if type(parameters['buttonLocator']) is None: # no button, start at 'top' of the page
-                        driver.switch_to_default_content()
-                    else: # there is a button. find it/click it/wait for page to load
-                        clicked = findAndClickButton(driver, delay, parameters)
-                        pageLoaded = newPageElementFound(driver, delay, None, parameters['staleLocator'])
+                lpList.append(lpRecord)
+                loopCount += 1
+
+            for row in lpList:
+                if row is None:
+                    print "main() : Finished, no more LP's ."
+                    break
+                plateString = str(row[0])
+
+                #VPS section   *****************************************************************
+                if vpsBool:
+                    startPageTextLocator = (By.XPATH, '//TD/H1[contains(text(),"Violation Search")]')
+                    # pause on next line for entry of credentials, and window navigation.
+                    ##startWindow = findTargetPage(driver, delay, startPageTextLocator, "mainframe")
+                    startWindow = findTargetPage(driver, delay, startPageTextLocator)
+                    if startWindow is None:
+                        print "main: Start Page not found."
+                        raise ValueError("main: Start Page not found.", startPageTextLocator)
+                    element = findElementOnPage(driver, delay, parameters['inputLocator'])
                     submitted = fillFormAndSubmit(driver, startWindow, element, plateString, parameters) # why so slow?  IeDriver64 ??
                     time.sleep(1)  #page may not be there yet!  how long to wait?
                     pageLoaded = newPageElementFound(driver, delay, (By.XPATH, '//frame[@name="fraTOP"]'), parameters['staleLocator2'])
                     foundFrame = findAndSelectFrame(driver, delay, "fraRL")
                     #time.sleep(1)  #text may not be there yet!  how long to wait?
                     text = getTextResults(driver, delay, plateString, parameters, "fraRL")
-                    endNum = int(str(text))
-                    diffNum = startNum - endNum
-                    print  startNum, endNum, diffNum
-                # navigate to search position
-                if type(parameters['buttonLocator']) is None: # no button, start at 'top' of the page
-                    driver.switch_to_default_content()
-                else: # there is a button. find it/click it/wait for page to load
-                    clicked = findAndClickButton(driver, delay, parameters)
-                    pageLoaded = newPageElementFound(driver, delay, None, parameters['staleLocator'])
+                    if text is not None: # if there is text, process it
+                        ##stdout.write("Initial # of " + plateString + ", " + str(text) + '\n')
+                        startNum = int(str(text))
+                        # insert orm to wait for user input
+                        # navigate to search position
+                        if type(parameters['buttonLocator']) is None: # no button, start at 'top' of the page
+                            driver.switch_to_default_content()
+                        else: # there is a button. find it/click it/wait for page to load
+                            clicked = findAndClickButton(driver, delay, parameters)
+                            pageLoaded = newPageElementFound(driver, delay, None, parameters['staleLocator'])
+                        submitted = fillFormAndSubmit(driver, startWindow, element, plateString, parameters) # why so slow?  IeDriver64 ??
+                        time.sleep(1)  #page may not be there yet!  how long to wait?
+                        pageLoaded = newPageElementFound(driver, delay, (By.XPATH, '//frame[@name="fraTOP"]'), parameters['staleLocator2'])
+                        foundFrame = findAndSelectFrame(driver, delay, "fraRL")
+                        #time.sleep(1)  #text may not be there yet!  how long to wait?
+                        text = getTextResults(driver, delay, plateString, parameters, "fraRL")
+                        endNum = int(str(text))
+                        diffNum = startNum - endNum
+                        print  startNum, endNum, diffNum
+                    # navigate to search position
+                    if type(parameters['buttonLocator']) is None: # no button, start at 'top' of the page
+                        driver.switch_to_default_content()
+                    else: # there is a button. find it/click it/wait for page to load
+                        clicked = findAndClickButton(driver, delay, parameters)
+                        pageLoaded = newPageElementFound(driver, delay, None, parameters['staleLocator'])
 
-            #TXDOT section   *****************************************************************
-            results = query(txDriver, delay, plateString)
-            if results is not None:
-                fileString = repairLineBreaks(results[0])
-                DMVplate = results[1]
-                #remove non-ascii
-                ##fileString = "".join(filter(lambda x:x in string.printable, fileString))
-            foundCurrentPlate = False
-            recordList = []
-            while True:
-                try:
-                    responseType, startNum, endNum = findResponseType(DMVplate, fileString)
-                except:
-                    responseType = None
-                    if foundCurrentPlate == False:
-                        print DMVplate, ' Plate/Pattern not found. Unable to resolve record type.'
-                        time.sleep(3)
-                    break
-                if responseType != None: # there must be a valid text record to process
-                    foundCurrentPlate = True
-                    #print 'main:', responseType, startNum, endNum # for debug
-                    typeString = fileString[startNum:endNum + 1]
-                    #print typeString # for debug
-                    fileString = fileString[:startNum] + fileString[endNum + 1:] # what is this for ?
-                    listData = parseRecord(responseType, typeString)
-                    # make txdot data record here
-                    recordList.append(listData)
-                    #print listData # for debug
-                    assert(len(listData)==12)
 
-            # Database section   *****************************************************************
-            for csvRecord in recordList:
-                txDotRecord = txDotDataFill(txDotDataInit(), csvRecord)
-                dbRecord = recordInit()
-                dbRecord = ToDbRecord(txDotRecord, dbRecord)
-                print dbRecord # for debug
-                sqlString = makeSqlString(dbRecord)
-                #print sqlString # for debug
-                sql = sqlString.format(**dbRecord)
-                """sql = "INSERT INTO Sheet1 (Plate, Plate_St, [Combined Name], Address, City, State, ZipCode, \
-                                          [Title Date], [Start Date], [End Date], \
-                                          [Vehicle Make], [Vehicle Model], [Vehicle Body], [Vehicle Year], \
-                                          [Total Image Reviewed], [Total Image corrected], Reason, \
-                                          [Time_Stamp], [Agent Initial], \
-                                          [Sent to Collections Agency],  Multiple, Unassign, [Completed: Yes / No Record], \
-                                          [E-Tags (Temporary Plates)], [Dealer Plates] \
-                                          ) \
-                            VALUES (    '{plate}', '{plate_st}', '{combined_name}', '{address}', '{city}', '{state}', {zip}, \
-                                        '{title_date}', '{start_date}', '{end_date}', \
-                                        '{make}', '{model}', '{body}', {vehicle_year},\
-                                         {images_reviewed}, {images_corrected}, '{reason}', \
-                                        '{time_stamp}', '{agent}', \
-                                         {collections}, {multiple}, {unassign}, '{completed}', \
-                                         {temp_plate}, {dealer_plate} \
-                                         ) ".format(**dbRecord)"""
-                '''"title_month":'', "title_day":'', "title_year":'','''   # where is this added ?
-                dbcursor.execute(sql)
-            print("Comitting changes")
-            dbcursor.commit()
-            time.sleep(SLEEPTIME)
+                #TXDOT section   *****************************************************************
+                if txBool:
+                    results = query(txDriver, delay, plateString)
+                    if results is not None:
+                        fileString = repairLineBreaks(results[0])
+                        DMVplate = results[1]
+                        #remove non-ascii
+                        ##fileString = "".join(filter(lambda x:x in string.printable, fileString))
+                    foundCurrentPlate = False
+                    recordList = []
+                    while True:
+                        try:
+                            responseType, startNum, endNum = findResponseType(DMVplate, fileString)
+                        except:
+                            responseType = None
+                            if foundCurrentPlate == False:
+                                print DMVplate, ' Plate/Pattern not found. Unable to resolve record type.'
+                                time.sleep(3)
+                            break
+                        if responseType != None: # there must be a valid text record to process
+                            foundCurrentPlate = True
+                            #print 'main:', responseType, startNum, endNum # for debug
+                            typeString = fileString[startNum:endNum + 1]
+                            #print typeString # for debug
+                            fileString = fileString[:startNum] + fileString[endNum + 1:] # what is this for ?
+                            listData = parseRecord(responseType, typeString)
+                            assert(len(listData)==17)
+                            recordList.append(listData)
+                            #print listData # for debug
+                else:
+                    recordList = [['response type', plateString, 'name', 'addr', 'addr2', 'city', 'state', '75000',\
+                                 '1/1/2000', '1/4/2000', '1/2/2000', '','year','make','model','style','vin']]
+
+                # Database Write section   *****************************************************************
+                if dbBool:
+                    for csvRecord in recordList:
+                        txDotRecord = txDotDataFill(txDotDataInit(), csvRecord)
+                        dbRecord = recordInit()
+                        dbRecord = ToDbRecord(txDotRecord, dbRecord)
+                        print
+                        print
+                        print dbRecord # for debug
+                        sqlString = makeSqlString(dbRecord)
+                        print
+                        print
+                        print sqlString # for debug
+                        sql = sqlString.format(**dbRecord)
+                        """sql = "INSERT INTO Sheet1 (Plate, Plate_St, [Combined Name], Address, City, State, ZipCode, \
+                                                  [Title Date], [Start Date], [End Date], \
+                                                  [Vehicle Make], [Vehicle Model], [Vehicle Body], [Vehicle Year], \
+                                                  [Total Image Reviewed], [Total Image corrected], Reason, \
+                                                  [Time_Stamp], [Agent Initial], \
+                                                  [Sent to Collections Agency],  Multiple, Unassign, [Completed: Yes / No Record], \
+                                                  [E-Tags (Temporary Plates)], [Dealer Plates] \
+                                                  ) \
+                                    VALUES (    '{plate}', '{plate_st}', '{combined_name}', '{address}', '{city}', '{state}', {zip}, \
+                                                '{title_date}', '{start_date}', '{end_date}', \
+                                                '{make}', '{model}', '{body}', {vehicle_year},\
+                                                 {images_reviewed}, {images_corrected}, '{reason}', \
+                                                '{time_stamp}', '{agent}', \
+                                                 {collections}, {multiple}, {unassign}, '{completed}', \
+                                                 {temp_plate}, {dealer_plate} \
+                                                 ) ".format(**dbRecord)"""
+                        '''"title_month":'', "title_day":'', "title_year":'','''   # where is this added ?
+                        dbcursor.execute(sql)
+                    print("Comitting changes")
+                    dbcursor.commit()
+                    time.sleep(SLEEPTIME)
 
 # from TxDot lib --> ['response type', 'plate', 'name', 'addr', 'addr2', 'city', 'state', 'zip', 'ownedStartDate', 'startDate', 'endDate', 'issued']
 #"""  ALMOST FULL WRITE TO DATABASE missing title day, month, year -->  this will never happen. some fields are exclusive of others. """
-
+    except ValueError as e:
+        print(e)
     finally:
         print("Closing databases")
-        dbConnect.close()
+        if dbBool:
+            dbConnect.close()
         if vpsBool:
             driver.close() # close browser window
-            driver.quit()  # close command window
+            driver.quit()  # quit command shell
         if txBool:
             txDriver.close()
             txDriver.quit()
