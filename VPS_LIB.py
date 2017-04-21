@@ -19,7 +19,8 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
-import tkMessageBox
+#import tkMessageBox # python 2
+from tkinter import messagebox
 #from Tkinter import *
 
 from UTIL_LIB import cleanUpString, openBrowser, timeout

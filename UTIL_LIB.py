@@ -12,11 +12,10 @@
 
 import re
 from selenium import webdriver
-#import time
+#from Tkinter import Tk # python 2
+from tkinter import Tk, messagebox
+#import tkMessageBox # python 2
 
-from Tkinter import Tk
-#import tkMessageBox
-import tkMessageBox
 
 def cleanUpString(messyString):
     cleanString = messyString.replace(' ' , '') # remove any spaces
@@ -119,13 +118,14 @@ def testPermutaionPattern():
 
 
 def timeout(msg="Took too much time!"):
-    print msg
+    print(msg)
 
 
 def waitForUser(msg="enter login credentials"):
     #Wait for user input
     root = Tk()
-    tkMessageBox.askokcancel(message=msg)
+    #tkMessageBox.askokcancel(message=msg)
+    messagebox.askokcancel(message=msg)
     root.destroy()
 
 
