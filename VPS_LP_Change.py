@@ -1,15 +1,15 @@
 #-------------------------------------------------------------------------------
 # Name:        VPS_LP_Change.py
 # Purpose:     Examine
-#              enter a licen
-#              find
-#              write.
+#              enter a licence plate and state
+#              find uninvoiced images
+#              write the correct lable
 #
 # Author:      mthornton
 #
 # Created:     2015 AUG 01
-# Updates:     2016 NOV 07
-# Copyright:   (c) michael thornton 2015,2016
+# Updates:     2017 APR 21
+# Copyright:   (c) michael thornton 2015,2016, 2017
 # input(s):    (see parameters, dataInFileName)
 # output(s):   (see parameters, dataOutFileName)
 #-------------------------------------------------------------------------------
@@ -21,7 +21,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.select import Select
 import selenium.webdriver.support.expected_conditions as EC
 
-from VPS_LIB import *
+#from VPS_LIB import 
+from UTIL_LIB import cleanUpString, waitForUser
 
 import re
 import io
@@ -33,9 +34,9 @@ import time
 import datetime
 import pyodbc
 import string
-import tkFileDialog
-import tkMessageBox
-from Tkinter import *
+#import tkFileDialog # python 2
+from tkinter import filedialog, messagebox
+#import tkMessageBox # python 2
 import xlwings
 
 def setParameters():
@@ -66,7 +67,7 @@ def common_code(driver, parameters, plates):
     startPageTextLocator = (By.XPATH, '//TD/H1[contains(text(),"Violation Search")]')
     startWindow = findTargetPage(driver, parameters['findStartWindowDelay'], startPageTextLocator)
     if startWindow is None:
-        print "Start Page not found."
+        print("Start Page not found.")
         return None
 
     for row in plates:
@@ -92,7 +93,7 @@ def common_code(driver, parameters, plates):
         count = 0
         while Selector is None:  # menu select is sometimes None, why ?
             count = count + 1
-            print "retrying excusal menu selection. Count: ", count
+            print("retrying excusal menu selection. Count: ", count)
             Selector = Select(menuElement)
         Selector.select_by_visible_text("ZipCash; Uninvoiced") # does this need to be instanciated each time?
         #Selector.select_by_visible_text("Excused") # does this need to be instanciated each time?
@@ -130,13 +131,13 @@ def common_code(driver, parameters, plates):
             # click the query button.
         #test with multiple plate changes
 
-    print "main: Finished with LP_correction file."
+    print("main: Finished with LP_correction file.")
 
 
 def openRunClose(plates):
     parameters = setParameters()
     parameters['findStartWindowDelay'] = 3
-    print parameters['operatorMessage']
+    print(parameters['operatorMessage'])
     regexPattens = loadRegExPatterns()
     driver = openBrowser(parameters['url'])
     waitForUser()
@@ -155,10 +156,9 @@ def excelEntryPoint():
     inputArray = xlwings.Range((startRow,startCol),(endRow,endCol)).options(ndim=2).value
     plates = []
     [plates.append([str(e) for  e in plate]) for plate  in inputArray if plate[0] != 'None' and plate[0] != ""]
-    #l = len(plates)
-    #print l, plates
+    #l = len(plates) ; print(l, plates)
     excelRecord = openRunClose(plates)
-    #print excelRecord
+    #print(excelRecord
     # field name-> type, plate, combined_name, address, city, state, zip, ownedStartDate, start_date, end_date
     ##xlwings.Range((2,2)).value = excelRecord
 
