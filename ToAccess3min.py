@@ -103,9 +103,9 @@ def makeSqlString(dictStruct):
         sval.append(", '{start_date}', '{end_date}'")
         sql.append(", [Vehicle Make], [Vehicle Model], [Vehicle Body]")
         sval.append(", '{make}', '{model}', '{body}'")
-#    if dictStruct["vehicle_year"]!=0:
-#        sql.append(", [Vehicle Year]")
-#        sval.append(", {vehicle_year}")
+    if dictStruct["vehicle_year"]!=0:
+        sql.append(", [Vehicle Year]")
+        sval.append(", {vehicle_year}")
     sql.append(", [Total Image Reviewed], [Total Image corrected], Reason, \
 [Time_Stamp], [Agent Initial], \
 [Sent to Collections Agency],  Multiple, Unassign, [Completed: Yes / No Record], \
@@ -201,7 +201,7 @@ def ToDbRecord(txDotRec, db):
     db["make"] = txDotRec["make"]
     db["model"] = txDotRec["model"]
     db["body"] = txDotRec["body"]
-    db["vehicle_year"] = txDotRec["vehicle_year"]
+    if txDotRec["vehicle_year"] !="": db["vehicle_year"] = txDotRec["vehicle_year"]
     db["images_reviewed"] = 10
     #db["images_corrected"] = txDotRec["images_corrected"]
     #db["reason"] = txDotRec["reason"]
@@ -216,6 +216,7 @@ def ToDbRecord(txDotRec, db):
     #db["unassign"] = txDotRec["unassign"]
     #db["completed"] = txDotRec["completed"]
     if txDotRec["type"]=='TEMPORARY': db["temp_plate"]= 1
+    if txDotRec["type"]=='PERMIT': db["temp_plate"]= 1
     if txDotRec["type"]=='DEALER': db["dealer_plate"]= 1
 
     return db
@@ -223,9 +224,9 @@ def ToDbRecord(txDotRec, db):
 
 if __name__ == '__main__':
 
-    NUMBERtoProcess = 10
+    NUMBERtoProcess = 8
     vpsBool = False
-    txBool = False
+    txBool = True
     dbBool = True
     delay=10
     SLEEPTIME = 0 # seconds 180 for standard time delay
@@ -244,8 +245,8 @@ if __name__ == '__main__':
             dbConnect, dbcursor = ConnectToAccessFile()
             #for row in dbcursor.columns(table='Sheet1'): # debug
             #    print row.column_name                    # debug
-            #dbcursor.execute("SELECT plate FROM [list of plate 4 without matching sheet1]") # (1),4,8,9,10, '11'  ,12
-            dbcursor.execute("SELECT plate FROM [list of plates 5 without matching sheet1]") # 2,3,5,6,7
+            dbcursor.execute("SELECT plate FROM [list of plate 12 without matching sheet1]") # (1),4,8,9,10, '11'  ,12
+            #dbcursor.execute("SELECT plate FROM [list of plates 5 without matching sheet1]") # 2,3,5,6,7
             lpList = []
             loopCount = 0
             while loopCount< NUMBERtoProcess:
@@ -336,14 +337,13 @@ if __name__ == '__main__':
                             #print listData # for debug
                 else:
                     recordList = [['response type', plateString, 'name', 'addr', 'addr2', 'city', 'state', '75000',\
-                                 '', '1/4/2000', '1/2/2000', '','year','make','model','style','vin']]
+                                 '', '1/4/2000', '1/2/2000', '','2000','make','model','style','vin']]
 
                 # Database Write section   *****************************************************************
                 if dbBool:
                     for csvRecord in recordList:
                         txDotRecord = txDotDataFill(txDotDataInit(), csvRecord)
-                        dbRecord = recordInit()
-                        dbRecord = ToDbRecord(txDotRecord, dbRecord)
+                        dbRecord = ToDbRecord(txDotRecord, recordInit())
                         #print dbRecord # for debug
                         sqlString = makeSqlString(dbRecord)
                         #print sqlString # for debug
