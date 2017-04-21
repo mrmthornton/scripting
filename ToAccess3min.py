@@ -88,6 +88,8 @@ def ConnectToAccessFile():
 def makeSqlString(dictStruct):
     sql = []
     sval = []
+    #sql.append("INSERT INTO Sheet1 (Plate, [Combined Name], Address, City, State")
+    #sval.append(" VALUES ( '{plate}', '{combined_name}', '{address}', '{city}', '{state}'")
     sql.append("INSERT INTO Sheet1 (Plate, Plate_St, [Combined Name], Address, City, State")
     sval.append(" VALUES ( '{plate}', '{plate_st}', '{combined_name}', '{address}', '{city}', '{state}'")
     if dictStruct["zip"]!= 0:
@@ -101,17 +103,19 @@ def makeSqlString(dictStruct):
         sval.append(", '{start_date}', '{end_date}'")
         sql.append(", [Vehicle Make], [Vehicle Model], [Vehicle Body]")
         sval.append(", '{make}', '{model}', '{body}'")
-    if dictStruct["vehicle_year"]!=0:
-        sql.append(", [Vehicle Year]")
-        sval.append(", {vehicle_year}")
+#    if dictStruct["vehicle_year"]!=0:
+#        sql.append(", [Vehicle Year]")
+#        sval.append(", {vehicle_year}")
     sql.append(", [Total Image Reviewed], [Total Image corrected], Reason, \
 [Time_Stamp], [Agent Initial], \
 [Sent to Collections Agency],  Multiple, Unassign, [Completed: Yes / No Record], \
-[E-Tags (Temporary Plates)], [Dealer Plates] )")
+[E-Tags (Temporary Plates)], [Dealer Plates] ")
     sval.append(", '{images_reviewed}', '{images_corrected}', '{reason}', \
 '{time_stamp}', '{agent}', \
 {collections}, {multiple}, {unassign}, '{completed}', \
-{temp_plate}, {dealer_plate} )")
+{temp_plate}, {dealer_plate} ")
+    sql.append(" )")
+    sval.append(" )")
     SQL = "".join(sql)
     SVAL = "".join(sval)
     return SQL + SVAL
@@ -303,7 +307,7 @@ if __name__ == '__main__':
 
                 #TXDOT section   *****************************************************************
                 if txBool:
-                    results = query(txDriver, delay, plateString)
+                    results = query(txDriver, delay, plateString)  # TODO remove unprintable chars
                     if results is not None:
                         fileString = repairLineBreaks(results[0])
                         DMVplate = results[1]
@@ -340,13 +344,9 @@ if __name__ == '__main__':
                         txDotRecord = txDotDataFill(txDotDataInit(), csvRecord)
                         dbRecord = recordInit()
                         dbRecord = ToDbRecord(txDotRecord, dbRecord)
-                        print
-                        print
-                        print dbRecord # for debug
+                        #print dbRecord # for debug
                         sqlString = makeSqlString(dbRecord)
-                        print
-                        print
-                        print sqlString # for debug
+                        #print sqlString # for debug
                         sql = sqlString.format(**dbRecord)
                         """sql = "INSERT INTO Sheet1 (Plate, Plate_St, [Combined Name], Address, City, State, ZipCode, \
                                                   [Title Date], [Start Date], [End Date], \

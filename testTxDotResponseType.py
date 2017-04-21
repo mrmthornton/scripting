@@ -17,7 +17,7 @@ def main():
     inputFileName = 'testCasesNoPii.txt'
     plateFileName = 'platesNoPii.txt'
     outputFileName = 'tempResponseResults.txt'
-    
+
     with open(outputFileName, 'w') as outfile, \
          open(inputFileName, 'r') as infile, \
          open(plateFileName, 'r') as platefile:
@@ -29,13 +29,13 @@ def main():
             ##print("main: ", results) # for debug
             fileString = repairLineBreaks(results)
             ##print("main: ", fileString) # for debug
-            
-        plates = platefile.readlines()  
+
+        plates = platefile.readlines()
         for plate in plates:
             plate = plate.strip().upper()
             if plate is None or plate == "":
                 break
-            
+
             foundCurrentPlate = False
             while True:
                 try:
@@ -81,8 +81,8 @@ NT:2017/01/01.PAPER TITLE.
     foundPlates = findAmbiguousPlates("P0ND", text)
     for eachPlate in foundPlates:
         print("testTxDotResponseType:testAmbig: ", eachPlate)
-    
+
 if __name__ == '__main__':
-    #main()
+    main()
     testAmbig()
-    
+
