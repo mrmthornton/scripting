@@ -114,6 +114,8 @@ def makeSqlString(dictStruct):
 '{time_stamp}', '{agent}', \
 {collections}, {multiple}, {unassign}, '{completed}', \
 {temp_plate}, {dealer_plate} ")
+    sql.append(", Comment")
+    sval.append(", {comment}")
     sql.append(" )")
     sval.append(" )")
     SQL = "".join(sql)
@@ -130,9 +132,9 @@ def recordInit():
         "make":'' , "model":'' , "body":'' , "vehicle_year":0 ,
         "images_reviewed":0, "images_corrected":0, "reason":'',
         "time_stamp":'', "agent":'',
-        "title_month":'', "title_day":'', "title_year":'',
         "collections":0, "multiple":0, "unassign":0,
-        "completed":'', "temp_plate":0, "dealer_plate":0
+        "completed":'', "temp_plate":0, "dealer_plate":0,
+        "comment":''
         }
     return recordDictionary
 
@@ -157,7 +159,7 @@ def txDotDataFill(recordDictionary, csvRecord):
         recordDictionary["plate_st"]= 'TX'
         recordDictionary["combined_name"] = csvRecord[2]
         recordDictionary["address"]= csvRecord[3]
-        #recordDictionary["addr2"]= csvRecord[4]
+        recordDictionary["addr2"]= csvRecord[4]
         recordDictionary["city"]= csvRecord[5]
         recordDictionary["state"]= csvRecord[6]
         recordDictionary["zip"]= csvRecord[7]
@@ -170,23 +172,19 @@ def txDotDataFill(recordDictionary, csvRecord):
         recordDictionary["model"]= csvRecord[14]
         recordDictionary["body"]= csvRecord[15]
         recordDictionary["vin"]= csvRecord[16]
-        #recordDictionary["reason"]= csvRecord[x1]
-        #recordDictionary["time_stamp"]= csvRecord[x1]
-        #recordDictionary["agent"]= csvRecord[x1]
-        #recordDictionary["title_month"]= csvRecord[x1]
-        #recordDictionary["title_day"]= csvRecord[x1]
-        #recordDictionary["title_year"]= csvRecord[x1]
-        #recordDictionary["collections"]= 0
-        #recordDictionary["multiple"]=
-        #recordDictionary["unassign"]=
-        #recordDictionary["completed"]=
-        #recordDictionary["temp_plate"]= csvRecord[x1]
-        #recordDictionary["dealer_plate"]= csvRecord[x1]
         return recordDictionary
 
 
+        '''
+        Violator already exists in VPS and it matches with TXDOT
+        Violator exists in TXDOT
+        Missing address in TXDOT
+        '''
 def ToDbRecord(txDotRec, db):
-    if txDotRec["type"]=='NORECORD': db["completed"]='NO RECORD'
+    if txDotRec["type"]=='TEMPORARY': db["temp_plate"]= 1
+    if txDotRec["type"]=='PERMIT': db["temp_plate"]= 1
+    if txDotRec["type"]=='DEALER': db["dealer_plate"]= 1
+    if txDotRec["type"]=='NORECORD': db["completed"]='No Record in TXDOT'
     else: db["completed"]='YES'
     db["plate"] = txDotRec["plate"]
     db["plate_st"] = txDotRec["plate_st"]
@@ -196,7 +194,7 @@ def ToDbRecord(txDotRec, db):
     db["state"]= txDotRec["state"]
     if txDotRec["zip"]!='': db["zip"] = int(txDotRec["zip"])
     db["title_date"] = txDotRec["title_date"]
-    if txDotRec["start_date"]!='': db["start_date"] = txDotRec["start_date"]
+    #if txDotRec["start_date"]!='': db["start_date"] = txDotRec["start_date"]
     if txDotRec["end_date"]!='': db["end_date"] = txDotRec["end_date"]
     db["make"] = txDotRec["make"]
     db["model"] = txDotRec["model"]
@@ -204,20 +202,24 @@ def ToDbRecord(txDotRec, db):
     if txDotRec["vehicle_year"] !="": db["vehicle_year"] = txDotRec["vehicle_year"]
     db["images_reviewed"] = 10
     #db["images_corrected"] = txDotRec["images_corrected"]
-    #db["reason"] = txDotRec["reason"]
     db["time_stamp"] = time.strftime("%m/%d/%Y %I:%M:%S %p") # month, day, long year, 12 hr, AM/PM
     #db["time_stamp"] = '9/13/2016 4:53:47 PM'
     db["agent"] = "mthornton"
-    #db["title_month"] = txDotRec["title_month"]
-    #db["title_day"] = txDotRec["title_day"]
-    #db["title_year"] = txDotRec["title_year"]
-    #db["collections"] = txDotRec["collections"]
-    #db["multiple"] = txDotRec["multiple"]
-    #db["unassign"] = txDotRec["unassign"]
-    #db["completed"] = txDotRec["completed"]
-    if txDotRec["type"]=='TEMPORARY': db["temp_plate"]= 1
-    if txDotRec["type"]=='PERMIT': db["temp_plate"]= 1
-    if txDotRec["type"]=='DEALER': db["dealer_plate"]= 1
+    #db["VIN"] = txDotRec["VIN"]
+    #db["reason"] = txDotRec["reason"]
+    db["comment"] = "test"
+    '''
+    Plate is correct
+    Plate is incorrect
+    Unclear image
+    Multiple vehicles with the same plate
+    NO images
+    Out of State
+    U.S. Government Plate
+    First Responder
+    Other
+    '''
+
 
     return db
 
@@ -226,7 +228,7 @@ if __name__ == '__main__':
 
     NUMBERtoProcess = 8
     vpsBool = False
-    txBool = True
+    txBool = False
     dbBool = True
     delay=10
     SLEEPTIME = 0 # seconds 180 for standard time delay
@@ -348,23 +350,6 @@ if __name__ == '__main__':
                         sqlString = makeSqlString(dbRecord)
                         #print sqlString # for debug
                         sql = sqlString.format(**dbRecord)
-                        """sql = "INSERT INTO Sheet1 (Plate, Plate_St, [Combined Name], Address, City, State, ZipCode, \
-                                                  [Title Date], [Start Date], [End Date], \
-                                                  [Vehicle Make], [Vehicle Model], [Vehicle Body], [Vehicle Year], \
-                                                  [Total Image Reviewed], [Total Image corrected], Reason, \
-                                                  [Time_Stamp], [Agent Initial], \
-                                                  [Sent to Collections Agency],  Multiple, Unassign, [Completed: Yes / No Record], \
-                                                  [E-Tags (Temporary Plates)], [Dealer Plates] \
-                                                  ) \
-                                    VALUES (    '{plate}', '{plate_st}', '{combined_name}', '{address}', '{city}', '{state}', {zip}, \
-                                                '{title_date}', '{start_date}', '{end_date}', \
-                                                '{make}', '{model}', '{body}', {vehicle_year},\
-                                                 {images_reviewed}, {images_corrected}, '{reason}', \
-                                                '{time_stamp}', '{agent}', \
-                                                 {collections}, {multiple}, {unassign}, '{completed}', \
-                                                 {temp_plate}, {dealer_plate} \
-                                                 ) ".format(**dbRecord)"""
-                        '''"title_month":'', "title_day":'', "title_year":'','''   # where is this added ?
                         dbcursor.execute(sql)
                     print("Comitting changes")
                     dbcursor.commit()
