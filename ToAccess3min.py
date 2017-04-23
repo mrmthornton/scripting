@@ -76,7 +76,7 @@ def ConnectToAccessFile():
         #Prompt the user for db, create connection and cursor.
         root = Tk()
         dbname = tkFileDialog.askopenfilename(parent=root, title="Select database",
-                    filetypes=[('locked', '*.accde'), ('normal', '*.accdb')])
+                    filetypes=[('normal', '*.accdb'), ('locked', '*.accde') ])
         root.destroy()
         # Connect to the Access database
         connectedDB = pyodbc.connect("Driver={Microsoft Access Driver (*.mdb, *.accdb)};DBQ="+dbname+";")
@@ -224,9 +224,9 @@ def ToDbRecord(txDotRec, db):
 
 if __name__ == '__main__':
 
-    NUMBERtoProcess = 8
+    NUMBERtoProcess = 2
     vpsBool = False
-    txBool = True
+    txBool = False
     dbBool = True
     delay=10
     SLEEPTIME = 0 # seconds 180 for standard time delay
