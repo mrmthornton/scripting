@@ -348,8 +348,9 @@ if __name__ == '__main__':
                         dbRecord = ToDbRecord(txDotRecord, recordInit())
                         #print dbRecord # for debug
                         sqlString = makeSqlString(dbRecord)
-                        #print sqlString # for debug
+                        print sqlString # for debug
                         sql = sqlString.format(**dbRecord)
+                        print sql # for debug
                         dbcursor.execute(sql)
                     print("Comitting changes")
                     dbcursor.commit()
