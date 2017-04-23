@@ -76,7 +76,7 @@ def ConnectToAccessFile():
         #Prompt the user for db, create connection and cursor.
         root = Tk()
         dbname = tkFileDialog.askopenfilename(parent=root, title="Select database",
-                    filetypes=[('locked', '*.accde'), ('normal', '*.accdb')])
+                    filetypes=[('normal', '*.accdb'), ('locked', '*.accde')])
         root.destroy()
         # Connect to the Access database
         connectedDB = pyodbc.connect("Driver={Microsoft Access Driver (*.mdb, *.accdb)};DBQ="+dbname+";")
@@ -114,8 +114,8 @@ def makeSqlString(dictStruct):
 '{time_stamp}', '{agent}', \
 {collections}, {multiple}, {unassign}, '{completed}', \
 {temp_plate}, {dealer_plate} ")
-    sql.append(", Comment")
-    sval.append(", {comment}")
+#    sql.append(", Comment")
+#    sval.append(", {comment}")
     sql.append(" )")
     sval.append(" )")
     SQL = "".join(sql)
