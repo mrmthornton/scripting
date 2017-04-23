@@ -145,7 +145,7 @@ def txDotDataInit():
         "plate":'', "plate_st":'',
         "combined_name":'',
         "address":'', "city":'', "state":'', "zip":'',
-        "ownedStartDate":'', "title_date":'', "start_date":'', "end_date":'' ,
+        "ownedStartDate":'', "title_date":'', "start_date":'', "end_date":'', "reg_date":'' ,
         "make":'' , "model":'', "body":'', "vehicle_year":''
         }
     return recordDictionary
@@ -193,20 +193,29 @@ def ToDbRecord(txDotRec, db):
     db["city"] = txDotRec["city"]
     db["state"]= txDotRec["state"]
     if txDotRec["zip"]!='': db["zip"] = int(txDotRec["zip"])
+
     db["title_date"] = txDotRec["title_date"]
-    #if txDotRec["start_date"]!='': db["start_date"] = txDotRec["start_date"]
+
+    if txDotRec["ownedStartDate"] != '':
+        db["start_date"] = txDotRec["ownedStartDate"]
+    elif txDotRec["title_date"] != '':
+        db["start_date"] = txDotRec["title_date"]
+    elif txDotRec["reg_date"] != '':
+        db["start_date"] = txDotRec["reg_date"] # TODO  what about only REG DT
+    else: db["start_date"] = txDotRec["start_date"]
+
     if txDotRec["end_date"]!='': db["end_date"] = txDotRec["end_date"]
+
     db["make"] = txDotRec["make"]
     db["model"] = txDotRec["model"]
     db["body"] = txDotRec["body"]
     if txDotRec["vehicle_year"] !="": db["vehicle_year"] = txDotRec["vehicle_year"]
     db["images_reviewed"] = 10
-    #db["images_corrected"] = txDotRec["images_corrected"]
-    db["time_stamp"] = time.strftime("%m/%d/%Y %I:%M:%S %p") # month, day, long year, 12 hr, AM/PM
-    #db["time_stamp"] = '9/13/2016 4:53:47 PM'
+    #db["images_corrected"] = ??
+    db["time_stamp"] = time.strftime("%m/%d/%Y %I:%M:%S %p") # example: '9/13/2016 4:53:47 PM'
     db["agent"] = "mthornton"
-    #db["VIN"] = txDotRec["VIN"]
-    #db["reason"] = txDotRec["reason"]
+    #db["VIN"] = txDotRec["VIN"]   TODO
+    #db["reason"] = txDotRec["reason"]   TODO
     db["comment"] = "test"
     '''
     Plate is correct
@@ -226,7 +235,7 @@ def ToDbRecord(txDotRec, db):
 
 if __name__ == '__main__':
 
-    NUMBERtoProcess = 8
+    NUMBERtoProcess = 1
     vpsBool = False
     txBool = False
     dbBool = True
@@ -338,15 +347,24 @@ if __name__ == '__main__':
                             recordList.append(listData)
                             #print listData # for debug
                 else:
-                    recordList = [['response type', plateString, 'name', 'addr', 'addr2', 'city', 'state', '75000',\
-                                 '', '1/4/2000', '1/2/2000', '','2000','make','model','style','vin']]
+                    recordList = [['STANDARD', 'S'+plateString, 'name', 'addr', 'addr2', 'city', 'state', '75000',\
+                                 '1/1/2000', '1/3/2000', '1/4/2000', '1/2/2000','2000','NISS','AC','4D','vin'],
+                                 ['SPECIAL', 'C'+plateString, 'name', 'addr', 'addr2', 'city', 'state', '75000',\
+                                 '',         '1/3/2000', '1/4/2000', '1/2/2000','2000','NISS','AC','4D','vin'],
+                                 ['TEMPORARY', 'T'+plateString, 'name2', 'addr2', 'addr22', 'city2', 'state2', '75002',\
+                                 '',         '1/3/2002', '1/4/2002', '',        '2002','BMW2','AC2','2D','vin2'],
+                                 ['DEALER', 'D'+plateString, 'name2', 'addr2', 'addr22', 'city2', 'state2', '75002',\
+                                 '',         '',         '1/4/2002', '',        '','','','', '']]
+                         #       ['response type', 'plate', 'name', 'addr', 'addr2', 'city', 'state', 'zip',
+                         # 'ownedStartDate', 'startDate', 'endDate', 'issued']
 
                 # Database Write section   *****************************************************************
                 if dbBool:
                     for csvRecord in recordList:
+                        print recordList # for debug
                         txDotRecord = txDotDataFill(txDotDataInit(), csvRecord)
                         dbRecord = ToDbRecord(txDotRecord, recordInit())
-                        #print dbRecord # for debug
+                        print dbRecord # for debug
                         sqlString = makeSqlString(dbRecord)
                         print sqlString # for debug
                         sql = sqlString.format(**dbRecord)
@@ -356,8 +374,6 @@ if __name__ == '__main__':
                     dbcursor.commit()
                     time.sleep(SLEEPTIME)
 
-# from TxDot lib --> ['response type', 'plate', 'name', 'addr', 'addr2', 'city', 'state', 'zip', 'ownedStartDate', 'startDate', 'endDate', 'issued']
-#"""  ALMOST FULL WRITE TO DATABASE missing title day, month, year -->  this will never happen. some fields are exclusive of others. """
     except ValueError as e:
         print(e)
     finally:
