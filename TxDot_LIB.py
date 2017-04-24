@@ -35,7 +35,7 @@ def findAmbiguousPlates(plate,text):
     platesPattern = permutationPattern(plate)
     foundIter = platesPattern.finditer(text)
     plateGen = (e.group() for e in foundIter)
-    for foundPlate in plateGen: print("TxDot_LIB:findAmbiguousPlates: ", foundPlate) # debug 
+    for foundPlate in plateGen: print("TxDot_LIB:findAmbiguousPlates: ", foundPlate) # debug
     return plateGen
 
 def repairLineBreaks(fileString):
@@ -257,7 +257,7 @@ def parsePlacard(responseType, typeString):
             plate = nextWord.group()
     return [responseType, plate.strip(), 'NOT a licence plate!', '', '', '', '', '', '', '', '', '','','','','','']
 
-def parseDealer(responseType, typeString):
+def parseDealer(responseType, typeString): # TODO get expiration date
     dealerPattern = re.compile('DEALER' + '[\s]+')
     #strip header
     header = dealerPattern.search(typeString)

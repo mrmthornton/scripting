@@ -347,16 +347,12 @@ if __name__ == '__main__':
                             recordList.append(listData)
                             #print listData # for debug
                 else:
-                    recordList = [['STANDARD',  plateString, 'name', 'addr', 'addr2', 'city', 'state', '75000',\
-                                 '1/1/2000', '1/3/2000', '1/4/2000', '1/2/2000','2000','NISS','AC','4D','vin'],
-                                 ['SPECIAL', 'C'+plateString, 'name', 'addr', 'addr2', 'city', 'state', '75000',\
-                                 '',         '1/3/2000', '1/4/2000', '1/2/2000','2000','NISS','AC','4D','vin'],
-                                 ['TEMPORARY', 'T'+plateString, 'name2', 'addr2', 'addr22', 'city2', 'state2', '75002',\
-                                 '',         '1/3/2002', '1/4/2002', '',        '2002','BMW2','AC2','2D','vin2'],
-                                 ['DEALER', 'D'+plateString, 'name2', 'addr2', 'addr22', 'city2', 'state2', '75002',\
-                                 '',         '',         '1/4/2002', '',        '','','','', '']]
-                         #       ['response type', 'plate', 'name', 'addr', 'addr2', 'city', 'state', 'zip',
-                         # 'ownedStartDate', 'startDate', 'endDate', 'issued']
+                    recordList = [
+['STANDARD',   plateString,    'name',  'addr',  'addr2',  'city',  'state',  '75000', '1/1/2000', '1/3/2000', '1/4/2000', '1/2/2000','2000','NISS','AC','4D','vin'],
+['SPECIAL',   'C'+plateString, 'name',  'addr',  'addr2',  'city',  'state',  '75000', '',         '1/3/2000', '1/4/2000', '1/2/2000','2000','NISS','AC','4D','vin'],
+['TEMPORARY', 'T'+plateString, 'name2', 'addr2', 'addr22', 'city2', 'state2', '75002', '',         '1/3/2002', '1/4/2002', '',        '2002','BMW', 'AC','2D','vin'],
+['DEALER',    'D'+plateString, 'name2', 'addr2', 'addr22', 'city2', 'state2', '75002', '',         '',         '6/1/2017', '',        '',     '',    '',  '',  '']]
+#' type',     'plate',         'name',  'addr',  'addr2',  'city',  'state',  'zip',   'Assigned', 'startDate', 'endDate', 'title'    'year', make',modl,body,vin
 
                 # Database Write section   *****************************************************************
                 if dbBool:
