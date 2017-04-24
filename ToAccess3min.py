@@ -347,7 +347,7 @@ if __name__ == '__main__':
                             recordList.append(listData)
                             #print listData # for debug
                 else:
-                    recordList = [['STANDARD', 'S'+plateString, 'name', 'addr', 'addr2', 'city', 'state', '75000',\
+                    recordList = [['STANDARD',  plateString, 'name', 'addr', 'addr2', 'city', 'state', '75000',\
                                  '1/1/2000', '1/3/2000', '1/4/2000', '1/2/2000','2000','NISS','AC','4D','vin'],
                                  ['SPECIAL', 'C'+plateString, 'name', 'addr', 'addr2', 'city', 'state', '75000',\
                                  '',         '1/3/2000', '1/4/2000', '1/2/2000','2000','NISS','AC','4D','vin'],
