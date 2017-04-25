@@ -1,3 +1,4 @@
+# -*- coding: UTF-8 -*-
 #-------------------------------------------------------------------------------
 # Name:        TxDot_LIB
 # Purpose:     code to parse the multi-formated results

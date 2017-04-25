@@ -1,3 +1,4 @@
+# -*- coding: UTF-8 -*-
 #-------------------------------------------------------------------------------
 # Name:        UTIL_LIB.py
 # Purpose:     A library for common behaviors.

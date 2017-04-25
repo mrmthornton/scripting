@@ -1,3 +1,4 @@
+# -*- coding: UTF-8 -*-
 #-------------------------------------------------------------------------------
 # Name:        testTxDotResponse
 # Purpose:     input reponses from TX DMV RTS database, in raw text format.
