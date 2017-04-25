@@ -144,7 +144,7 @@ def findResponseType(plate, fileString):
 
     # TXIRP
     targetType = 'TXIRP'
-    startPattern = re.compile('LIC ' + plate + ' EXPIRES')
+    startPattern = re.compile('LIC' + plate + ' EXPIRES')
     endPattern = re.compile('REMARKS')
     startNum, endNum = findStartEnd(fileString,startPattern, endPattern)
     if startNum is not None:
@@ -644,7 +644,7 @@ def query(driver, delay, plate):
         print("TxDot_LIB:query:ERROR: Timeout, input licence plate may not match the record.")
         return None
     plateSubmitElement.clear() # does this need to be cleared ?
-    return (str(uText), correctPlate)
+    return (str(uText.encode('ascii', 'ignore')), correctPlate.encode('ascii', 'ignore'))#  TEST  TODO
 
 if __name__ == "__main__":
     print("TxDot_LIB:main: TESTING TxDot_LIB")

@@ -76,7 +76,7 @@ def ConnectToAccessFile():
         #Prompt the user for db, create connection and cursor.
         root = Tk()
         dbname = tkFileDialog.askopenfilename(parent=root, title="Select database",
-                    filetypes=[('normal', '*.accdb'), ('locked', '*.accde')])
+                    filetypes=[('normal', '*.accde'), ('locked', '*.accdb')])
         root.destroy()
         # Connect to the Access database
         connectedDB = pyodbc.connect("Driver={Microsoft Access Driver (*.mdb, *.accdb)};DBQ="+dbname+";")
@@ -110,7 +110,7 @@ def makeSqlString(dictStruct):
 [Time_Stamp], [Agent Initial], \
 [Sent to Collections Agency],  Multiple, Unassign, [Completed: Yes / No Record], \
 [E-Tags (Temporary Plates)], [Dealer Plates] ")
-    sval.append(", '{images_reviewed}', '{images_corrected}', '{reason}', \
+    sval.append(", {images_reviewed}, {images_corrected}, '{reason}', \
 '{time_stamp}', '{agent}', \
 {collections}, {multiple}, {unassign}, '{completed}', \
 {temp_plate}, {dealer_plate} ")
@@ -181,6 +181,7 @@ def txDotDataFill(recordDictionary, csvRecord):
         Missing address in TXDOT
         '''
 def ToDbRecord(txDotRec, db):
+    '''
     if txDotRec["type"]=='TEMPORARY': db["temp_plate"]= 1
     if txDotRec["type"]=='PERMIT': db["temp_plate"]= 1
     if txDotRec["type"]=='DEALER': db["dealer_plate"]= 1
@@ -218,6 +219,7 @@ def ToDbRecord(txDotRec, db):
     #db["reason"] = txDotRec["reason"]   TODO
     db["comment"] = "test"
     '''
+    '''
     Plate is correct
     Plate is incorrect
     Unclear image
@@ -228,16 +230,14 @@ def ToDbRecord(txDotRec, db):
     First Responder
     Other
     '''
-
-
     return db
 
 
 if __name__ == '__main__':
 
-    NUMBERtoProcess = 1
+    NUMBERtoProcess = 10
     vpsBool = False
-    txBool = False
+    txBool = True
     dbBool = True
     delay=10
     SLEEPTIME = 0 # seconds 180 for standard time delay
@@ -256,7 +256,7 @@ if __name__ == '__main__':
             dbConnect, dbcursor = ConnectToAccessFile()
             #for row in dbcursor.columns(table='Sheet1'): # debug
             #    print row.column_name                    # debug
-            dbcursor.execute("SELECT plate FROM [list of plate 12 without matching sheet1]") # (1),4,8,9,10, '11'  ,12
+            dbcursor.execute("SELECT plate FROM [list of plate 8 without matching sheet1]") # (1),4,8,9,10, '11'  ,12
             #dbcursor.execute("SELECT plate FROM [list of plates 5 without matching sheet1]") # 2,3,5,6,7
             lpList = []
             loopCount = 0
@@ -319,11 +319,10 @@ if __name__ == '__main__':
 
                 #TXDOT section   *****************************************************************
                 if txBool:
-                    results = query(txDriver, delay, plateString)  # TODO remove unprintable chars
-                    if results is not None:
-                        fileString = repairLineBreaks(results[0])
-                        DMVplate = results[1]
-                        #remove non-ascii
+                    text, DMVplate  = query(txDriver, delay, plateString)  # TODO remove unprintable chars
+                    if text is not None:
+                        cleanText = "".join(filter(lambda x:x in string.printable, text)) # TODO move to query
+                        fileString = repairLineBreaks(cleanText)  # TODO remove non-ascii  TODO move to query
                         ##fileString = "".join(filter(lambda x:x in string.printable, fileString))
                     foundCurrentPlate = False
                     recordList = []
