@@ -15,14 +15,16 @@
 [remote "origin"]
 	url = git@github.com:mrmthornton/scripting.git
 	url = git@bitbucket.org:mrmthornton/scripting.git
+	fetch = +refs/heads/*:refs/remotes/origin/*
 [user]
 	name = mrmthornton
 	email = mrmthornton@gmail.com
 [color "status"]
 	updated = green
-	added = green
+	added = green bold
 	untracked = green
 	changed = red white bold
+	unmerged = red bold
 [color "branch"]
 [color "interactive"]
 # normal, black, red, green, yellow, blue, magenta, cyan, white
@@ -30,3 +32,6 @@
 [color "diff"]
 	new = green bold	
 	old = red bold
+[branch "py2"]
+	remote = origin
+	merge = refs/heads/py2
