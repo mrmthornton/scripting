@@ -76,7 +76,8 @@ def ConnectToAccessFile():
         #Prompt the user for db, create connection and cursor.
         root = Tk()
         dbname = tkFileDialog.askopenfilename(parent=root, title="Select database",
-                    filetypes=[('normal', '*.accde'), ('locked', '*.accdb')])
+                    filetypes=[('locked', '*.accde')])
+                    #filetypes=[('locked', '*.accde'), ('normal', '*.accdb')])
         root.destroy()
         # Connect to the Access database
         connectedDB = pyodbc.connect("Driver={Microsoft Access Driver (*.mdb, *.accdb)};DBQ="+dbname+";")
@@ -88,8 +89,6 @@ def ConnectToAccessFile():
 def makeSqlString(dictStruct):
     sql = []
     sval = []
-    #sql.append("INSERT INTO Sheet1 (Plate, [Combined Name], Address, City, State")
-    #sval.append(" VALUES ( '{plate}', '{combined_name}', '{address}', '{city}', '{state}'")
     sql.append("INSERT INTO Sheet1 (Plate, Plate_St, [Combined Name], Address, City, State")
     sval.append(" VALUES ( '{plate}', '{plate_st}', '{combined_name}', '{address}', '{city}', '{state}'")
     if dictStruct["zip"]!= 0:
@@ -106,16 +105,20 @@ def makeSqlString(dictStruct):
     if dictStruct["vehicle_year"]!=0:
         sql.append(", [Vehicle Year]")
         sval.append(", {vehicle_year}")
-    sql.append(", [Total Image Reviewed], [Total Image corrected], Reason, \
-[Time_Stamp], [Agent Initial], \
-[Sent to Collections Agency],  Multiple, Unassign, [Completed: Yes / No Record], \
-[E-Tags (Temporary Plates)], [Dealer Plates] ")
-    sval.append(", {images_reviewed}, {images_corrected}, '{reason}', \
-'{time_stamp}', '{agent}', \
-{collections}, {multiple}, {unassign}, '{completed}', \
-{temp_plate}, {dealer_plate} ")
+    sql.append(", [Total Image Reviewed]")
+    sval.append(", {images_reviewed}")
+    sql.append(", [Total Image corrected]")
+    sval.append(", {images_corrected}")
+    sql.append(", Reason")
+    sval.append(", '{reason}'")
+    sql.append(", [Time_Stamp], [Agent Initial]")
+    sval.append(", '{time_stamp}', '{agent}'")
+    sql.append(", [Sent to Collections Agency],  Multiple, Unassign, [Completed: Yes / No Record]")
+    sval.append(", '{collections}', '{multiple}', '{unassign}', '{completed}'")
+    sql.append(", [E-Tags (Temporary Plates)], [Dealer Plates]")
+    sval.append(", '{temp_plate}', '{dealer_plate}'")
 #    sql.append(", Comment")
-#    sval.append(", {comment}")
+#    sval.append(", '{comment}'")
     sql.append(" )")
     sval.append(" )")
     SQL = "".join(sql)
@@ -146,7 +149,7 @@ def txDotDataInit():
         "combined_name":'',
         "address":'', "city":'', "state":'', "zip":'',
         "ownedStartDate":'', "title_date":'', "start_date":'', "end_date":'', "reg_date":'' ,
-        "make":'' , "model":'', "body":'', "vehicle_year":''
+        "make":'' , "model":'', "body":'', "vehicle_year":'', "vin":''
         }
     return recordDictionary
 
@@ -174,19 +177,19 @@ def txDotDataFill(recordDictionary, csvRecord):
         recordDictionary["vin"]= csvRecord[16]
         return recordDictionary
 
-
         '''
         Violator already exists in VPS and it matches with TXDOT
         Violator exists in TXDOT
         Missing address in TXDOT
         '''
 def ToDbRecord(txDotRec, db):
-    '''
     if txDotRec["type"]=='TEMPORARY': db["temp_plate"]= 1
     if txDotRec["type"]=='PERMIT': db["temp_plate"]= 1
     if txDotRec["type"]=='DEALER': db["dealer_plate"]= 1
     if txDotRec["type"]=='NORECORD': db["completed"]='No Record in TXDOT'
-    else: db["completed"]='YES'
+    elif txDotRec["address"]=='': db["completed"]='Missing address in TXDOT'
+    else: db["completed"]='Violator exists in TXDOT'
+
     db["plate"] = txDotRec["plate"]
     db["plate_st"] = txDotRec["plate_st"]
     db["combined_name"] = txDotRec["combined_name"]
@@ -194,9 +197,7 @@ def ToDbRecord(txDotRec, db):
     db["city"] = txDotRec["city"]
     db["state"]= txDotRec["state"]
     if txDotRec["zip"]!='': db["zip"] = int(txDotRec["zip"])
-
     db["title_date"] = txDotRec["title_date"]
-
     if txDotRec["ownedStartDate"] != '':
         db["start_date"] = txDotRec["ownedStartDate"]
     elif txDotRec["title_date"] != '':
@@ -204,21 +205,19 @@ def ToDbRecord(txDotRec, db):
     elif txDotRec["reg_date"] != '':
         db["start_date"] = txDotRec["reg_date"] # TODO  what about only REG DT
     else: db["start_date"] = txDotRec["start_date"]
-
     if txDotRec["end_date"]!='': db["end_date"] = txDotRec["end_date"]
-
     db["make"] = txDotRec["make"]
     db["model"] = txDotRec["model"]
     db["body"] = txDotRec["body"]
     if txDotRec["vehicle_year"] !="": db["vehicle_year"] = txDotRec["vehicle_year"]
     db["images_reviewed"] = 10
-    #db["images_corrected"] = ??
+    #db["images_corrected"] =  TODO
+    #db["reason"] =   TODO
     db["time_stamp"] = time.strftime("%m/%d/%Y %I:%M:%S %p") # example: '9/13/2016 4:53:47 PM'
     db["agent"] = "mthornton"
-    #db["VIN"] = txDotRec["VIN"]   TODO
-    #db["reason"] = txDotRec["reason"]   TODO
+    #db["VIN"] = txDotRec["VIN"]  # TODO
     db["comment"] = "test"
-    '''
+
     '''
     Plate is correct
     Plate is incorrect
@@ -235,9 +234,9 @@ def ToDbRecord(txDotRec, db):
 
 if __name__ == '__main__':
 
-    NUMBERtoProcess = 10
+    NUMBERtoProcess = 1
     vpsBool = False
-    txBool = True
+    txBool = False
     dbBool = True
     delay=10
     SLEEPTIME = 0 # seconds 180 for standard time delay
@@ -350,13 +349,13 @@ if __name__ == '__main__':
 ['STANDARD',   plateString,    'name',  'addr',  'addr2',  'city',  'state',  '75000', '1/1/2000', '1/3/2000', '1/4/2000', '1/2/2000','2000','NISS','AC','4D','vin'],
 ['SPECIAL',   'C'+plateString, 'name',  'addr',  'addr2',  'city',  'state',  '75000', '',         '1/3/2000', '1/4/2000', '1/2/2000','2000','NISS','AC','4D','vin'],
 ['TEMPORARY', 'T'+plateString, 'name2', 'addr2', 'addr22', 'city2', 'state2', '75002', '',         '1/3/2002', '1/4/2002', '',        '2002','BMW', 'AC','2D','vin'],
-['DEALER',    'D'+plateString, 'name2', 'addr2', 'addr22', 'city2', 'state2', '75002', '',         '',         '6/1/2017', '',        '',     '',    '',  '',  '']]
+['DEALER',    'D'+plateString, 'name2', 'addr2', 'addr22', 'city2', 'state2', '75002', '',         '',         '6/1/2017', '',        '',    '',    '',  '',  '']]
 #' type',     'plate',         'name',  'addr',  'addr2',  'city',  'state',  'zip',   'Assigned', 'startDate', 'endDate', 'title'    'year', make',modl,body,vin
 
                 # Database Write section   *****************************************************************
                 if dbBool:
                     for csvRecord in recordList:
-                        print recordList # for debug
+                        #print recordList # for debug
                         txDotRecord = txDotDataFill(txDotDataInit(), csvRecord)
                         dbRecord = ToDbRecord(txDotRecord, recordInit())
                         print dbRecord # for debug
@@ -368,6 +367,7 @@ if __name__ == '__main__':
                     print("Comitting changes")
                     dbcursor.commit()
                     time.sleep(SLEEPTIME)
+
 
     except ValueError as e:
         print(e)
@@ -399,30 +399,3 @@ if __name__ == '__main__':
 # 's' String (converts any Python object using str()).
 # '%' No argument is converted, results in a '%' character in the result.
 
-'''
-SELECTION REQUEST: PERMIT 123456G PERMIT ISSUANCE ID: 31199999995000004
-
-ONE TRIP PERMIT: 123456G VALID:2016/08/25 00:07:00--2016/09/09 23:59:59
-BUSINESS NAME : JOBSRUS      |or|   APPLICANT NAME : BEA A KING
-PO BOX 00 SOMETOWN
-SOMETOWN TX 75000
-ORIGINATION POINT: OCEANA
-INTERMEDIATE POINTS: HAWAII
-INTERMEDIATE POINTS: GUAM
-INTERMEDIATE POINTS: MIDWAY
-DESTINATION POINT: CALIFORNIA
-2005 ISUZ BL                 |or|   1986 CT
-VIN: 1XXXX4B0123456789
-ISSUING OFFICE: WEB TEMPORARY PERMIT
------------------------------
-SELECTION REQUEST: PERMIT 543321G PERMIT ISSUANCE ID: 10156255555101223
-
-30 DAY PERMIT: 543321G VALID:2016/05/17 10:10:21--2016/06/16 23:59:59
-APPLICANT NAME : ROAR DE LEON
-1000 N CANYON RD
-WEST FALLS  TX 78542
-2001 CHEVROLET PK
-VIN: 1XXXX19V21Z123456
-ISSUING OFFICE: HARRIS COUNTY
----------------------------
-'''
