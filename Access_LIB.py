@@ -11,40 +11,47 @@
 #-------------------------------------------------------------------------------
 
 import pyodbc
-from selenium.webdriver.common.by import By
-import string
-import time
+#from selenium.webdriver.common.by import By
+#import string
+#import time
 import tkFileDialog
 from Tkinter import Tk
 
-from structures_LIB import txDotDataInit, txDotDataFill, recordInit, ToDbRecord, makeSqlString
-from TxDot_LIB import findResponseType, parseRecord, query, repairLineBreaks
-from UTIL_LIB import openBrowser, waitForUser
-from VPS_LIB import getTextResults, fillFormAndSubmit, findAndClickButton, findAndSelectFrame,\
-                    findElementOnPage, findTargetPage, newPageElementFound
+#from structures_LIB import txDotDataInit, txDotDataFill, recordInit, ToDbRecord, makeSqlString
+#from TxDot_LIB import findResponseType, parseRecord, query, repairLineBreaks
+#from UTIL_LIB import openBrowser, waitForUser
+#from VPS_LIB import getTextResults, fillFormAndSubmit, findAndClickButton, findAndSelectFrame,\
+#                    findElementOnPage, findTargetPage, newPageElementFound
 
 
-def printDbColumnNames(dbcursor):
+def printDbColumnNames(dbCursor):
+    dbCursor.execute('''SELECT * FROM [Sheet1]''')
+    columns = dbCursor.description
+    for column in columns:
+        print(column.column_name)
+"""
     rowcount = 0
     while True:
-        row = dbcursor.fetchone()
+        row = dbCursor.fetchone()
         if row is None:
             break
         rowcount += 1
         print("Plate {}".format(row[0]))
         #print("entire row -->", row)
     print(rowcount)
+"""
 
-    for column in dbcursor.columns(table='US State'):
+"""
+    for column in dbCursor.columns(table='US State'):
         print(column.column_name)
-    dbcursor.execute('''SELECT Field1
+    dbCursor.execute('''SELECT Field1
                         FROM [US State]''')
     while True:
-        row = dbcursor.fetchone()
+        row = dbCursor.fetchone()
         if row is None:
             break
         print("entire row -->{}").format(row[0])
-
+"""
 
 def ConnectToAccessFile():
         #Prompt the user for db, create connection and cursor.
@@ -54,14 +61,13 @@ def ConnectToAccessFile():
                     #filetypes=[('locked', '*.accde'), ('normal', '*.accdb')])
         root.destroy()
         # Connect to the Access database
-        connectedDB = pyodbc.connect("Driver={Microsoft Access Driver (*.mdb, *.accdb)};DBQ="+dbname+";")
-        dbcursor=connectedDB.cursor()
-        print("ConnectToAccessFile: Connected to {}".format(dbname))
-        return connectedDB, dbcursor
+        dbConnection = pyodbc.connect("Driver={Microsoft Access Driver (*.mdb, *.accdb)};DBQ="+dbname+";")
+        dbCursor=dbConnection.cursor()
+        print("Access_LIB:ConnectToAccessFile: Connected to {}".format(dbname))
+        return dbConnection, dbCursor
 
 if __name__ == '__main__':
-    databaseName, cursor = ConnectToAccessFile()
-    print("Access_LIB:main: database name ", databaseName)
+    connection, cursor = ConnectToAccessFile()
     printDbColumnNames(cursor)
     print("Access_LIB:main: DONE ")
 
