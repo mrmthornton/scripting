@@ -26,9 +26,8 @@ from Tkinter import Tk
 
 def printDbColumnNames(dbCursor):
     dbCursor.execute('''SELECT * FROM [Sheet1]''')
-    columns = dbCursor.description
-    for column in columns:
-        print(column.column_name)
+    columns = [desc[0] for desc in dbCursor.description]
+    print(columns)
 """
     rowcount = 0
     while True:
