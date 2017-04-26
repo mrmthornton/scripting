@@ -15,7 +15,7 @@
 # (timATgreening-jackson.com)
 #-------------------------------------------------------------------------------
 
-import datetime
+
 import pyodbc
 from selenium.webdriver.common.by import By
 import string
@@ -24,7 +24,7 @@ import tkFileDialog
 from Tkinter import Tk
 
 from structures_LIB import txDotDataInit, txDotDataFill, recordInit, ToDbRecord, makeSqlString
-from TxDot_LIB import  csvStringFromList, findResponseType, parseRecord, query, repairLineBreaks
+from TxDot_LIB import findResponseType, parseRecord, query, repairLineBreaks
 from UTIL_LIB import openBrowser, waitForUser
 from VPS_LIB import getTextResults, fillFormAndSubmit, findAndClickButton, findAndSelectFrame,\
                     findElementOnPage, findTargetPage, newPageElementFound
@@ -59,19 +59,19 @@ def printDbColumnNames():
         if row is None:
             break
         rowcount += 1
-        print "Plate {}".format(row[0])
-        #print "entire row -->", row
-    print rowcount
+        print("Plate {}").format(row[0])
+        #print("entire row -->", row)
+    print(rowcount)
 
     for column in dbcursor.columns(table='US State'):
-        print column.column_name
+        print(column.column_name)
     dbcursor.execute('''SELECT Field1
                         FROM [US State]''')
     while True:
         row = dbcursor.fetchone()
         if row is None:
             break
-        print "entire row -->{}".format(row[0])
+        print("entire row -->{}").format(row[0])
 
 
 def ConnectToAccessFile():
@@ -84,7 +84,7 @@ def ConnectToAccessFile():
         # Connect to the Access database
         connectedDB = pyodbc.connect("Driver={Microsoft Access Driver (*.mdb, *.accdb)};DBQ="+dbname+";")
         dbcursor=connectedDB.cursor()
-        print("ConnectToAccessFile: Connected to {}".format(dbname))
+        print("ConnectToAccessFile: Connected to {}").format(dbname)
         return connectedDB, dbcursor
 
 
@@ -92,13 +92,13 @@ if __name__ == '__main__':
 
     NUMBERtoProcess = 50
     vpsBool = False
-    txBool = True
+    txBool = False
     dbBool = True
     delay=10
     SLEEPTIME = 0 # seconds 180 for standard time delay
     parameters = setParameters()
     parameters['operatorMessage'] = "Use debug mode, \n open VPS, new violator search window, \n open DMV window, \n run to completion"
-    print parameters['operatorMessage']
+    print(parameters['operatorMessage'])
     if txBool:
         txDriver = openBrowser('https://mvinet.txdmv.gov')
         waitForUser('enter DMV credentials,\nnavigate to single entry page.')
@@ -110,7 +110,7 @@ if __name__ == '__main__':
         if dbBool:
             dbConnect, dbcursor = ConnectToAccessFile()
             #for row in dbcursor.columns(table='Sheet1'): # debug
-            #    print row.column_name                    # debug
+            #    print(row.column_name)                   # debug
             dbcursor.execute("SELECT plate FROM [list of plate 8 without matching sheet1]") # (1),4,8,9,10, '11'  ,12
             #dbcursor.execute("SELECT plate FROM [list of plates 5 without matching sheet1]") # 2,3,5,6,7
             lpList = []
@@ -118,14 +118,14 @@ if __name__ == '__main__':
             while loopCount< NUMBERtoProcess:
                 lpRecord = dbcursor.fetchone()
                 if lpRecord is None:
-                    print "main() : Finished, no more input records."
+                    print("main() : Finished, no more input records.")
                     break
                 lpList.append(lpRecord)
                 loopCount += 1
 
             for row in lpList:
                 if row is None:
-                    print "main() : Finished, no more LP's ."
+                    print("main() : Finished, no more LP's .")
                     break
                 plateString = str(row[0])
 
@@ -136,7 +136,7 @@ if __name__ == '__main__':
                     ##startWindow = findTargetPage(driver, delay, startPageTextLocator, "mainframe")
                     startWindow = findTargetPage(driver, delay, startPageTextLocator)
                     if startWindow is None:
-                        print "main: Start Page not found."
+                        print("main: Start Page not found.")
                         raise ValueError("main: Start Page not found.", startPageTextLocator)
                     element = findElementOnPage(driver, delay, parameters['inputLocator'])
                     submitted = fillFormAndSubmit(driver, startWindow, element, plateString, parameters) # why so slow?  IeDriver64 ??
@@ -163,7 +163,7 @@ if __name__ == '__main__':
                         text = getTextResults(driver, delay, plateString, parameters, "fraRL")
                         endNum = int(str(text))
                         diffNum = startNum - endNum
-                        print  startNum, endNum, diffNum
+                        print( startNum, endNum, diffNum)
                     # navigate to search position
                     if type(parameters['buttonLocator']) is None: # no button, start at 'top' of the page
                         driver.switch_to_default_content()
@@ -187,19 +187,19 @@ if __name__ == '__main__':
                         except:
                             responseType = None
                             if foundCurrentPlate == False:
-                                print DMVplate, ' Plate/Pattern not found. Unable to resolve record type.'
+                                print(DMVplate, ' Plate/Pattern not found. Unable to resolve record type.')
                                 time.sleep(3)
                             break
                         if responseType != None: # there must be a valid text record to process
                             foundCurrentPlate = True
-                            #print 'main:', responseType, startNum, endNum # for debug
+                            #print('main:', responseType, startNum, endNum) # for debug
                             typeString = fileString[startNum:endNum + 1]
-                            #print typeString # for debug
+                            #print(typeString) # for debug
                             fileString = fileString[:startNum] + fileString[endNum + 1:] # what is this for ?
                             listData = parseRecord(responseType, typeString)
                             assert(len(listData)==17)
                             recordList.append(listData)
-                            #print listData # for debug
+                            #print(listData) # for debug
                 else:
                     recordList = [
 ['STANDARD',   plateString,    'name',  'addr',  'addr2',  'city',  'state',  '75000', '1/1/2000', '1/3/2000', '1/4/2000', '1/2/2000','2000','NISS','AC','4D','vin'],
@@ -211,14 +211,15 @@ if __name__ == '__main__':
                 # Database Write section   *****************************************************************
                 if dbBool:
                     for csvRecord in recordList:
-                        #print recordList # for debug
+                        #print(recordList) # for debug
                         txDotRecord = txDotDataFill(txDotDataInit(), csvRecord)
                         dbRecord = ToDbRecord(txDotRecord, recordInit())
-                        #print dbRecord # for debug
+                        #print(dbRecord) # for debug
                         sqlString = makeSqlString(dbRecord)
-                        print sqlString # for debug
+                        print(sqlString) # for debug
                         sql = sqlString.format(**dbRecord)
-                        print sql # for debug
+                        print(sql) # for debug
+                if DMVplate is in db, skip, if DMVplate is not same as plateString, comment is fix image lable.
                         dbcursor.execute(sql)
                     print("Comitting changes")
                     dbcursor.commit()

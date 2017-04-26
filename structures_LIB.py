@@ -15,18 +15,8 @@
 # (timATgreening-jackson.com)
 #-------------------------------------------------------------------------------
 
-import datetime
-import pyodbc
-from selenium.webdriver.common.by import By
-import string
-import time
-import tkFileDialog
-from Tkinter import Tk
-from TxDot_LIB import  csvStringFromList, findResponseType, parseRecord, query, repairLineBreaks
-from UTIL_LIB import openBrowser, waitForUser
-from VPS_LIB import getTextResults, fillFormAndSubmit, findAndClickButton, findAndSelectFrame,\
-                    findElementOnPage, findTargetPage, newPageElementFound
 
+import time
 
 def makeSqlString(dictStruct):
     sql = []
