@@ -10,18 +10,24 @@
 # Copyright:   (c) michael thornton 2017
 #-------------------------------------------------------------------------------
 
+
 import pyodbc
-#from selenium.webdriver.common.by import By
-#import string
-#import time
 import tkFileDialog
 from Tkinter import Tk
 
-#from structures_LIB import txDotDataInit, txDotDataFill, recordInit, ToDbRecord, makeSqlString
-#from TxDot_LIB import findResponseType, parseRecord, query, repairLineBreaks
-#from UTIL_LIB import openBrowser, waitForUser
-#from VPS_LIB import getTextResults, fillFormAndSubmit, findAndClickButton, findAndSelectFrame,\
-#                    findElementOnPage, findTargetPage, newPageElementFound
+
+def ConnectToAccessFile():
+        #Prompt the user for db, create connection and cursor.
+        root = Tk()
+        dbname = tkFileDialog.askopenfilename(parent=root, title="Select database",
+                    filetypes=[('locked', '*.accde')])
+                    #filetypes=[('locked', '*.accde'), ('normal', '*.accdb')])
+        root.destroy()
+        # Connect to the Access database
+        dbConnection = pyodbc.connect("Driver={Microsoft Access Driver (*.mdb, *.accdb)};DBQ="+dbname+";")
+        dbCursor=dbConnection.cursor()
+        print("Access_LIB:ConnectToAccessFile: Connected to {}".format(dbname))
+        return dbConnection, dbCursor
 
 
 def printDbColumnNames(dbCursor):
@@ -52,18 +58,6 @@ def printDbColumnNames(dbCursor):
         print("entire row -->{}").format(row[0])
 """
 
-def ConnectToAccessFile():
-        #Prompt the user for db, create connection and cursor.
-        root = Tk()
-        dbname = tkFileDialog.askopenfilename(parent=root, title="Select database",
-                    filetypes=[('locked', '*.accde')])
-                    #filetypes=[('locked', '*.accde'), ('normal', '*.accdb')])
-        root.destroy()
-        # Connect to the Access database
-        dbConnection = pyodbc.connect("Driver={Microsoft Access Driver (*.mdb, *.accdb)};DBQ="+dbname+";")
-        dbCursor=dbConnection.cursor()
-        print("Access_LIB:ConnectToAccessFile: Connected to {}".format(dbname))
-        return dbConnection, dbCursor
 
 if __name__ == '__main__':
     connection, cursor = ConnectToAccessFile()
