@@ -23,7 +23,7 @@
 	updated = green
 	added = green bold
 	untracked = green
-	changed = red white bold
+	changed = red white 
 	unmerged = red bold
 [color "branch"]
 [color "interactive"]
@@ -31,7 +31,7 @@
 # bold, dim, ul, blink, reverse
 [color "diff"]
 	new = green bold	
-	old = red bold
+	old = red 
 [branch "py2"]
 	remote = origin
 	merge = refs/heads/py2
