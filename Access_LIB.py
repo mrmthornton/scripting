@@ -16,7 +16,7 @@ import tkFileDialog
 from Tkinter import Tk
 
 
-def ConnectToAccessFile():
+def ConnectToAccess():
         #Prompt the user for db, create connection and cursor.
         root = Tk()
         dbname = tkFileDialog.askopenfilename(parent=root, title="Select database",
@@ -60,7 +60,7 @@ def printDbColumnNames(dbCursor):
 
 
 if __name__ == '__main__':
-    connection, cursor = ConnectToAccessFile()
+    connection, cursor = ConnectToAccess()
     printDbColumnNames(cursor)
     print("Access_LIB:main: DONE ")
 

@@ -23,6 +23,7 @@ import time
 import tkFileDialog
 from Tkinter import Tk
 
+from Access_LIB import ConnectToAccess
 from structures_LIB import txDotDataInit, txDotDataFill, recordInit, ToDbRecord, makeSqlString
 from TxDot_LIB import findResponseType, parseRecord, query, repairLineBreaks
 from UTIL_LIB import openBrowser, waitForUser
@@ -52,45 +53,9 @@ def setParameters():
     return parameters
 
 
-def printDbColumnNames():
-    rowcount = 0
-    while True:
-        row = dbcursor.fetchone()
-        if row is None:
-            break
-        rowcount += 1
-        print("Plate {}").format(row[0])
-        #print("entire row -->", row)
-    print(rowcount)
-
-    for column in dbcursor.columns(table='US State'):
-        print(column.column_name)
-    dbcursor.execute('''SELECT Field1
-                        FROM [US State]''')
-    while True:
-        row = dbcursor.fetchone()
-        if row is None:
-            break
-        print("entire row -->{}").format(row[0])
-
-
-def ConnectToAccessFile():
-        #Prompt the user for db, create connection and cursor.
-        root = Tk()
-        dbname = tkFileDialog.askopenfilename(parent=root, title="Select database",
-                    filetypes=[('locked', '*.accde')])
-                    #filetypes=[('locked', '*.accde'), ('normal', '*.accdb')])
-        root.destroy()
-        # Connect to the Access database
-        connectedDB = pyodbc.connect("Driver={Microsoft Access Driver (*.mdb, *.accdb)};DBQ="+dbname+";")
-        dbcursor=connectedDB.cursor()
-        print("ConnectToAccessFile: Connected to {}").format(dbname)
-        return connectedDB, dbcursor
-
-
 if __name__ == '__main__':
 
-    NUMBERtoProcess = 50
+    NUMBERtoProcess = 10
     vpsBool = False
     txBool = False
     dbBool = True
@@ -108,7 +73,7 @@ if __name__ == '__main__':
     try:
         # Database Read section   *****************************************************************
         if dbBool:
-            dbConnect, dbcursor = ConnectToAccessFile()
+            dbConnect, dbcursor = ConnectToAccess()
             #for row in dbcursor.columns(table='Sheet1'): # debug
             #    print(row.column_name)                   # debug
             dbcursor.execute("SELECT plate FROM [list of plate 8 without matching sheet1]") # (1),4,8,9,10, '11'  ,12
@@ -211,6 +176,7 @@ if __name__ == '__main__':
                 # Database Write section   *****************************************************************
                 if dbBool:
                     for csvRecord in recordList:
+                    #  if DMVplate is in db, skip, if DMVplate is not same as plateString, comment is fix image lable.  TODO
                         #print(recordList) # for debug
                         txDotRecord = txDotDataFill(txDotDataInit(), csvRecord)
                         dbRecord = ToDbRecord(txDotRecord, recordInit())
@@ -219,7 +185,7 @@ if __name__ == '__main__':
                         print(sqlString) # for debug
                         sql = sqlString.format(**dbRecord)
                         print(sql) # for debug
-              #  if DMVplate is in db, skip, if DMVplate is not same as plateString, comment is fix image lable.  TODO
+
                         dbcursor.execute(sql)
                     print("Comitting changes")
                     dbcursor.commit()
