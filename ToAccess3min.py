@@ -90,7 +90,7 @@ def ConnectToAccessFile():
 
 if __name__ == '__main__':
 
-    NUMBERtoProcess = 20
+    NUMBERtoProcess = 50
     vpsBool = False
     txBool = True
     dbBool = True
