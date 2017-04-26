@@ -23,7 +23,7 @@ linePattern = re.compile('^.+') # from start of line to newline(\n)
 wordPattern = re.compile('\w+') # any non-whitespace
 csvPattern = re.compile('[A-Z0-9 .#&]*,') #   almost-anything followed by a comma
 commaToEOLpattern = re.compile(',[A-Z0-9 .#&]+$') # comma almost-anything end-of-line
-LICpattern = re.compile(r'LIC ([A-Z0-9]{1,10}) [A-Z]{3,3}/[0-9]{4,4}')# group(1) is the LP
+LICpattern = re.compile(r'LIC\s+([A-Z0-9]{1,10})\s+[A-Z]{3,3}/[0-9]{4,4}')# group(1) is the LP
 issuedPattern = re.compile('ISSUED ')
 reg_dtPattern = re.compile('REG DT ')
 datePattern = re.compile('[0-9]{2,2}/[0-9]{2,2}/[0-9]{4,4}') # mo/day/year
@@ -135,8 +135,7 @@ def findResponseType(plate, fileString):
 
     # STANDARD
     targetType = 'STANDARD'
-    #startPattern = re.compile('LIC ' + plate + ' [A-Z]{3,3}' + '/' '[0-9]{4,4}')
-    startPattern = re.compile('LIC ' + plate + ' [A-Z]{3,3}/[0-9]{4,4}')
+    startPattern = re.compile('LIC\s+' + plate + '\s+[A-Z]{3,3}/[0-9]{4,4}')
     endPattern = re.compile(r'TITLE[D.]')
     startNum, endNum = findStartEnd(fileString,startPattern, endPattern)
     if startNum is not None:

@@ -90,9 +90,9 @@ def ConnectToAccessFile():
 
 if __name__ == '__main__':
 
-    NUMBERtoProcess = 1
+    NUMBERtoProcess = 20
     vpsBool = False
-    txBool = False
+    txBool = True
     dbBool = True
     delay=10
     SLEEPTIME = 0 # seconds 180 for standard time delay
@@ -214,7 +214,7 @@ if __name__ == '__main__':
                         #print recordList # for debug
                         txDotRecord = txDotDataFill(txDotDataInit(), csvRecord)
                         dbRecord = ToDbRecord(txDotRecord, recordInit())
-                        print dbRecord # for debug
+                        #print dbRecord # for debug
                         sqlString = makeSqlString(dbRecord)
                         print sqlString # for debug
                         sql = sqlString.format(**dbRecord)
