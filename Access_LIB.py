@@ -58,10 +58,17 @@ def printDbColumnNames(dbCursor):
         print("entire row -->{}").format(row[0])
 """
 
+def duplicateKey(dbCursor, table, column, value):
+    matches = cursor.execute('SELECT * FROM ' + table + ' WHERE ' + column + ' = ' + value )
+    #matches = cursor.execute("SELECT * FROM Sheet1 WHERE Plate = '6' ")
+    if matches.rowcount>0:
+        return True
+    return False
 
 if __name__ == '__main__':
     connection, cursor = ConnectToAccess()
-    printDbColumnNames(cursor)
+    #printDbColumnNames(cursor)
+    bool = duplicateKey(cursor, "Sheet1", "Plate", '6')
     print("Access_LIB:main: DONE ")
 
 # 'd' Signed integer decimal.
