@@ -1,3 +1,4 @@
+# -*- coding: UTF-8 -*-
 #-------------------------------------------------------------------------------
 # Name:        testTxDotResponse
 # Purpose:     input reponses from TX DMV RTS database, in raw text format.
@@ -63,7 +64,9 @@ def main():
         outfile.flush()
     print("main: Finished.")
 
+
 from TxDot_LIB import findAmbiguousPlates
+
 def testAmbig():
     text = """
 LIC JJJ111 JAN/2018 OLD # DONN   JAN/2017 EWT  5200 GWT   6200

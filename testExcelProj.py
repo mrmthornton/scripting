@@ -273,8 +273,8 @@ def txDotToDbRecord(txDotRec, db):
 
 def commonCode(lpList):
     if txdotBool:
-        #txDriver = openBrowser('https://mvinet.txdmv.gov')
-        txDriver = openBrowser('https://ssoextprd.txdmv.gov/sso/UI/Login?goto=http%3A%2F%2Fmvinet.txdmv.gov%2Fmvdi%2Fmvdi.html')
+        txDriver = openBrowser('http://mvinet.txdmv.gov/mvdi/mvdi.html')
+        #txDriver = openBrowser('https://ssoextprd.txdmv.gov/sso/UI/Login?goto=http%3A%2F%2Fmvinet.txdmv.gov%2Fmvdi%2Fmvdi.html')
         waitForUser('enter credentials for DMV and navigate to single plate inquiry')
     if vpsBool:
         driver = openBrowser(parameters['url'])

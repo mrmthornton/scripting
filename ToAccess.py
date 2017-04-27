@@ -1,26 +1,31 @@
 # -*- coding: UTF-8 -*-
 #-------------------------------------------------------------------------------
-# Name:        ToAccessDBOneEach --> ToAccess3min.py
-#              do one loop every 3 min to simulate human interaction
+# Name:        ToAccess.py
+#              do one loop every N min to simulate human interaction
 # Purpose:     Read LP from a DB, gather TxDot info, if any, and combine with
-#              user input to form a complete record, write record to the DB.
+#              other input to form a complete record, write record to the DB.
 #              Commit a record before gathering more info.
 #
 # Author:      mthornton
 #
 # Created:     2016 AUG 12
-# Update:      2017 APR 19
+# Update:      2017 APR 26
 # Copyright:   (c) mthornton 2016, 2017
 # educational snippits thanks to Tim Greening-Jackson
 # (timATgreening-jackson.com)
 #-------------------------------------------------------------------------------
 
+
 import pyodbc
 from selenium.webdriver.common.by import By
+import string
 import time
-#import tkFileDialog
-from tkinter import Tk, filedialog
-from TxDot_LIB import  findResponseType, parseRecord, query, repairLineBreaks
+import tkFileDialog
+from Tkinter import Tk
+
+from Access_LIB import ConnectToAccess, duplicateKey
+from structures_LIB import txDotDataInit, txDotDataFill, recordInit, ToDbRecord, makeSqlString
+from TxDot_LIB import findResponseType, parseRecord, query, repairLineBreaks
 from UTIL_LIB import openBrowser, waitForUser
 from VPS_LIB import getTextResults, fillFormAndSubmit, findAndClickButton, findAndSelectFrame,\
                     findElementOnPage, findTargetPage, newPageElementFound
@@ -48,171 +53,14 @@ def setParameters():
     return parameters
 
 
-def printDbColumnNames():
-    rowcount = 0
-    while True:
-        row = dbcursor.fetchone()
-        if row is None:
-            break
-        rowcount += 1
-        print("Plate {}").format(row[0])
-        #print "entire row -->", row
-    print(rowcount)
-
-    for column in dbcursor.columns(table='US State'):
-        print(column.column_name)
-    dbcursor.execute('''SELECT Field1
-                        FROM [US State]''')
-    while True:
-        row = dbcursor.fetchone()
-        if row is None:
-            break
-        print("entire row -->{}").format(row[0])
-
-
-def ConnectToAccessFile():
-        #Prompt the user for db, create connection and cursor.
-        root = Tk()
-        dbname = filedialog.askopenfilename(parent=root, title="Select database",
-                    filetypes=[('locked', '*.accde'), ('normal', '*.accdb')])
-        root.destroy()
-        # Connect to the Access database
-        connectedDB = pyodbc.connect("Driver={Microsoft Access Driver (*.mdb, *.accdb)};DBQ="+dbname+";")
-        dbcursor=connectedDB.cursor()
-        print("ConnectToAccessFile: Connected to {}".format(dbname))
-        return connectedDB, dbcursor
-
-
-def makeSqlString(dictStruct):
-    sql = []
-    sval = []
-    #sql.append("INSERT INTO Sheet1 (Plate, [Combined Name], Address, City, State")
-    #sval.append(" VALUES ( '{plate}', '{combined_name}', '{address}', '{city}', '{state}'")
-    sql.append("INSERT INTO Sheet1 (Plate, Plate_St, [Combined Name], Address, City, State")
-    sval.append(" VALUES ( '{plate}', '{plate_st}', '{combined_name}', '{address}', '{city}', '{state}'")
-    if dictStruct["zip"]!= 0:
-        sql.append(", ZipCode")
-        sval.append(", {zip}")
-    if dictStruct["title_date"]!= '':
-        sql.append(", [Title Date]")
-        sval.append(", '{title_date}'")
-    if dictStruct["start_date"]!='':
-        sql.append(", [Start Date], [End Date]")
-        sval.append(", '{start_date}', '{end_date}'")
-        sql.append(", [Vehicle Make], [Vehicle Model], [Vehicle Body]")
-        sval.append(", '{make}', '{model}', '{body}'")
-    if dictStruct["vehicle_year"]!=0:
-        sql.append(", [Vehicle Year]")
-        sval.append(", {vehicle_year}")
-    sql.append(", [Total Image Reviewed], [Total Image corrected], Reason, \
-[Time_Stamp], [Agent Initial], \
-[Sent to Collections Agency],  Multiple, Unassign, [Completed: Yes / No Record], \
-[E-Tags (Temporary Plates)], [Dealer Plates] ")
-    sval.append(", '{images_reviewed}', '{images_corrected}', '{reason}', \
-'{time_stamp}', '{agent}', \
-{collections}, {multiple}, {unassign}, '{completed}', \
-{temp_plate}, {dealer_plate} ")
-    sql.append(" )")
-    sval.append(" )")
-    SQL = "".join(sql)
-    SVAL = "".join(sval)
-    return SQL + SVAL
-
-
-def recordInit():
-    return {
-        "plate":'', "plate_st":'',
-        "combined_name":'',
-        "address":'', "city":'', "state":'', "zip":0,
-        "title_date":'', "start_date":'', "end_date":'',
-        "make":'' , "model":'' , "body":'' , "vehicle_year":0 ,
-        "images_reviewed":0, "images_corrected":0, "reason":'',
-        "time_stamp":'', "agent":'',
-        "title_month":'', "title_day":'', "title_year":'',
-        "collections":0, "multiple":0, "unassign":0,
-        "completed":'', "temp_plate":0, "dealer_plate":0
-        }
-
-
-def txDotRecordInit():
-    return {
-        "type":'',
-        "plate":'', "plate_st":'',
-        "nameField":'', "nameField2":'', "combined_name":'',
-        "address":'', "city":'', "state":'', "zip":'',
-        "ownedStartDate":'', "title_date":'', "start_date":'', "end_date":'' ,
-        "make":'' , "model":'', "body":'', "vehicle_year":''
-        }
-
-
-def txDotDataFill(recordDictionary, csvRecord):
-        recordDictionary["type"]= csvRecord[0]
-        recordDictionary["plate"]= csvRecord[1]
-        recordDictionary["plate_st"]= 'TX'
-        recordDictionary["combined_name"] = csvRecord[2]
-        recordDictionary["address"]= csvRecord[3]
-        recordDictionary["addr2"]= csvRecord[4]
-        recordDictionary["city"]= csvRecord[5]
-        recordDictionary["state"]= csvRecord[6]
-        recordDictionary["zip"]= csvRecord[7]
-        recordDictionary['ownedStartDate']= csvRecord[8]
-        recordDictionary["start_date"]= csvRecord[9]
-        recordDictionary["end_date"]= csvRecord[10]
-        recordDictionary["title_date"]=csvRecord[11]
-        recordDictionary["vehicle_year"]= csvRecord[12]
-        recordDictionary["make"]= csvRecord[13]
-        recordDictionary["model"]= csvRecord[14]
-        recordDictionary["body"]= csvRecord[15]
-        recordDictionary["vin"]= csvRecord[16]
-        return recordDictionary
-
-
-def ToDbRecord(txDotRec, db):
-    if txDotRec["type"]=='NORECORD': db["completed"]='NO RECORD'
-    else: db["completed"]='YES'
-    if txDotRec["type"]=='TEMPORARY': db["temp_plate"]= 1
-    if txDotRec["type"]=='PERMIT': db["temp_plate"]= 1
-    if txDotRec["type"]=='DEALER': db["dealer_plate"]= 1
-    db["plate"] = txDotRec["plate"]
-    db["plate_st"] = txDotRec["plate_st"]
-    db["combined_name"] = txDotRec["combined_name"]
-    db["address"] = txDotRec["address"]
-    db["city"] = txDotRec["city"]
-    db["state"]= txDotRec["state"]
-    if txDotRec["zip"]!='': db["zip"] = int(txDotRec["zip"])
-    db["title_date"] = txDotRec["title_date"]
-    if txDotRec["start_date"]!='': db["start_date"] = txDotRec["start_date"]
-    if txDotRec["end_date"]!='': db["end_date"] = txDotRec["end_date"]
-    db["make"] = txDotRec["make"]
-    db["model"] = txDotRec["model"]
-    db["body"] = txDotRec["body"]
-    if txDotRec["vehicle_year"] !="": db["vehicle_year"] = txDotRec["vehicle_year"]
-    db["images_reviewed"] = 10
-    #db["images_corrected"] = txDotRec["images_corrected"]
-    #db["reason"] = txDotRec["reason"]
-    db["time_stamp"] = time.strftime("%m/%d/%Y %I:%M:%S %p") # month, day, long year, 12 hr, AM/PM
-    #db["time_stamp"] = '9/13/2016 4:53:47 PM'
-    db["agent"] = "mthornton"
-    #db["title_month"] = txDotRec["title_month"]
-    #db["title_day"] = txDotRec["title_day"]
-    #db["title_year"] = txDotRec["title_year"]
-    #db["collections"] = txDotRec["collections"]
-    #db["multiple"] = txDotRec["multiple"]
-    #db["unassign"] = txDotRec["unassign"]
-    #db["completed"] = txDotRec["completed"]
-
-
-    return db
-
-
 if __name__ == '__main__':
 
-    NUMBERtoProcess = 2
+    NUMBERtoProcess = 4
     vpsBool = False
     txBool = False
     dbBool = True
     delay=10
-    SLEEPTIME = 0 # seconds 180 for standard time delay
+    SLEEPTIME = 1 # seconds 180 for standard time delay
     parameters = setParameters()
     parameters['operatorMessage'] = "Use debug mode, \n open VPS, new violator search window, \n open DMV window, \n run to completion"
     print(parameters['operatorMessage'])
@@ -225,10 +73,10 @@ if __name__ == '__main__':
     try:
         # Database Read section   *****************************************************************
         if dbBool:
-            dbConnect, dbcursor = ConnectToAccessFile()
+            dbConnect, dbcursor = ConnectToAccess()
             #for row in dbcursor.columns(table='Sheet1'): # debug
-            #    print row.column_name                    # debug
-            dbcursor.execute("SELECT plate FROM [list of plate 12 without matching sheet1]") # (1),4,8,9,10, '11'  ,12
+            #    print(row.column_name)                   # debug
+            dbcursor.execute("SELECT plate FROM [list of plate 8 without matching sheet1]") # (1),4,8,9,10, '11'  ,12
             #dbcursor.execute("SELECT plate FROM [list of plates 5 without matching sheet1]") # 2,3,5,6,7
             lpList = []
             loopCount = 0
@@ -280,7 +128,7 @@ if __name__ == '__main__':
                         text = getTextResults(driver, delay, plateString, parameters, "fraRL")
                         endNum = int(str(text))
                         diffNum = startNum - endNum
-                        print(startNum, endNum, diffNum)
+                        print( startNum, endNum, diffNum)
                     # navigate to search position
                     if type(parameters['buttonLocator']) is None: # no button, start at 'top' of the page
                         driver.switch_to_default_content()
@@ -291,10 +139,10 @@ if __name__ == '__main__':
 
                 #TXDOT section   *****************************************************************
                 if txBool:
-                    text, DMVplate = query(txDriver, delay, plateString)  #  TODO remove unprintable chars
+                    text, DMVplate  = query(txDriver, delay, plateString)  # TODO remove unprintable chars
                     if text is not None:
-                        fileString = repairLineBreaks(text)
-                        #remove non-ascii
+                        cleanText = "".join(filter(lambda x:x in string.printable, text)) # TODO move to query
+                        fileString = repairLineBreaks(cleanText)  # TODO remove non-ascii  TODO move to query
                         ##fileString = "".join(filter(lambda x:x in string.printable, fileString))
                     foundCurrentPlate = False
                     recordList = []
@@ -318,26 +166,36 @@ if __name__ == '__main__':
                             recordList.append(listData)
                             #print(listData) # for debug
                 else:
-                    recordList = [['response type', plateString, 'name', 'addr', 'addr2', 'city', 'state', '75000',\
-                                 '', '1/4/2000', '1/2/2000', '','2000','make','model','style','vin']]
+                    recordList = [
+['STANDARD',   plateString,    'name',  'addr',  'addr2',  'city',  'state',  '75000', '1/1/2000', '1/3/2000', '1/4/2000', '1/2/2000','2000','NISS','AC','4D','vin'],
+['SPECIAL',   'C'+plateString, 'name',  'addr',  'addr2',  'city',  'state',  '75000', '',         '1/3/2000', '1/4/2000', '1/2/2000','2000','NISS','AC','4D','vin'],
+['TEMPORARY', 'T'+plateString, 'name2', 'addr2', 'addr22', 'city2', 'state2', '75002', '',         '1/3/2002', '1/4/2002', '',        '2002','BMW', 'AC','2D','vin'],
+['DEALER',    'D'+plateString, 'name2', 'addr2', 'addr22', 'city2', 'state2', '75002', '',         '',         '6/1/2017', '',        '',    '',    '',  '',  ''],
+['DEALER',    'D'+plateString, 'name2', 'addr2', 'addr22', 'city2', 'state2', '75002', '',         '',         '6/1/2017', '',        '',    '',    '',  '',  ''],
+]
+
+#' type',     'plate',         'name',  'addr',  'addr2',  'city',  'state',  'zip',   'Assigned', 'startDate', 'endDate', 'title'    'year', make',modl,body,vin
 
                 # Database Write section   *****************************************************************
                 if dbBool:
                     for csvRecord in recordList:
-                        txDotRecord = txDotDataFill(txDotRecordInit(), csvRecord)
+                        #print(recordList) # for debug
+                        txDotRecord = txDotDataFill(txDotDataInit(), csvRecord)
                         dbRecord = ToDbRecord(txDotRecord, recordInit())
-                        #print dbRecord # for debug
+                        #print(dbRecord) # for debug
+                        duplicateFound = duplicateKey(dbcursor, "Sheet1", "Plate", dbRecord["plate"])
+                        if duplicateFound:
+                            print("ToAccess:main: DUPLICATE FOUND")
+                            continue
                         sqlString = makeSqlString(dbRecord)
-                        #print sqlString # for debug
+                        #print(sqlString) # for debug
                         sql = sqlString.format(**dbRecord)
-                        # sql = "INSERT INTO Sheet1 ([Time_Stamp]) VALUES ('{time_stamp}') ".format(**dbRecord)
+                        #print(sql) # for debug
                         dbcursor.execute(sql)
-                    print("Comitting changes")
-                    dbcursor.commit()
-                    time.sleep(SLEEPTIME)
+                        print("Comitting changes")
+                        dbcursor.commit()
+                        time.sleep(SLEEPTIME)
 
-# from TxDot lib --> ['response type', 'plate', 'name', 'addr', 'addr2', 'city', 'state', 'zip', 'ownedStartDate', 'startDate', 'endDate', 'issued']
-#"""  ALMOST FULL WRITE TO DATABASE missing title day, month, year -->  this will never happen. some fields are exclusive of others. """
     except ValueError as e:
         print(e)
     finally:
@@ -368,30 +226,3 @@ if __name__ == '__main__':
 # 's' String (converts any Python object using str()).
 # '%' No argument is converted, results in a '%' character in the result.
 
-'''
-SELECTION REQUEST: PERMIT 123456G PERMIT ISSUANCE ID: 31199999995000004
-
-ONE TRIP PERMIT: 123456G VALID:2016/08/25 00:07:00--2016/09/09 23:59:59
-BUSINESS NAME : JOBSRUS  (or)   APPLICANT NAME : BEA A KING
-PO BOX 100 SOMETOWN
-SOMETOWN TX 75000
-ORIGINATION POINT: OCEANA
-INTERMEDIATE POINTS: HAWAII
-INTERMEDIATE POINTS: GUAM
-INTERMEDIATE POINTS: MIDWAY
-DESTINATION POINT: CALIFORNIA
-2005 ISUZ BL   (or)   1986 CT
-VIN: 123VIN12345678901
-ISSUING OFFICE: WEB TEMPORARY PERMIT
------------------------------
-SELECTION REQUEST: PERMIT 123456W PERMIT ISSUANCE ID: 10156255555101223
-
-30 DAY PERMIT: 123456W VALID:2016/05/17 10:10:21--2016/06/16 23:59:59
-APPLICANT NAME : ROAR DE LEON
-1000 N CANYON RD
-WEST FALLS  TX 70000
-2001 CHEVROLET PK
-VIN: 123VIN12345678901
-ISSUING OFFICE: NOT_MY COUNTY
----------------------------
-'''
