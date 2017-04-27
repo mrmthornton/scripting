@@ -207,9 +207,9 @@ def ToDbRecord(txDotRec, db):
 
 if __name__ == '__main__':
 
-    NUMBERtoProcess = 8
+    NUMBERtoProcess = 2
     vpsBool = False
-    txBool = True
+    txBool = False
     dbBool = True
     delay=10
     SLEEPTIME = 0 # seconds 180 for standard time delay
