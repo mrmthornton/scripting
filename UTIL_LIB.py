@@ -13,9 +13,9 @@
 
 import re
 from selenium import webdriver
-#from Tkinter import Tk # python 2
-from tkinter import Tk, messagebox
-#import tkMessageBox # python 2
+from Tkinter import Tk # python 2
+#from tkinter import Tk, messagebox
+import tkMessageBox # python 2
 
 
 def cleanUpString(messyString):
