@@ -23,7 +23,7 @@ import time
 import tkFileDialog
 from Tkinter import Tk
 
-from Access_LIB import ConnectToAccess
+from Access_LIB import ConnectToAccess, duplicateKey
 from structures_LIB import txDotDataInit, txDotDataFill, recordInit, ToDbRecord, makeSqlString
 from TxDot_LIB import findResponseType, parseRecord, query, repairLineBreaks
 from UTIL_LIB import openBrowser, waitForUser
@@ -170,7 +170,10 @@ if __name__ == '__main__':
 ['STANDARD',   plateString,    'name',  'addr',  'addr2',  'city',  'state',  '75000', '1/1/2000', '1/3/2000', '1/4/2000', '1/2/2000','2000','NISS','AC','4D','vin'],
 ['SPECIAL',   'C'+plateString, 'name',  'addr',  'addr2',  'city',  'state',  '75000', '',         '1/3/2000', '1/4/2000', '1/2/2000','2000','NISS','AC','4D','vin'],
 ['TEMPORARY', 'T'+plateString, 'name2', 'addr2', 'addr22', 'city2', 'state2', '75002', '',         '1/3/2002', '1/4/2002', '',        '2002','BMW', 'AC','2D','vin'],
-['DEALER',    'D'+plateString, 'name2', 'addr2', 'addr22', 'city2', 'state2', '75002', '',         '',         '6/1/2017', '',        '',    '',    '',  '',  '']]
+['DEALER',    'D'+plateString, 'name2', 'addr2', 'addr22', 'city2', 'state2', '75002', '',         '',         '6/1/2017', '',        '',    '',    '',  '',  ''],
+['DEALER',    'D'+plateString, 'name2', 'addr2', 'addr22', 'city2', 'state2', '75002', '',         '',         '6/1/2017', '',        '',    '',    '',  '',  ''],
+]
+
 #' type',     'plate',         'name',  'addr',  'addr2',  'city',  'state',  'zip',   'Assigned', 'startDate', 'endDate', 'title'    'year', make',modl,body,vin
 
                 # Database Write section   *****************************************************************
@@ -181,16 +184,18 @@ if __name__ == '__main__':
                         txDotRecord = txDotDataFill(txDotDataInit(), csvRecord)
                         dbRecord = ToDbRecord(txDotRecord, recordInit())
                         #print(dbRecord) # for debug
+                        duplicateFound = duplicateKey(dbcursor, "Sheet1", "Plate", dbRecord["plate"])
+                        if duplicateFound:
+                            print("ToAccess:main: DUPLICATE FOUND")
+                            continue
                         sqlString = makeSqlString(dbRecord)
                         print(sqlString) # for debug
                         sql = sqlString.format(**dbRecord)
                         print(sql) # for debug
-
                         dbcursor.execute(sql)
                     print("Comitting changes")
                     dbcursor.commit()
                     time.sleep(SLEEPTIME)
-
 
     except ValueError as e:
         print(e)
