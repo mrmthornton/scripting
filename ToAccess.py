@@ -55,9 +55,9 @@ def setParameters():
 
 if __name__ == '__main__':
 
-    NUMBERtoProcess = 10
+    NUMBERtoProcess = 20
     vpsBool = False
-    txBool = False
+    txBool = True
     dbBool = True
     delay=10
     SLEEPTIME = 0 # seconds 180 for standard time delay
@@ -189,9 +189,9 @@ if __name__ == '__main__':
                             print("ToAccess:main: DUPLICATE FOUND")
                             continue
                         sqlString = makeSqlString(dbRecord)
-                        print(sqlString) # for debug
+                        #print(sqlString) # for debug
                         sql = sqlString.format(**dbRecord)
-                        print(sql) # for debug
+                        #print(sql) # for debug
                         dbcursor.execute(sql)
                     print("Comitting changes")
                     dbcursor.commit()
