@@ -630,7 +630,7 @@ def query(driver, delay, plate):
     except TimeoutException:
         print("TxDot_LIB:query:ERROR: Timeout, input licence plate may not match the record.")
         return (None, None)
-    plateSubmitElement.clear() # does this need to be cleared ?
+    plateSubmitElement.clear() # does this need to be cleared ? TODO
     return (str(uText.encode('ascii', 'ignore')), correctPlate.encode('ascii', 'ignore'))#  TEST  TODO
 
 if __name__ == "__main__":

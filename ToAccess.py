@@ -55,7 +55,7 @@ def setParameters():
 
 if __name__ == '__main__':
 
-    NUMBERtoProcess = 4
+    NUMBERtoProcess = 1
     vpsBool = False
     txBool = False
     dbBool = True
