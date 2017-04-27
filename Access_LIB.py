@@ -59,16 +59,23 @@ def printDbColumnNames(dbCursor):
 """
 
 def duplicateKey(dbCursor, table, column, value):
-    matches = cursor.execute('SELECT * FROM ' + table + ' WHERE ' + column + ' = ' + value )
-    #matches = cursor.execute("SELECT * FROM Sheet1 WHERE Plate = '6' ")
-    if matches.rowcount>0:
-        return True
+    sql ="SELECT * FROM " + table + " WHERE " + column + " = '" + value + "'"
+    matches = cursor.execute(sql)
+    for row in matches:
+        if row is not None:
+            return True
+#    matchesTest = cursor.execute("SELECT * FROM Sheet1 WHERE Plate = 'CIKD' ")
+#    for row in matchesTest:
+#        if row is not None:
+#            return True
     return False
 
 if __name__ == '__main__':
     connection, cursor = ConnectToAccess()
     #printDbColumnNames(cursor)
-    bool = duplicateKey(cursor, "Sheet1", "Plate", '6')
+    duplicateFound = duplicateKey(cursor, "Sheet1", "Plate", "CIKDXXX")
+    if duplicateFound: print("Access_LIB:main: DUPLICATE FOUND ")
+    if duplicateFound: print("Access_LIB:main: NO DUPLICATE ")
     print("Access_LIB:main: DONE ")
 
 # 'd' Signed integer decimal.
