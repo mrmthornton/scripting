@@ -607,7 +607,7 @@ def query(driver, delay, plate):
 
     if plateSubmitElement is None:
         print("TxDot_LIB:query: plate submission form not found on page")
-        return None
+        return (None, None)
     plateSubmitElement.clear()
     plateSubmitElement.send_keys(plate)
     plateSubmitElement.send_keys('\n')
@@ -629,7 +629,7 @@ def query(driver, delay, plate):
             continue
     except TimeoutException:
         print("TxDot_LIB:query:ERROR: Timeout, input licence plate may not match the record.")
-        return None
+        return (None, None)
     plateSubmitElement.clear() # does this need to be cleared ?
     return (str(uText.encode('ascii', 'ignore')), correctPlate.encode('ascii', 'ignore'))#  TEST  TODO
 
