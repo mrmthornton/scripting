@@ -55,12 +55,12 @@ def setParameters():
 
 if __name__ == '__main__':
 
-    NUMBERtoProcess = 20
+    NUMBERtoProcess = 4
     vpsBool = False
-    txBool = True
+    txBool = False
     dbBool = True
     delay=10
-    SLEEPTIME = 0 # seconds 180 for standard time delay
+    SLEEPTIME = 1 # seconds 180 for standard time delay
     parameters = setParameters()
     parameters['operatorMessage'] = "Use debug mode, \n open VPS, new violator search window, \n open DMV window, \n run to completion"
     print(parameters['operatorMessage'])
@@ -179,7 +179,6 @@ if __name__ == '__main__':
                 # Database Write section   *****************************************************************
                 if dbBool:
                     for csvRecord in recordList:
-                    #  if DMVplate is in db, skip, if DMVplate is not same as plateString, comment is fix image lable.  TODO
                         #print(recordList) # for debug
                         txDotRecord = txDotDataFill(txDotDataInit(), csvRecord)
                         dbRecord = ToDbRecord(txDotRecord, recordInit())
@@ -193,9 +192,9 @@ if __name__ == '__main__':
                         sql = sqlString.format(**dbRecord)
                         #print(sql) # for debug
                         dbcursor.execute(sql)
-                    print("Comitting changes")
-                    dbcursor.commit()
-                    time.sleep(SLEEPTIME)
+                        print("Comitting changes")
+                        dbcursor.commit()
+                        time.sleep(SLEEPTIME)
 
     except ValueError as e:
         print(e)
