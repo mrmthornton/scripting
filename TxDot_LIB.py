@@ -1,3 +1,4 @@
+# -*- coding: UTF-8 -*-
 #-------------------------------------------------------------------------------
 # Name:        TxDot_LIB
 # Purpose:     code to parse the multi-formated results
@@ -6,8 +7,8 @@
 # Author:      mthornton
 #
 # Created:     2014 NOV 24
-# Updates:     2017 APR 08
-# Copyright:   (c) mthornton 2014, 2015, 2016
+# Updates:     2017 APR 27
+# Copyright:   (c) mthornton 2014, 2015, 2016, 2017
 #-------------------------------------------------------------------------------
 
 
@@ -22,7 +23,7 @@ linePattern = re.compile('^.+') # from start of line to newline(\n)
 wordPattern = re.compile('\w+') # any non-whitespace
 csvPattern = re.compile('[A-Z0-9 .#&]*,') #   almost-anything followed by a comma
 commaToEOLpattern = re.compile(',[A-Z0-9 .#&]+$') # comma almost-anything end-of-line
-LICpattern = re.compile(r'LIC ([A-Z0-9]{1,10}) [A-Z]{3,3}/[0-9]{4,4}')# group(1) is the LP
+LICpattern = re.compile(r'LIC\s+([A-Z0-9]{1,10})\s+[A-Z]{3,3}/[0-9]{4,4}')# group(1) is the LP
 issuedPattern = re.compile('ISSUED ')
 reg_dtPattern = re.compile('REG DT ')
 datePattern = re.compile('[0-9]{2,2}/[0-9]{2,2}/[0-9]{4,4}') # mo/day/year
@@ -35,7 +36,7 @@ def findAmbiguousPlates(plate,text):
     platesPattern = permutationPattern(plate)
     foundIter = platesPattern.finditer(text)
     plateGen = (e.group() for e in foundIter)
-    for foundPlate in plateGen: print("TxDot_LIB:findAmbiguousPlates: ", foundPlate) # debug 
+    for foundPlate in plateGen: print("TxDot_LIB:findAmbiguousPlates: ", foundPlate) # debug
     return plateGen
 
 def repairLineBreaks(fileString):
@@ -46,20 +47,20 @@ def repairLineBreaks(fileString):
     # five-numbers, dash(-), [white space], [return(\r)], newline(\n), [white-space], partial-number or
     # partial-number, [white space], [return(\r)], newline(\n), [white-space], partial-number, dash(-), four-numbers
 
-    # broken address lines ?
+    # broken address lines ?  TODO
 
     wordBreakPattern = re.compile(r'[A-Z]+ *\n\s+[A-Z]+(,|\.|-)',re.MULTILINE) # find broken words
     while True:
         broken = wordBreakPattern.search(fileString)
         if broken is not None:
-            print('repairLineBreaks:words:' , broken.group())
+            #print('TxDot_LIB:repairLineBreaks:words:' , broken.group()) # debug
             fileStringBegin = fileString[:broken.start()]
             fileStringMiddle = broken.group()
             fileStringMiddle = fileStringMiddle.replace('\n', '')
             fileStringMiddle = fileStringMiddle.replace(' ', '')
             fileStringEnd = fileString[broken.end():]
             fileString = fileStringBegin + fileStringMiddle + fileStringEnd
-            print('repairLineBreaks:words:' , fileStringMiddle)
+            #print('TxDot_LIB:repairLineBreaks:words:' , fileStringMiddle) # debug
         else:
             break
 
@@ -68,33 +69,20 @@ def repairLineBreaks(fileString):
     while True:
         broken = numberBreakPattern.search(fileString)
         if broken is not None:
-            print('repairLineBreaks:number:' , broken.group())
+            #print('TxDot_LIB:repairLineBreaks:number:' , broken.group()) # debug
             fileStringBegin = fileString[:broken.start()]
             fileStringMiddle = broken.group()
             fileStringMiddle = fileStringMiddle.replace('\n', '')
             fileStringMiddle = fileStringMiddle.replace(' ', '')
             fileStringEnd = fileString[broken.end():]
-            #if re.search(zipPlusPattern, fileStringMiddle) is not None:
+            ##if re.search(zipPlusPattern, fileStringMiddle) is not None:
             fileString = fileStringBegin + fileStringMiddle + fileStringEnd
-            if re.search(zipCodePattern, fileString) is not None:
-                print('repairLineBreaks:number:', fileStringMiddle)
+            #if re.search(zipCodePattern, fileString) is not None: #debug
+            #    print('TxDot_LIB:repairLineBreaks:number:', fileStringMiddle) # debug
         else:
             break
-##    #print 'repairLineBreaks:' + fileString
+    #print 'TxDot_LIB:repairLineBreaks:\n' + fileString # debug
     return fileString
-
-#def fixLine(lineString):
-#    # repair lines broken with \n and/or \r and following spaces
-##    # get owner line and remove
-#    ownerStartPattern = re.compile(r'OWNER')
-#    ownerEndPattern = re.compile(r' RNWL RCP| PLATE AGE:| LIEN')
-#    ownerStartFound = ownerStartPattern.search(typeString)
-#    ownerStart = ownerStartFound.start()
-#    ownerEndFound = ownerEndPattern.search(typeString)
-#    ownerEnd = ownerEndFound.start()
-#    ownerLine = typeString[ownerStartFound.start():ownerEndFound.start()]
-#    print 'parseStandard: ' + ownerLine
-#    return lineString
 
 def findStartEnd(fileString,startPattern, endPattern):
     # the iterator is used to search for all possible endLoc instances,
@@ -134,8 +122,7 @@ def findResponseType(plate, fileString):
 
     # STANDARD
     targetType = 'STANDARD'
-    #startPattern = re.compile('LIC ' + plate + ' [A-Z]{3,3}' + '/' '[0-9]{4,4}')
-    startPattern = re.compile('LIC ' + plate + ' [A-Z]{3,3}/[0-9]{4,4}')
+    startPattern = re.compile('LIC\s+' + plate + '\s+[A-Z]{3,3}/[0-9]{4,4}')
     endPattern = re.compile(r'TITLE[D.]')
     startNum, endNum = findStartEnd(fileString,startPattern, endPattern)
     if startNum is not None:
@@ -144,7 +131,7 @@ def findResponseType(plate, fileString):
 
     # TXIRP
     targetType = 'TXIRP'
-    startPattern = re.compile('LIC ' + plate + ' EXPIRES')
+    startPattern = re.compile('LIC' + plate + ' EXPIRES')
     endPattern = re.compile('REMARKS')
     startNum, endNum = findStartEnd(fileString,startPattern, endPattern)
     if startNum is not None:
@@ -257,7 +244,7 @@ def parsePlacard(responseType, typeString):
             plate = nextWord.group()
     return [responseType, plate.strip(), 'NOT a licence plate!', '', '', '', '', '', '', '', '', '','','','','','']
 
-def parseDealer(responseType, typeString):
+def parseDealer(responseType, typeString): # TODO get expiration date
     dealerPattern = re.compile('DEALER' + '[\s]+')
     #strip header
     header = dealerPattern.search(typeString)
@@ -644,7 +631,7 @@ def query(driver, delay, plate):
         print("TxDot_LIB:query:ERROR: Timeout, input licence plate may not match the record.")
         return None
     plateSubmitElement.clear() # does this need to be cleared ?
-    return (str(uText), correctPlate)
+    return (str(uText.encode('ascii', 'ignore')), correctPlate.encode('ascii', 'ignore'))#  TEST  TODO
 
 if __name__ == "__main__":
     print("TxDot_LIB:main: TESTING TxDot_LIB")
