@@ -135,9 +135,10 @@ def commonCode():
                         cleanText = "".join(filter(lambda x:x in string.printable, text)) # TODO move to query
                         fileString = repairLineBreaks(cleanText)  # TODO remove non-ascii  TODO move to query
                         ##fileString = "".join(filter(lambda x:x in string.printable, fileString))
-                    foundCurrentPlate = False
-                    recordList = []
 
+                    recordList = []
+                    """
+                    foundCurrentPlate = False
                     while True:
                         try:
                             responseType, startNum, endNum = findResponseType(DMVplate, fileString)
@@ -155,10 +156,11 @@ def commonCode():
                             fileString = fileString[:startNum] + fileString[endNum + 1:] # what is this for ?
                             listData = parseRecord(responseType, typeString)
                             assert(len(listData)==17)
-
-                            listData.append(plateString) # send the original plate for comparison and comment
-                            recordList.append(listData)
-                            #print(listData) # for debug
+                            """
+                    listData = extractFields(DMVplate, fileString, logfile=None)
+                    listData.append(plateString) # send the original plate for comparison and comment
+                    recordList.append(listData)
+                    #print(listData) # for debug
                 else:
                     recordList = [
 ['STANDARD',   plateString,    'name',  'addr',  'addr2',  'city',  'state',  '75000', '1/1/2000', '1/3/2000', '1/4/2000', '1/2/2000','2000','NISS','AC','4D','vin'],
