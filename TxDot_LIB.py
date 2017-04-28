@@ -634,7 +634,8 @@ def query(driver, delay, plate):
     return (str(uText.encode('ascii', 'ignore')), correctPlate.encode('ascii', 'ignore'))#  TEST  TODO
 
 if __name__ == "__main__":
-    print("TxDot_LIB:main: TESTING TxDot_LIB")
+    print("TxDot_LIB: TESTING TxDot_LIB")
+
     '''
     # TEST 'repairLineBreaks()
     with open('temp.txt', 'r') as infile:
@@ -650,3 +651,22 @@ if __name__ == "__main__":
             result = findResponseType(lp, text)
             if result is not None: print(result[0])
     '''
+
+    # test findAmbiguousPlates
+
+    text = """
+LIC JJJ111 JAN/2018 OLD # DONN   JAN/2017 EWT  5200 GWT   6200
+PASSENGER-TRUCK PLT, STKR            REG CLASS  35   $ 83.25 HARRISON CNTY
+TITLE 12345678901234567 ISSUED 01/21/2017 ODOMETER 196765 REG DT 01/13/2017
+YR:2009 MAK:FORD MODL:F1  BDY STYL:PK VEH CLS:TRK<=1     SALE PRC:       $0.00
+VIN: 123VIN12345678901 BODY VIN: N/A COLOR: WHITE
+PREV TTL: JUR TX TTL # 12345678901234567 ISSUE 06/22/2010
+PREV OWN  DUB SIMPLETON,ALVARADO,TX
+OWNER     DONALD TRUMP,,1 PENN AVE,,WASHINGTON,TX,75672
+PLATE AGE:  0  LAST ACTIVITY 01/20/2017 RLSAUT OFC: 297
+REMARKS PLATE POND   CANCELLED ON 2017/01/13.ACTUAL MILEAGE.DATE OF ASSIGNME
+NT:2017/01/01.PAPER TITLE.
+"""
+    foundPlates = findAmbiguousPlates("P0ND", text)
+    for eachPlate in foundPlates:
+        print("testTxDotResponseType:testAmbig: ", eachPlate)

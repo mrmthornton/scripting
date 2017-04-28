@@ -137,6 +137,7 @@ def commonCode():
                         ##fileString = "".join(filter(lambda x:x in string.printable, fileString))
                     foundCurrentPlate = False
                     recordList = []
+
                     while True:
                         try:
                             responseType, startNum, endNum = findResponseType(DMVplate, fileString)
@@ -154,6 +155,7 @@ def commonCode():
                             fileString = fileString[:startNum] + fileString[endNum + 1:] # what is this for ?
                             listData = parseRecord(responseType, typeString)
                             assert(len(listData)==17)
+
                             listData.append(plateString) # send the original plate for comparison and comment
                             recordList.append(listData)
                             #print(listData) # for debug
