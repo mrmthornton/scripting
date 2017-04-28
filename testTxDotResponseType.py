@@ -31,12 +31,10 @@ def main():
             fileString = repairLineBreaks(results)
             ##print("main: ", fileString) # for debug
 
-        plates = platefile.readlines()
-        for plate in plates:
-            plate = plate.strip().upper()
-            if plate is None or plate == "":
-                break
+        platesRaw = platefile.readlines()
+        plates = [plate.strip().upper() for plate in platesRaw if plate != ""] #  if plate is not None or plate !=""]  why check for None? TODO
 
+        for plate in plates:
             foundCurrentPlate = False
             while True:
                 try:

@@ -60,12 +60,13 @@ def commonCode():
     if vpsBool:
         driver = openBrowser(parameters['url'])
         waitForUser('login to VPS,\nopen violator maintenance')
+
     try:
         # Database Read section   *****************************************************************
         if dbBool:
             dbConnect, dbcursor = ConnectToAccess()
-            #for row in dbcursor.columns(table='Sheet1'): # debug
-            #    print(row.column_name)                   # debug
+            #for col in dbcursor.columns(table='Sheet1'): # debug
+            #    print(col.column_name)                   # debug
             dbcursor.execute("SELECT plate FROM [list of plate 8 without matching sheet1]") # (1),4,8,9,10, '11'  ,12
             #dbcursor.execute("SELECT plate FROM [list of plates 5 without matching sheet1]") # 2,3,5,6,7
             lpList = []
