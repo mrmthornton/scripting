@@ -13,6 +13,39 @@
 
 from TxDot_LIB import findResponseType, repairLineBreaks, parseRecord, csvStringFromList
 
+def extractFields(plates, fileString, outfile):
+    """plates - a collection of clean licence plate strings
+       fileString  -  the input text as a single string
+       outfile - a file handle for the log of events """
+    for plate in plates:
+        foundCurrentPlate = False
+        while True:
+            try:
+                responseType, startNum, endNum = findResponseType(plate, fileString)
+            except:
+                responseType = None
+                if foundCurrentPlate == False:
+                    print('extractFields: Searching for plate "', plate, '". Plate or Pattern not found.')
+                    outfile.write('extractFields: ' + plate + ' Plate/Pattern not found\n')
+                break
+            if responseType is not None:
+                foundCurrentPlate = True
+                ##print('extractFields: type, start, end: ', responseType, startNum, endNum) # for debug
+                # save only the 'core' string
+                typeString = fileString[startNum:endNum + 1] # extract the string for the specific type
+                ##print("v: typestring: ", typeString) # for debug
+                #remove the current working string from the larger string
+                fileString = fileString[:startNum] + fileString[endNum + 1:] #the rest of the original string
+                listData = parseRecord(responseType, typeString)
+                assert(len(listData)==17)
+                print("extractFields: listdata: ", listData) # for debug
+                csvString = csvStringFromList(listData)
+                outfile.write(csvString)
+        outfile.write('----------------\n')
+        outfile.flush()
+    return csvString
+
+
 def main():
     # move to LIB ?? as  TODO
     inputFileName = 'testCasesNoPii.txt'
@@ -26,40 +59,15 @@ def main():
         outfile.truncate()
 
         results = infile.read()
-        if (results is not None and results != ""):
+        if (results is not None and results != ""):  # why check for None? TODO
             ##print("main: ", results) # for debug
             fileString = repairLineBreaks(results)
             ##print("main: ", fileString) # for debug
 
         platesRaw = platefile.readlines()
-        plates = [plate.strip().upper() for plate in platesRaw if plate != ""] #  if plate is not None or plate !=""]  why check for None? TODO
+        plates = [plate.strip().upper() for plate in platesRaw if plate is not None or plate !=""]  # why check for None? TODO
+        extractFields(plates, fileString, outfile)
 
-        for plate in plates:
-            foundCurrentPlate = False
-            while True:
-                try:
-                    responseType, startNum, endNum = findResponseType(plate, fileString)
-                except:
-                    responseType = None
-                    if foundCurrentPlate == False:
-                        print('main: Searching for plate "', plate, '". Plate or Pattern not found.')
-                        outfile.write('main: ' + plate + ' Plate/Pattern not found\n')
-                    break
-                if responseType is not None:
-                    foundCurrentPlate = True
-                    ##print('main: type, start, end: ', responseType, startNum, endNum) # for debug
-                    # save only the 'core' string
-                    typeString = fileString[startNum:endNum + 1] # extract the string for the specific type
-                    ##print("main: typestring: ", typeString) # for debug
-                    #remove the current working string from the larger string
-                    fileString = fileString[:startNum] + fileString[endNum + 1:] #the rest of the original string
-                    listData = parseRecord(responseType, typeString)
-                    assert(len(listData)==17)
-                    print("main: listdata: ", listData) # for debug
-                    csvString = csvStringFromList(listData)
-                    outfile.write(csvString)
-        outfile.write('----------------\n')
-        outfile.flush()
     print("main: Finished.")
 
 
