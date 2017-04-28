@@ -13,10 +13,15 @@
 
 from TxDot_LIB import findResponseType, repairLineBreaks, parseRecord, csvStringFromList
 
-def extractFields(plates, fileString, outfile):
-    """plates - a collection of clean licence plate strings
-       fileString  -  the input text as a single string
-       outfile - a file handle for the log of events """
+def extractFields(plates, fileString, logfile=None): #TODO make outfile optional >>/dev/null?
+    """
+    plates - a collection of clean licence plate strings
+    fileString  -  the input text as a single string
+    logfile - a file handle for the log of events
+    """
+    if logfile is None: outfile = open("nul", 'w')
+    else: outfile = logfile
+
     for plate in plates:
         foundCurrentPlate = False
         while True:
@@ -33,7 +38,7 @@ def extractFields(plates, fileString, outfile):
                 ##print('extractFields: type, start, end: ', responseType, startNum, endNum) # for debug
                 # save only the 'core' string
                 typeString = fileString[startNum:endNum + 1] # extract the string for the specific type
-                ##print("v: typestring: ", typeString) # for debug
+                ##print("extractFields: typestring: ", typeString) # for debug
                 #remove the current working string from the larger string
                 fileString = fileString[:startNum] + fileString[endNum + 1:] #the rest of the original string
                 listData = parseRecord(responseType, typeString)
@@ -43,6 +48,7 @@ def extractFields(plates, fileString, outfile):
                 outfile.write(csvString)
         outfile.write('----------------\n')
         outfile.flush()
+    if logfile is None: outfile.close()
     return csvString
 
 
@@ -66,7 +72,7 @@ def main():
 
         platesRaw = platefile.readlines()
         plates = [plate.strip().upper() for plate in platesRaw if plate is not None or plate !=""]  # why check for None? TODO
-        extractFields(plates, fileString, outfile)
+        extractFields(plates, fileString)
 
     print("main: Finished.")
 
