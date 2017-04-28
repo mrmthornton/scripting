@@ -22,6 +22,7 @@ def extractFields(plate, fileString, logfile=None): #TODO make outfile optional 
     if logfile is None: outfile = open("nul", 'w')
     else: outfile = logfile
 
+    listData = []
     foundCurrentPlate = False
     while True:
         try:
@@ -65,7 +66,7 @@ def main():
         platesRaw = platefile.readlines()
         plates = [plate.strip().upper() for plate in platesRaw if plate is not None or plate !=""]  # why check for None? TODO
         for plate in plates:
-            print(extractFields(plates, fileString))
+            print(extractFields(plate, fileString))
 
     print("main: Finished.")
 
