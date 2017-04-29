@@ -60,13 +60,12 @@ def commonCode():
     if vpsBool:
         driver = openBrowser(parameters['url'])
         waitForUser('login to VPS,\nopen violator maintenance')
-
     try:
         # Database Read section   *****************************************************************
         if dbBool:
             dbConnect, dbcursor = ConnectToAccess()
-            #for col in dbcursor.columns(table='Sheet1'): # debug
-            #    print(col.column_name)                   # debug
+            #for row in dbcursor.columns(table='Sheet1'): # debug
+            #    print(row.column_name)                   # debug
             dbcursor.execute("SELECT plate FROM [list of plate 8 without matching sheet1]") # (1),4,8,9,10, '11'  ,12
             #dbcursor.execute("SELECT plate FROM [list of plates 5 without matching sheet1]") # 2,3,5,6,7
             lpList = []
@@ -135,10 +134,8 @@ def commonCode():
                         cleanText = "".join(filter(lambda x:x in string.printable, text)) # TODO move to query
                         fileString = repairLineBreaks(cleanText)  # TODO remove non-ascii  TODO move to query
                         ##fileString = "".join(filter(lambda x:x in string.printable, fileString))
-
-                    recordList = []
-                    """
                     foundCurrentPlate = False
+                    recordList = []
                     while True:
                         try:
                             responseType, startNum, endNum = findResponseType(DMVplate, fileString)
@@ -156,11 +153,9 @@ def commonCode():
                             fileString = fileString[:startNum] + fileString[endNum + 1:] # what is this for ?
                             listData = parseRecord(responseType, typeString)
                             assert(len(listData)==17)
-                            """
-                    listData = extractFields(DMVplate, fileString, logfile=None)
-                    listData.append(plateString) # send the original plate for comparison and comment
-                    recordList.append(listData)
-                    #print(listData) # for debug
+                            listData.append(plateString) # send the original plate for comparison and comment
+                            recordList.append(listData)
+                            #print(listData) # for debug
                 else:
                     recordList = [
 ['STANDARD',   plateString,    'name',  'addr',  'addr2',  'city',  'state',  '75000', '1/1/2000', '1/3/2000', '1/4/2000', '1/2/2000','2000','NISS','AC','4D','vin'],
