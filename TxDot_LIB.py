@@ -585,14 +585,27 @@ def parseCanceled(responseType, typeString):
 
 
 def csvStringFromList(listData):
-    csvString = ''
-    for stringValue in listData:
-        # remove any commas that may be part of the text,
-        # since the new delimiter will be a comma,
-        stringValue = stringValue.replace(',' , '')
-        csvString += stringValue + ', '
-    csvString += '\n'
-    return csvString
+    """
+    Remove any commas that may be part of the text,
+    since the new delimiter is a comma.
+    """
+    return insertCommas([removeCommas(e) for e in listData])
+
+
+def insertCommas(strings):
+    """
+    Insert commas between elements of a string list
+    returning a single string.
+    """
+    return "".join([(e + ',') for e in strings])
+
+
+def removeCommas(stringValue):
+    """
+    Remove commas from a string.
+    """
+    return stringValue.replace(',' , '')
+
 
 def timeout():
     print("TxDotQuery: timeout!")
@@ -670,3 +683,8 @@ NT:2017/01/01.PAPER TITLE.
     foundPlates = findAmbiguousPlates("P0ND", text)
     for eachPlate in foundPlates:
         print("testTxDotResponseType:testAmbig: ", eachPlate)
+
+    assert("abcd") == removeCommas("a,b,c,d,")
+    assert("a,b,c,d,") == insertCommas("abcd")
+    assert("name one,name two,addr,apt," == csvStringFromList(["name, one", "name, two", "addr", "apt"]))
+

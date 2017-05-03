@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 #-------------------------------------------------------------------------------
-# Name:        testTxDotResponse
+# Name:        testTxDotResponseType
 # Purpose:     input reponses from TX DMV RTS database, in raw text format.
 #
 # Author:      mthornton
@@ -13,7 +13,7 @@
 
 from TxDot_LIB import findResponseType, repairLineBreaks, parseRecord, csvStringFromList
 
-def extractFields(plate, fileString, logfile=None): #TODO make outfile optional >>/dev/null?
+def extractFields(plate, fileString, logfile=None):
     """
     plates - a clean licence plate string
     fileString  -  the input text as a single string
@@ -30,15 +30,15 @@ def extractFields(plate, fileString, logfile=None): #TODO make outfile optional 
         except:
             responseType = None
             if foundCurrentPlate == False:
-                print('extractFields: Searching for plate "', plate, '". Plate or Pattern not found.')
-                outfile.write('extractFields: ' + plate + ' Plate/Pattern not found\n')
+                print('testTxDotResponseType:extractFields: Searching for plate "', plate, '". Plate or Pattern not found.')
+                outfile.write('testTxDotResponseType:extractFields: ' + plate + ' Plate/Pattern not found\n')
             break
         if responseType is not None:
             foundCurrentPlate = True
-            ##print('extractFields: type, start, end: ', responseType, startNum, endNum) # for debug
+            ##print('testTxDotResponseType:extractFields: type, start, end: ', responseType, startNum, endNum) # for debug
             # save only the 'core' string
             typeString = fileString[startNum:endNum + 1] # extract the string for the specific type
-            ##print("extractFields: typestring: ", typeString) # for debug
+            ##print("testTxDotResponseType:extractFields: typestring: ", typeString) # for debug
             #remove the current working string from the larger string
             fileString = fileString[:startNum] + fileString[endNum + 1:] #the rest of the original string
             listData = parseRecord(responseType, typeString)
