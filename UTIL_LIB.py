@@ -90,6 +90,7 @@ def permutationPattern(lp):
     print("UTIL_LIB:permutatinPattern:regexString: ", regexString) # for debug
     return re.compile(regexString)
 
+
 def testPermutaionPattern():
     licencePlate = "loseit"
     io10Pattern = permutationPattern(licencePlate)
@@ -115,7 +116,26 @@ def testPermutaionPattern():
     found = io10Pattern.search("I am a NOO0DLE")
     if found:
         print(found.start(),found.end())
-    pass
+
+
+def returnLargest(a,b):
+    int
+    if int(a)>int(b): return a
+    return b
+
+def testReturnLargest():
+    assert(returnLargest(0,1)==1)
+    assert(returnLargest('0','1')=='1')
+
+
+def returnSmallest(a,b):
+    int
+    if int(a)<int(b): return a
+    return b
+
+def testReturnSmallest():
+    assert(returnSmallest(0,1)==0)
+    assert(returnSmallest('0','1')=='0')
 
 
 def timeout(msg="Took too much time!"):
@@ -132,4 +152,7 @@ def waitForUser(msg="enter login credentials"):
 
 if __name__ == '__main__':
     testPermutaionPattern()
+    testReturnSmallest()
+    testReturnLargest()
+
 

@@ -15,7 +15,7 @@
 import re
 from selenium.common.exceptions import TimeoutException, StaleElementReferenceException
 from selenium.webdriver.common.by import By
-from UTIL_LIB import permutationPattern
+from UTIL_LIB import permutationPattern, returnLargest
 from VPS_LIB import findElementOnPage
 
 
@@ -32,6 +32,14 @@ zipPlusPattern = re.compile(r'\d{5,5}-\d{4,4}')
 zipCodePattern = re.compile(r',\d{5,5}|\s+\w{2,2}\s+\d{5,5}')  # commaZIP or spaceSTspaceZIP
 
 
+def csvStringFromList(listData):
+    """
+    Remove any commas that may be part of the text,
+    since the new delimiter is a comma.
+    """
+    return insertCommas([removeCommas(e) for e in listData])
+
+
 def findAmbiguousPlates(plate,text):
     platesPattern = permutationPattern(plate)
     foundIter = platesPattern.finditer(text)
@@ -39,50 +47,6 @@ def findAmbiguousPlates(plate,text):
     for foundPlate in plateGen: print("TxDot_LIB:findAmbiguousPlates: ", foundPlate) # debug
     return plateGen
 
-def repairLineBreaks(fileString):
-    # broken keywords words have a pattern of
-    # partial-word, newline(\n) white-space, partial word, identifier(, . -)
-
-    # broken ZipPlus numbers have a pattern of
-    # five-numbers, dash(-), [white space], [return(\r)], newline(\n), [white-space], partial-number or
-    # partial-number, [white space], [return(\r)], newline(\n), [white-space], partial-number, dash(-), four-numbers
-
-    # broken address lines ?  TODO
-
-    wordBreakPattern = re.compile(r'[A-Z]+ *\n\s+[A-Z]+(,|\.|-)',re.MULTILINE) # find broken words
-    while True:
-        broken = wordBreakPattern.search(fileString)
-        if broken is not None:
-            #print('TxDot_LIB:repairLineBreaks:words:' , broken.group()) # debug
-            fileStringBegin = fileString[:broken.start()]
-            fileStringMiddle = broken.group()
-            fileStringMiddle = fileStringMiddle.replace('\n', '')
-            fileStringMiddle = fileStringMiddle.replace(' ', '')
-            fileStringEnd = fileString[broken.end():]
-            fileString = fileStringBegin + fileStringMiddle + fileStringEnd
-            #print('TxDot_LIB:repairLineBreaks:words:' , fileStringMiddle) # debug
-        else:
-            break
-
-    numberBreakPattern = re.compile(r',\d{1,4}\s*\n\s*\d{1,4}',re.MULTILINE) # find broken Zip
-    # total of 5 digits around a line break?
-    while True:
-        broken = numberBreakPattern.search(fileString)
-        if broken is not None:
-            #print('TxDot_LIB:repairLineBreaks:number:' , broken.group()) # debug
-            fileStringBegin = fileString[:broken.start()]
-            fileStringMiddle = broken.group()
-            fileStringMiddle = fileStringMiddle.replace('\n', '')
-            fileStringMiddle = fileStringMiddle.replace(' ', '')
-            fileStringEnd = fileString[broken.end():]
-            ##if re.search(zipPlusPattern, fileStringMiddle) is not None:
-            fileString = fileStringBegin + fileStringMiddle + fileStringEnd
-            #if re.search(zipCodePattern, fileString) is not None: #debug
-            #    print('TxDot_LIB:repairLineBreaks:number:', fileStringMiddle) # debug
-        else:
-            break
-    #print 'TxDot_LIB:repairLineBreaks:\n' + fileString # debug
-    return fileString
 
 def findStartEnd(fileString,startPattern, endPattern):
     # the iterator is used to search for all possible endLoc instances,
@@ -99,96 +63,85 @@ def findStartEnd(fileString,startPattern, endPattern):
                 return [startLoc,endLoc]
     return [None, None]
 
+
 def findResponseType(plate, fileString):
 
     # NO RECORD
-    targetType = 'NORECORD'
     startPattern = re.compile('PLATE:' + '[\s]+' + plate)
     endPattern = re.compile('NO RECORD IN RTS DATABASE')
     startNum, endNum = findStartEnd(fileString,startPattern, endPattern)
     if startNum is not None:
         #print('TxDot_LIB: findResponseType::', targetType, plate)
-        return [targetType, startNum, endNum]
+        return ['NORECORD', startNum, endNum]
 
     # DEALER
-    targetType = 'DEALER'
     startPattern = re.compile('DEALER' + '[\s]+' + plate)
     endPattern = re.compile('CODE ')
     #endPattern = re.compile('CODE ' + '[A-Z]{2,2}' + '[\s]+' + '[0-9]+')
     startNum, endNum = findStartEnd(fileString,startPattern, endPattern)
     if startNum is not None:
         #print('TxDot_LIB: findResponseType::', targetType, plate)
-        return [targetType, startNum, endNum]
+        return ['DEALER', startNum, endNum]
 
     # STANDARD
-    targetType = 'STANDARD'
     startPattern = re.compile('LIC\s+' + plate + '\s+[A-Z]{3,3}/[0-9]{4,4}')
     endPattern = re.compile(r'TITLE[D.]')
     startNum, endNum = findStartEnd(fileString,startPattern, endPattern)
     if startNum is not None:
         #print('TxDot_LIB: findResponseType::', targetType, plate)
-        return [targetType, startNum, endNum]
+        return ['STANDARD', startNum, endNum]
 
     # TXIRP
-    targetType = 'TXIRP'
     startPattern = re.compile('LIC' + plate + ' EXPIRES')
     endPattern = re.compile('REMARKS')
     startNum, endNum = findStartEnd(fileString,startPattern, endPattern)
     if startNum is not None:
         #print('TxDot_LIB: findResponseType::', targetType, plate)
-        return [targetType, startNum, endNum]
+        return ['TXIRP', startNum, endNum]
 
     # PERMIT
-    targetType = 'PERMIT'
     permitStartPattern = re.compile(r'SELECTION REQUEST:\s+PERMIT\s+' + plate)
     permitEndPattern = re.compile('ISSUING OFFICE: ')
     startNum, endNum = findStartEnd(fileString,permitStartPattern, permitEndPattern)
     if startNum is not None:
         #print('TxDot_LIB: findResponseType::', targetType, plate)
-        return [targetType, startNum, endNum]
+        return ['PERMIT', startNum, endNum]
 
     # TEMPORARY
-    targetType = 'TEMPORARY'
     startPattern = re.compile(r'SELECTION REQUEST:\s+TEMPORARY TAG\s+' + plate)
     endPattern = re.compile(r',\w{2,2},\d{5,5}')  # ,ST,Zip
     startNum, endNum = findStartEnd(fileString,startPattern, endPattern)
     if startNum is not None:
         #print('TxDot_LIB: findResponseType::', targetType, plate)
-        return [targetType, startNum, endNum]
+        return ['TEMPORARY', startNum, endNum]
 
     # SPECIAL
-    targetType = 'SPECIAL'
     startPattern = re.compile(r'SPECIAL PLATE\s+' + plate)
     endPattern = zipCodePattern
     startNum, endNum = findStartEnd(fileString,startPattern, endPattern)
     if startNum is not None:
         #print('TxDot_LIB: findResponseType::', targetType, plate)
-        return [targetType, startNum, endNum]
+        return ['SPECIAL', startNum, endNum]
 
     # PLACARD
-    targetType = 'PLACARD'
     startPattern = re.compile(r'SELECTION REQUEST:\s+PLACARD\s+' + plate )
     endPattern = re.compile('DISABLED PERSON#:\s+\d+')
     startNum, endNum = findStartEnd(fileString,startPattern, endPattern)
     if startNum is not None:
         #print('TxDot_LIB: findResponseType::', targetType, plate)
-        return [targetType, startNum, endNum]
+        return ['PLACARD', startNum, endNum]
 
     # CANCELED
-    targetType = 'CANCELED'
     canceledPattern = re.compile(plate + '[ ]*(CANCELED|CANCELLED)')
     canceledStartPattern = re.compile(r'LIC [A-Z0-9]{1,10} [A-Z]{3,3}/[0-9]{4,4}')
     canceledEndPattern = re.compile('TITLE[D.]')
     found = canceledPattern.search(fileString)
-    # Examine all start-positions for closest, but not past canceled-position
     if found is not None:
         startCancel = found.start()
         #print("TxDot_LIB: findResponseType: cancel found at: ", startCancel)
-        if startCancel < 1000:  # make this more obvious, what is the purpose.
-            startSearchAt = 0
-        else:
-            startSearchAt = startCancel-1000
-        ##print("findResponseType:CANCELED: ",fileString[startSearchAt:])
+        backFromRemarksDistance = 1000  # how far back is the start? guesstimate.
+        startSearchAt = returnLargest(0, startCancel-backFromRemarksDistance)
+        #print("findResponseType:CANCELED: ",fileString[startSearchAt:]) # debug
         found = canceledStartPattern.search(fileString[startSearchAt:])
         startNum = found.start() + startSearchAt
 
@@ -197,8 +150,30 @@ def findResponseType(plate, fileString):
         foundEnd = canceledEndPattern.search(fileString[startCancel:])
         endNum = foundEnd.end() + startCancel
         #print ('findResponseType:', targetType, plate)
-        return [targetType, startNum, endNum]
+        return ['CANCELED', startNum, endNum]
     return None
+
+
+def insertCommas(strings):
+    """
+    Insert commas between elements of a string list
+    returning a single string.
+    """
+    return "".join([(e + ',') for e in strings])
+
+
+def make(stringText):
+    makPattern = re.compile('(?<=MAK:)\w+')
+    return makPattern.search(stringText).group()
+
+
+def model(stringText):
+    modlPattern = re.compile('(?<=MODL:)\w+')
+    modl = modlPattern.search(stringText)
+    if modl:
+        return modl.group()
+    return ""
+
 
 # parseRecord() calls the appropriate 'parse<RESPONSETYPE>()' function,
 # which returns a list of strings as follows:
@@ -245,19 +220,17 @@ def parsePlacard(responseType, typeString):
     return [responseType, plate.strip(), 'NOT a licence plate!', '', '', '', '', '', '', '', '', '','','','','','']
 
 def parseDealer(responseType, typeString): # TODO get expiration date
-    dealerPattern = re.compile('DEALER' + '[\s]+')
-    #strip header
+    dealerPattern = re.compile('DEALER[\s]+([\w]+)')
     header = dealerPattern.search(typeString)
-    typeString =  typeString[header.end():]
-    #get plate and remove line
-    foundPlate = linePattern.search(typeString)
-    plate = foundPlate.group()
-    typeString =  typeString[foundPlate.end() + 1:]
-    #remove next line
-    nextLine = linePattern.search(typeString)
-    typeString =  typeString[nextLine.end() + 1:]
+    plate = header.group(1)
+    print(typeString[header.end() + 1:])
+    #skip next line
+    skipLine = linePattern.search(typeString[header.end() + 1:])
+    print(typeString[header.end() + skipLine.end() + 1:])
+    ##typeString =  typeString[nextLine.end() + 1:]
     # get name and remove next line
-    nextLine = linePattern.search(typeString)
+    nextLine = linePattern.search( (typeString[header.end() + skipLine.end() + 1:]) )
+    print(typeString[header.end() + skipLine.end() + 1:])
     name = nextLine.group()
     typeString =  typeString[nextLine.end() + 1:]
     # get name and remove next line
@@ -286,24 +259,6 @@ def parseDealer(responseType, typeString): # TODO get expiration date
     typeString =  typeString[nextWord.end() + 1:]
     return [responseType, plate.strip(), name.strip(), addr.strip(), '', city.strip(), state.strip(), zipCode, '', '', '', '','','','','','']
 
-def year(stringText):
-    yrPattern = re.compile('(?<=YR:)\d{4}')
-    return yrPattern.search(stringText).group()
-def make(stringText):
-    makPattern = re.compile('(?<=MAK:)\w+')
-    return makPattern.search(stringText).group()
-def model(stringText):
-    modlPattern = re.compile('(?<=MODL:)\w+')
-    modl = modlPattern.search(stringText)
-    if modl:
-        return modl.group()
-    return ""
-def style(stringText):
-    stylPattern = re.compile('(?<=STYL:)\w+')
-    return stylPattern.search(stringText).group()
-def vinNumber(stringText):
-    vinPattern = re.compile('(?<=VIN: )\w+')
-    return vinPattern.search(stringText).group()
 
 def parseStandard(responseType, typeString):
     # remove header
@@ -584,34 +539,6 @@ def parseCanceled(responseType, typeString):
     return parsedList
 
 
-def csvStringFromList(listData):
-    """
-    Remove any commas that may be part of the text,
-    since the new delimiter is a comma.
-    """
-    return insertCommas([removeCommas(e) for e in listData])
-
-
-def insertCommas(strings):
-    """
-    Insert commas between elements of a string list
-    returning a single string.
-    """
-    return "".join([(e + ',') for e in strings])
-
-
-def removeCommas(stringValue):
-    """
-    Remove commas from a string.
-    """
-    return stringValue.replace(',' , '')
-
-
-def timeout():
-    print("TxDotQuery: timeout!")
-    quit()
-
-
 def query(driver, delay, plate):
     # the input field is uniquely defined by the MANDATORY class attributes
     # class="v-textfield v-widget v-has-width iw-child v-textfield-iw-child iw-mandatory v-textfield-iw-mandatory"
@@ -619,7 +546,7 @@ def query(driver, delay, plate):
     plateSubmitElement = findElementOnPage(driver, delay, plateSubmitLocator)
 
     if plateSubmitElement is None:
-        print("TxDot_LIB:query: plate submission form not found on page")
+        print("TxDot_LIB:query: plate submission FORM not found on page")
         return (None, None)
     plateSubmitElement.clear()
     plateSubmitElement.send_keys(plate)
@@ -645,6 +572,80 @@ def query(driver, delay, plate):
         return (None, None)
     plateSubmitElement.clear() # does this need to be cleared ? TODO
     return (str(uText.encode('ascii', 'ignore')), correctPlate.encode('ascii', 'ignore'))#  TEST  TODO
+
+
+def removeCommas(stringValue):
+    """
+    Remove commas from a string.
+    """
+    return stringValue.replace(',' , '')
+
+
+def repairLineBreaks(fileString):
+    # broken keywords words have a pattern of
+    # partial-word, newline(\n) white-space, partial word, identifier(, . -)
+
+    # broken ZipPlus numbers have a pattern of
+    # five-numbers, dash(-), [white space], [return(\r)], newline(\n), [white-space], partial-number or
+    # partial-number, [white space], [return(\r)], newline(\n), [white-space], partial-number, dash(-), four-numbers
+
+    # broken address lines ?  TODO
+
+    wordBreakPattern = re.compile(r'[A-Z]+ *\n\s+[A-Z]+(,|\.|-)',re.MULTILINE) # find broken words
+    while True:
+        broken = wordBreakPattern.search(fileString)
+        if broken is not None:
+            #print('TxDot_LIB:repairLineBreaks:words:' , broken.group()) # debug
+            fileStringBegin = fileString[:broken.start()]
+            fileStringMiddle = broken.group()
+            fileStringMiddle = fileStringMiddle.replace('\n', '')
+            fileStringMiddle = fileStringMiddle.replace(' ', '')
+            fileStringEnd = fileString[broken.end():]
+            fileString = fileStringBegin + fileStringMiddle + fileStringEnd
+            #print('TxDot_LIB:repairLineBreaks:words:' , fileStringMiddle) # debug
+        else:
+            break
+
+    numberBreakPattern = re.compile(r',\d{1,4}\s*\n\s*\d{1,4}',re.MULTILINE) # find broken Zip
+    # total of 5 digits around a line break?
+    while True:
+        broken = numberBreakPattern.search(fileString)
+        if broken is not None:
+            #print('TxDot_LIB:repairLineBreaks:number:' , broken.group()) # debug
+            fileStringBegin = fileString[:broken.start()]
+            fileStringMiddle = broken.group()
+            fileStringMiddle = fileStringMiddle.replace('\n', '')
+            fileStringMiddle = fileStringMiddle.replace(' ', '')
+            fileStringEnd = fileString[broken.end():]
+            ##if re.search(zipPlusPattern, fileStringMiddle) is not None:
+            fileString = fileStringBegin + fileStringMiddle + fileStringEnd
+            #if re.search(zipCodePattern, fileString) is not None: #debug
+            #    print('TxDot_LIB:repairLineBreaks:number:', fileStringMiddle) # debug
+        else:
+            break
+    #print 'TxDot_LIB:repairLineBreaks:\n' + fileString # debug
+    return fileString
+
+
+def style(stringText):
+    stylPattern = re.compile('(?<=STYL:)\w+')
+    return stylPattern.search(stringText).group()
+
+
+def timeout():
+    print("TxDotQuery: timeout!")
+    quit()
+
+
+def vinNumber(stringText):
+    vinPattern = re.compile('(?<=VIN: )\w+')
+    return vinPattern.search(stringText).group()
+
+
+def year(stringText):
+    yrPattern = re.compile('(?<=YR:)\d{4}')
+    return yrPattern.search(stringText).group()
+
 
 if __name__ == "__main__":
     print("TxDot_LIB: TESTING TxDot_LIB")
