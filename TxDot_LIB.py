@@ -15,7 +15,7 @@
 import re
 from selenium.common.exceptions import TimeoutException, StaleElementReferenceException
 from selenium.webdriver.common.by import By
-from UTIL_LIB import permutationPattern, returnLargest
+from UTIL_LIB import nextIndex, permutationPattern, returnLargest
 from VPS_LIB import findElementOnPage
 
 
@@ -219,19 +219,23 @@ def parsePlacard(responseType, typeString):
             plate = nextWord.group()
     return [responseType, plate.strip(), 'NOT a licence plate!', '', '', '', '', '', '', '', '', '','','','','','']
 
+
 def parseDealer(responseType, typeString): # TODO get expiration date
     dealerPattern = re.compile('DEALER[\s]+([\w]+)')
     header = dealerPattern.search(typeString)
     plate = header.group(1)
-    print(typeString[header.end() + 1:])
+    genNewStr = nextIndex(typeString)
+    shortenStr = genNewStr(header.end() + 1)
+    s = shortenStr(header.end() + 1)
+    print(s)
     #skip next line
-    skipLine = linePattern.search(typeString[header.end() + 1:])
-    print(typeString[header.end() + skipLine.end() + 1:])
+    skipLine = linePattern.search(s)
+    print(genNewStr(skipLine.end() + 1))
     ##typeString =  typeString[nextLine.end() + 1:]
     # get name and remove next line
-    nextLine = linePattern.search( (typeString[header.end() + skipLine.end() + 1:]) )
-    print(typeString[header.end() + skipLine.end() + 1:])
+    nextLine = linePattern.search(genNewStr(header.end() + 1))
     name = nextLine.group()
+    print(typeString[header.end() + skipLine.end() + 1:])
     typeString =  typeString[nextLine.end() + 1:]
     # get name and remove next line
     nextLine = linePattern.search(typeString)

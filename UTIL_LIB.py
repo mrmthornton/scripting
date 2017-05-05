@@ -44,6 +44,15 @@ def loadRegExPatterns():
     return regex_patterns
 
 
+from functools import partial
+def nextIndex(aString):
+    def func(s,n):
+        while True:
+            yield s[n+1:]
+            n+=n
+    return partial(func, aString)
+
+
 def openBrowser(url):
     driver = webdriver.Ie()
     #driver.maximize_window()
@@ -154,5 +163,9 @@ if __name__ == '__main__':
     testPermutaionPattern()
     testReturnSmallest()
     testReturnLargest()
+
+    x = nextIndex("helloWorld")
+    print(x(2).next())
+    print(x(4).next())
 
 
