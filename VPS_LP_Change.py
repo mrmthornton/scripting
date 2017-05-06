@@ -21,8 +21,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.select import Select
 import selenium.webdriver.support.expected_conditions as EC
 
-#from VPS_LIB import 
-from UTIL_LIB import cleanUpString, waitForUser
+from VPS_LIB import fillFormAndSubmit, findAndSelectFrame, findElementOnPage, findTargetPage, getTextResults, newPageElementFound
+from UTIL_LIB import cleanUpString, openBrowser, waitForUser
 
 import re
 import io
@@ -34,9 +34,9 @@ import time
 import datetime
 import pyodbc
 import string
-#import tkFileDialog # python 2
-from tkinter import filedialog, messagebox
-#import tkMessageBox # python 2
+import tkFileDialog # python 2
+#from tkinter import filedialog, messagebox # python 3
+import tkMessageBox # python 2
 import xlwings
 
 def setParameters():
@@ -71,20 +71,16 @@ def common_code(driver, parameters, plates):
         return None
 
     for row in plates:
-        rawString = row[0] # wrong plate
-        if rawString == "" or rawString == 0:  #end when first input does not exist
+        wrongPlate = row[0]; wrongState = row[1]; correctPlate = row[2]; correctState = row[3]
+        # minimum requirements  wrongPlate, and  (correctPlate or correctState)
+        if wrongPlate is None or (correctPlate is None and correctState is None):
+            print("VPS_LP_Change:common_code: The Minimum requirements are not met.")
             break
-        plateString = cleanUpString(rawString)
 
-        rawString = row[2] # correct plate
-        if rawString == "" or rawString == 0:  #end when second input does not exist
-            break
-        replacementString = cleanUpString(rawString)
-
-        rawString = row[3] # correct state
-        if rawString == "" or rawString == 0:
-            rawString = ""
-        correctState = cleanUpString(rawString)
+        wrongPlate = cleanUpString(wrongPlate)
+        wrongState = cleanUpString(wrongState)
+        correctPlate = cleanUpString(correctPlate)
+        correctState = cleanUpString(correctState)
 
         #select from Violation Status menu
         menuLocator = (By.XPATH, '//select[@name="P_L_VST_VIOL_STATUS_DESCR"]')
@@ -99,7 +95,7 @@ def common_code(driver, parameters, plates):
         #Selector.select_by_visible_text("Excused") # does this need to be instanciated each time?
 
         element = findElementOnPage(driver, delay, parameters['inputLpLocator'])
-        submitted = fillFormAndSubmit(driver, startWindow, element, plateString, parameters) # why so slow?
+        submitted = fillFormAndSubmit(driver, startWindow, element, wrongPlate, parameters) # why so slow?
         time.sleep(1)  #page may not be there yet!  how long to wait?
         pageLoaded = newPageElementFound(driver, delay, (By.XPATH, '//frame[@name="fraTOP"]'), parameters['pageLocator2'])
 
@@ -107,7 +103,7 @@ def common_code(driver, parameters, plates):
         while True:
             foundFrame = findAndSelectFrame(driver, delay, "fraRL")
             #time.sleep(1)  #text may not be there yet!  how long to wait?
-            text = getTextResults(driver, delay, plateString, parameters, "fraRL")
+            text = getTextResults(driver, delay, wrongPlate, parameters, "fraRL")
             if text is not None and text != 0: # there's more to correct   ############ does this do what I think it does?
                 #click on the first record
                 element = findElementOnPage(driver, delay, parameters['LpLocator'])
@@ -116,8 +112,19 @@ def common_code(driver, parameters, plates):
                 handle = driver.current_window_handle
                 driver.switch_to_window(handle)
                 foundFrame = findAndSelectFrame(driver, delay, "fraVF")
+
+                menuElement = findElementOnPage(driver, delay, parameters['inputStateLocator'])
+                Selector = Select(menuElement)
+                count = 0
+                while Selector is None:  # menu select is sometimes None, why ?
+                    count = count + 1
+                    print("retrying excusal menu selection. Count: ", count)
+                    Selector = Select(menuElement)
+                Selector.select_by_visible_text("CO") # does this need to be instanciated each time?
+
                 element = findElementOnPage(driver, delay, parameters['inputLpLocator'])
-                submitted = fillFormAndSubmit(driver, startWindow, element, replacementString, parameters)
+                submitted = fillFormAndSubmit(driver, startWindow, element, correctPlate, parameters)
+
                 time.sleep(1)  #page may not be there yet!  how long to wait?
                 handle = driver.current_window_handle
                 driver.switch_to_window(handle)
@@ -138,7 +145,7 @@ def openRunClose(plates):
     parameters = setParameters()
     parameters['findStartWindowDelay'] = 3
     print(parameters['operatorMessage'])
-    regexPattens = loadRegExPatterns()
+    #regexPattens = loadRegExPatterns()
     driver = openBrowser(parameters['url'])
     waitForUser()
     common_code(driver, parameters, plates)
@@ -155,12 +162,14 @@ def excelEntryPoint():
     #inputArray = xlwings.Range('A3:E7').options(ndim=2).value
     inputArray = xlwings.Range((startRow,startCol),(endRow,endCol)).options(ndim=2).value
     plates = []
-    [plates.append([str(e) for  e in plate]) for plate  in inputArray if plate[0] != 'None' and plate[0] != ""]
+    #[plates.append([str(e) for  e in plate]) for plate  in inputArray if plate[0] != 'None' and plate[0] != ""]
+    [plates.append(elem[0:4]) for elem  in inputArray if elem[0] is not None and elem[0] != ""]
+    # test the plate array for empty strings or zeros (0),  TODO
     #l = len(plates) ; print(l, plates)
     excelRecord = openRunClose(plates)
     #print(excelRecord
     # field name-> type, plate, combined_name, address, city, state, zip, ownedStartDate, start_date, end_date
-    ##xlwings.Range((2,2)).value = excelRecord
+    ##xlwings.Range((2,2)).value = excelRecord # example of writing
 
 
 # global costants

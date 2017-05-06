@@ -154,8 +154,8 @@ def timeout(msg="Took too much time!"):
 def waitForUser(msg="enter login credentials"):
     #Wait for user input
     root = Tk()
-    #tkMessageBox.askokcancel(message=msg)
-    messagebox.askokcancel(message=msg)
+    tkMessageBox.askokcancel(message=msg) # python 2
+    #messagebox.askokcancel(message=msg) # python 3
     root.destroy()
 
 
