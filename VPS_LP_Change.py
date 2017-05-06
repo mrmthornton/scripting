@@ -167,7 +167,7 @@ def excelEntryPoint():
     # test the plate array for empty strings or zeros (0),  TODO
     #l = len(plates) ; print(l, plates)
     excelRecord = openRunClose(plates)
-    #print(excelRecord
+    #print(excelRecord) # debug
     # field name-> type, plate, combined_name, address, city, state, zip, ownedStartDate, start_date, end_date
     ##xlwings.Range((2,2)).value = excelRecord # example of writing
 

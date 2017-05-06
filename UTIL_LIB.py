@@ -19,6 +19,7 @@ import tkMessageBox # python 2
 
 
 def cleanUpString(messyString):
+    if messyString is None: return
     cleanString = messyString.replace(' ' , '') # remove any spaces
     cleanString = cleanString.replace('"' , '') # remove any double quotes
     cleanString = cleanString.replace('\t' , '') # remove any tabs
