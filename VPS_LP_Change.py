@@ -120,7 +120,7 @@ def common_code(driver, parameters, plates):
                     count = count + 1
                     print("retrying excusal menu selection. Count: ", count)
                     Selector = Select(menuElement)
-                Selector.select_by_visible_text("CO") # does this need to be instanciated each time?
+                Selector.select_by_visible_text(correctState) # does this need to be instanciated each time?
 
                 element = findElementOnPage(driver, delay, parameters['inputLpLocator'])
                 submitted = fillFormAndSubmit(driver, startWindow, element, correctPlate, parameters)
