@@ -100,13 +100,23 @@ def common_code(driver, parameters, plates):
         pageLoaded = newPageElementFound(driver, delay, (By.XPATH, '//frame[@name="fraTOP"]'), parameters['pageLocator2'])
 
         #while there is a violation to correct
+        n=0
         while True:
             foundFrame = findAndSelectFrame(driver, delay, "fraRL")
             #time.sleep(1)  #text may not be there yet!  how long to wait?
             text = getTextResults(driver, delay, wrongPlate, parameters, "fraRL")
             if text is not None and text != 0: # there's more to correct   ############ does this do what I think it does?
-                #click on the first record
-                element = findElementOnPage(driver, delay, parameters['LpLocator'])
+                n+=1
+                if n>text: break  #end of list
+                if n>10: n=1 # if end of page, start over
+
+                # click next button
+                # continue loop
+
+                #click on the Nth record
+
+                locator =  (By.XPATH, '//td[@id = "LIC_PLATE_NBR'+str(n)+'"]')
+                element = findElementOnPage(driver, delay, locator)
                 element.click()
                 #change the value
                 handle = driver.current_window_handle
