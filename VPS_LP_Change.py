@@ -108,13 +108,15 @@ def common_code(driver, parameters, plates):
             if text is not None and text != 0: # there's more to correct   ############ does this do what I think it does?
                 n+=1
                 if n>text: break  #end of list
-                if n>10: n=1 # if end of page, start over
-
-                # click next button
-                # continue loop
+                if n>10: # if end of page
+                    # click next button
+                    locator =  (By.XPATH, '//input[@value="Next"]')
+                    element = findElementOnPage(driver, delay, locator)
+                    element.click()
+                    n=1 # start over
+                    # continue loop
 
                 #click on the Nth record
-
                 locator =  (By.XPATH, '//td[@id = "LIC_PLATE_NBR'+str(n)+'"]')
                 element = findElementOnPage(driver, delay, locator)
                 element.click()
