@@ -100,13 +100,13 @@ def common_code(driver, parameters, plates):
         pageLoaded = newPageElementFound(driver, delay, (By.XPATH, '//frame[@name="fraTOP"]'), parameters['pageLocator2'])
 
         #while there is a violation to correct
-        n=0
+        n=1
+        vid=0
         while True:
             foundFrame = findAndSelectFrame(driver, delay, "fraRL")
             #time.sleep(1)  #text may not be there yet!  how long to wait?
             text = getTextResults(driver, delay, wrongPlate, parameters, "fraRL")
             if text is not None and text != 0: # there's more to correct   ############ does this do what I think it does?
-                n+=1
                 if n>text: break  #end of list
                 if n>10: # if end of page
                     # click next button
@@ -120,6 +120,15 @@ def common_code(driver, parameters, plates):
                 locator =  (By.XPATH, '//td[@id = "LIC_PLATE_NBR'+str(n)+'"]')
                 element = findElementOnPage(driver, delay, locator)
                 element.click()
+                # get vID
+                vidLocator =  (By.XPATH, '//td[@id = "VIOLATION_ID'+str(n)+'"]')
+                vidElement = findElementOnPage(driver, delay, vidLocator)
+                vidUtext = vidElement.text
+                newVid = vidUtext.encode('ascii', 'ignore')
+                if newVid == vid:
+                    n+=1
+                vid = newVid
+
                 #change the value
                 handle = driver.current_window_handle
                 driver.switch_to_window(handle)
@@ -133,9 +142,13 @@ def common_code(driver, parameters, plates):
                     print("retrying excusal menu selection. Count: ", count)
                     Selector = Select(menuElement)
                 Selector.select_by_visible_text(correctState) # does this need to be instanciated each time?
-
-                element = findElementOnPage(driver, delay, parameters['inputLpLocator'])
-                submitted = fillFormAndSubmit(driver, startWindow, element, correctPlate, parameters)
+                if wrongPlate != correctPlate: # if the plate changed, update it.
+                    element = findElementOnPage(driver, delay, parameters['inputLpLocator'])
+                    submitted = fillFormAndSubmit(driver, startWindow, element, correctPlate, parameters)
+                else:
+                    saveLocator = (By.XPATH, '//input[@value = "Save"]')
+                    saveButton = findElementOnPage(driver, delay, saveLocator)
+                    saveButton.click()
 
                 time.sleep(1)  #page may not be there yet!  how long to wait?
                 handle = driver.current_window_handle
