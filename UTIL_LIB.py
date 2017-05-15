@@ -13,12 +13,13 @@
 
 import re
 from selenium import webdriver
-#from Tkinter import Tk # python 2
-from tkinter import Tk, messagebox
-#import tkMessageBox # python 2
+from Tkinter import Tk # python 2
+#from tkinter import Tk, messagebox
+import tkMessageBox # python 2
 
 
 def cleanUpString(messyString):
+    if messyString is None: return
     cleanString = messyString.replace(' ' , '') # remove any spaces
     cleanString = cleanString.replace('"' , '') # remove any double quotes
     cleanString = cleanString.replace('\t' , '') # remove any tabs
@@ -42,6 +43,15 @@ def loadRegExPatterns():
         dateYearFirstPattern=re.compile(r'\d{4,4}/\d{2,2}/\d{2,2}')
     )
     return regex_patterns
+
+
+from functools import partial
+def nextIndex(aString):
+    def func(s,n):
+        while True:
+            yield s[n+1:]
+            n+=n
+    return partial(func, aString)
 
 
 def openBrowser(url):
@@ -90,6 +100,7 @@ def permutationPattern(lp):
     print("UTIL_LIB:permutatinPattern:regexString: ", regexString) # for debug
     return re.compile(regexString)
 
+
 def testPermutaionPattern():
     licencePlate = "loseit"
     io10Pattern = permutationPattern(licencePlate)
@@ -115,7 +126,26 @@ def testPermutaionPattern():
     found = io10Pattern.search("I am a NOO0DLE")
     if found:
         print(found.start(),found.end())
-    pass
+
+
+def returnLargest(a,b):
+    int
+    if int(a)>int(b): return a
+    return b
+
+def testReturnLargest():
+    assert(returnLargest(0,1)==1)
+    assert(returnLargest('0','1')=='1')
+
+
+def returnSmallest(a,b):
+    int
+    if int(a)<int(b): return a
+    return b
+
+def testReturnSmallest():
+    assert(returnSmallest(0,1)==0)
+    assert(returnSmallest('0','1')=='0')
 
 
 def timeout(msg="Took too much time!"):
@@ -125,11 +155,18 @@ def timeout(msg="Took too much time!"):
 def waitForUser(msg="enter login credentials"):
     #Wait for user input
     root = Tk()
-    #tkMessageBox.askokcancel(message=msg)
-    messagebox.askokcancel(message=msg)
+    tkMessageBox.askokcancel(message=msg) # python 2
+    #messagebox.askokcancel(message=msg) # python 3
     root.destroy()
 
 
 if __name__ == '__main__':
     testPermutaionPattern()
+    testReturnSmallest()
+    testReturnLargest()
+
+    x = nextIndex("helloWorld")
+    print(x(2).next())
+    print(x(4).next())
+
 

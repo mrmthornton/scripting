@@ -19,9 +19,9 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
-#import tkMessageBox # python 2
-from tkinter import messagebox
-#from Tkinter import *
+import tkMessageBox # python 2
+#from tkinter import messagebox
+from Tkinter import *
 
 from UTIL_LIB import cleanUpString, openBrowser, timeout
 
@@ -63,7 +63,7 @@ def findAndSelectFrame(driver, delay, frameName):
         (C3) end loop if recuse returns True
         (C4) if list empty return False (not found)
     '''
-    def walkFrames(targetLocator, parentFrame):
+    def walkFrames(targetLocator, parentFrame):# TODO does the work from the top level frame on VPS?
         frameList = []
         frameDelay = 1
         #if targetLocator is not None:

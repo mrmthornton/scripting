@@ -53,17 +53,7 @@ def setParameters():
     return parameters
 
 
-if __name__ == '__main__':
-
-    NUMBERtoProcess = 4
-    vpsBool = False
-    txBool = False
-    dbBool = True
-    delay=10
-    SLEEPTIME = 1 # seconds 180 for standard time delay
-    parameters = setParameters()
-    parameters['operatorMessage'] = "Use debug mode, \n open VPS, new violator search window, \n open DMV window, \n run to completion"
-    print(parameters['operatorMessage'])
+def commonCode():
     if txBool:
         txDriver = openBrowser('https://mvinet.txdmv.gov')
         waitForUser('enter DMV credentials,\nnavigate to single entry page.')
@@ -163,6 +153,7 @@ if __name__ == '__main__':
                             fileString = fileString[:startNum] + fileString[endNum + 1:] # what is this for ?
                             listData = parseRecord(responseType, typeString)
                             assert(len(listData)==17)
+                            listData.append(plateString) # send the original plate for comparison and comment
                             recordList.append(listData)
                             #print(listData) # for debug
                 else:
@@ -171,7 +162,7 @@ if __name__ == '__main__':
 ['SPECIAL',   'C'+plateString, 'name',  'addr',  'addr2',  'city',  'state',  '75000', '',         '1/3/2000', '1/4/2000', '1/2/2000','2000','NISS','AC','4D','vin'],
 ['TEMPORARY', 'T'+plateString, 'name2', 'addr2', 'addr22', 'city2', 'state2', '75002', '',         '1/3/2002', '1/4/2002', '',        '2002','BMW', 'AC','2D','vin'],
 ['DEALER',    'D'+plateString, 'name2', 'addr2', 'addr22', 'city2', 'state2', '75002', '',         '',         '6/1/2017', '',        '',    '',    '',  '',  ''],
-['DEALER',    'D'+plateString, 'name2', 'addr2', 'addr22', 'city2', 'state2', '75002', '',         '',         '6/1/2017', '',        '',    '',    '',  '',  ''],
+['DEALER',    'D'+plateString, 'name2', 'addr2', 'addr22', 'city2', 'state2', '75002', '',         '',         '6/1/2017', '',        '',    '',    '',  '',  '', plateString],
 ]
 
 #' type',     'plate',         'name',  'addr',  'addr2',  'city',  'state',  'zip',   'Assigned', 'startDate', 'endDate', 'title'    'year', make',modl,body,vin
@@ -186,6 +177,13 @@ if __name__ == '__main__':
                         duplicateFound = duplicateKey(dbcursor, "Sheet1", "Plate", dbRecord["plate"])
                         if duplicateFound:
                             print("ToAccess:main: DUPLICATE FOUND")
+                            originalPlate = csvRecord[17]
+                            DMVplate = dbRecord["plate"]
+                            if DMVplate != originalPlate:
+                                # add date range to  comment about fixing plates  TODO
+                                print("ToAccess:commonCode:database write section: \n \t Uninvoiced Images labled " + originalPlate + " must be corrected to " + DMVplate + '\n')
+                            # TODO add section for true duplicate when the original and the dmv record agree.
+                            else: print("True duplicate ")
                             continue
                         sqlString = makeSqlString(dbRecord)
                         #print(sqlString) # for debug
@@ -208,6 +206,20 @@ if __name__ == '__main__':
         if txBool:
             txDriver.close()
             txDriver.quit()
+
+
+if __name__ == '__main__':
+
+    NUMBERtoProcess = 1
+    vpsBool = False
+    txBool = False
+    dbBool = True
+    delay=10
+    SLEEPTIME = 1 # seconds 180 for standard time delay
+    parameters = setParameters()
+    parameters['operatorMessage'] = "Use debug mode, \n open VPS, new violator search window, \n open DMV window, \n run to completion"
+    print(parameters['operatorMessage'])
+    commonCode()
 
 # 'd' Signed integer decimal.
 # 'i' Signed integer decimal.
