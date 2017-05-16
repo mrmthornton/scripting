@@ -141,6 +141,8 @@ def common_code(driver, parameters, plates):
                     count = count + 1
                     print("retrying excusal menu selection. Count: ", count)
                     Selector = Select(menuElement)
+                option = Selector.first_selected_option
+                print("VPS_LP_Change:common code: menu value is ", option.opt)
                 Selector.select_by_visible_text(correctState) # does this need to be instanciated each time?
                 if wrongPlate != correctPlate: # if the plate changed, update it.
                     element = findElementOnPage(driver, delay, parameters['inputLpLocator'])
