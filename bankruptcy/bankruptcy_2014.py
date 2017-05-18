@@ -168,10 +168,10 @@ def main():
 
         for row in csvInput:
             d = dbDictFill(row)
-            for k,v in d.items:
+            for k,v in d.items():
                 print(k,v)
 
-            outfile.write(nameString + plateStrings)
+            outfile.write("")
             outfile.flush()
     print "main: Finished parsing TxDot file."
 
