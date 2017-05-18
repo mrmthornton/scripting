@@ -167,17 +167,9 @@ def main():
         csvInput = csv.reader(infile)
 
         for row in csvInput:
-            nameString = '"' + row[0] +'"\n'
-            plateStrings = row[1] + '\n'
-            plateStrings = plateStrings.replace(' ' , '') # remove any spaces
-            plateStrings = plateStrings.replace('"' , '') # remove any quotes
-            plateStrings = plateStrings.replace('\t' , '') # remove any tabs
-            plateStrings = plateStrings.replace(',' , '\n') # replace , with \n
-            for n in range(10):
-                plateStrings = plateStrings.replace('\n\n' , '\n') # replace \n\n, with \n
-            #plateStrings = plateStrings.replace('\n\n' , '\n') # replace \n\n, with \n
-            #plateStrings = plateStrings.replace('\n\n' , '\n') # replace \n\n, with \n
-            print nameString, plateStrings
+            d = dbDictFill(row)
+            for k,v in d.items:
+                print(k,v)
 
             outfile.write(nameString + plateStrings)
             outfile.flush()

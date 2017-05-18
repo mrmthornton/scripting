@@ -106,7 +106,10 @@ def common_code(driver, parameters, plates):
             foundFrame = findAndSelectFrame(driver, delay, "fraRL")
             #time.sleep(1)  #text may not be there yet!  how long to wait?
             text = getTextResults(driver, delay, wrongPlate, parameters, "fraRL")
-            if text is not None and text != 0: # there's more to correct
+            if text == 0: # finished with
+                print("VPS_LP_Change:common_code: Finished with ", wrongPlate, "No more records")
+                break
+            if text is not None: # there's more to correct
                 if n>text: break  #end of list
                 if n>10: # if end of page
                     # click next button
@@ -142,7 +145,7 @@ def common_code(driver, parameters, plates):
                     print("retrying excusal menu selection. Count: ", count)
                     Selector = Select(menuElement)
                 option = Selector.first_selected_option
-                print("VPS_LP_Change:common code: menu value is ", option.opt)
+                # #print("VPS_LP_Change:common code: menu value is ", option.opt)  ### how to find selected value?
                 Selector.select_by_visible_text(correctState) # does this need to be instanciated each time?
                 if wrongPlate != correctPlate: # if the plate changed, update it.
                     element = findElementOnPage(driver, delay, parameters['inputLpLocator'])
