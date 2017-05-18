@@ -106,7 +106,7 @@ def common_code(driver, parameters, plates):
             foundFrame = findAndSelectFrame(driver, delay, "fraRL")
             #time.sleep(1)  #text may not be there yet!  how long to wait?
             text = getTextResults(driver, delay, wrongPlate, parameters, "fraRL")
-            if text is not None and text != 0: # there's more to correct   ############ does this do what I think it does?
+            if text is not None and text != 0: # there's more to correct
                 if n>text: break  #end of list
                 if n>10: # if end of page
                     # click next button
