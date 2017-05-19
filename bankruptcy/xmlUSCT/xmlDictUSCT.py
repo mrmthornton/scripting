@@ -22,7 +22,7 @@ def nameSpaceUSCT():
 
 
 def phraseNamesUSCT():
-    
+
     dictUSCT = {
         "petitionDate":'.//ebn:BankruptcyFilingDate/nc:Date',
         "caseNumber"  :'.//nc:CaseDocketID',
@@ -61,12 +61,8 @@ identified by SSN or TaxID
 provided
 <nc:PersonSurName> Opt Last Name
 <nc:PersonSuffixNameText> Opt Generation or other suffix
-<bankruptcy:AssetNoticeIndicator> True or
-False
-Opt Indicates if this is an asset case.
-<bankruptcy:JointPetitionIndicator> True or
-False
-Req True if Joint Debtor Case
+<bankruptcy:AssetNoticeIndicator> True or False Opt Indicates if this is an asset case.
+<bankruptcy:JointPetitionIndicator> True or False Req True if Joint Debtor Case
 
 '''
 
@@ -104,8 +100,7 @@ starts a transaction.
 <ecf:SendingMDELocationID>  Req Indicates who sent the document,
                                 notices from BNC will have ?BNC?
 <ecf:SendingMDEProfileCode> Req Provided for ECF compliance.
-<ebn:BankruptcyFilingDate>
-<nc:Date>                   Opt The filing date
+<ebn:BankruptcyFilingDate>      <nc:Date>  Opt The filing date
 <nc:CaseTitleText>          Req Typically the debtor's name or the title used for ?In re?
 <nc:CaseCategoryText>       Req See Code List
 <nc:CaseDocketID>           Req Case number
