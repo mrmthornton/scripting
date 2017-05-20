@@ -28,82 +28,117 @@ import string
 import time
 
 
-def changeStateOnly(driver, parameters):
-    delay = parameters['delay']
-    startPageTextLocator = (By.XPATH, '//TD/H1[contains(text(),"Violation Search")]')
-    # pause on next line for entry of credentials, and window navigation.
-    startWindow = findTargetPage(driver, findStartWindowDelay, startPageTextLocator)
-    if startWindow is None:
-        print "Start Page not found."
-        return None
-    with open(parameters['dataInFileName'], 'r') as infile, open(parameters['dataOutFileName'], 'a') as outfile:
-        outfile.truncate()
-        csvInput = csv.reader(infile)
-        for row in csvInput:
-            rawString = row[0]
-            if rawString == "" or rawString == 0:  #end when first input does not exist
-                break
-            plateString = cleanUpString(rawString)
-            rawString = row[1]
-            if rawString == "" or rawString == 0:  #end when second input does not exist
-                break
-            replacementString = cleanUpString(rawString)
+def changeLP(driver, delay, parameters, startWindow, wrongPlate, correctPlate, correctState):
+    while True:
+        foundFrame = findAndSelectFrame(driver, delay, "fraRL")
+        #time.sleep(1)  #text may not be there yet!  how long to wait?
+        text = getTextResults(driver, delay, wrongPlate, parameters, "fraRL")
+        if text == 0: # finished with
+            print("VPS_LP_Change:common_code: Finished with ", wrongPlate, "No more records")
+            break
+        if text is not None: # there's more to correct
 
-            #select from Violation Status menu
-            menuLocator = (By.XPATH, '//select[@name="P_L_VST_VIOL_STATUS_DESCR"]')
-            menuElement = findElementOnPage(driver, delay, menuLocator)
+            #click on the Nth record
+            locator =  (By.XPATH, '//td[@id = "LIC_PLATE_NBR1"]')
+            element = findElementOnPage(driver, delay, locator)
+            element.click()
+
+            #change the value
+            handle = driver.current_window_handle
+            driver.switch_to_window(handle)
+            foundFrame = findAndSelectFrame(driver, delay, "fraVF")
+
+            menuElement = findElementOnPage(driver, delay, parameters['inputStateLocator'])
             Selector = Select(menuElement)
             count = 0
             while Selector is None:  # menu select is sometimes None, why ?
                 count = count + 1
-                print "retrying excusal menu selection. Count: ", count
+                print("retrying excusal menu selection. Count: ", count)
                 Selector = Select(menuElement)
-            Selector.select_by_visible_text("ZipCash; Uninvoiced") # does this need to be instanciated each time?
+            option = Selector.first_selected_option
+            # #print("VPS_LP_Change:common code: menu value is ", option.opt)  ### how to find selected value?
+            Selector.select_by_visible_text(correctState) # does this need to be instanciated each time?
+            if wrongPlate != correctPlate: # if the plate changed, update it.
+                element = findElementOnPage(driver, delay, parameters['inputLpLocator'])
+                submitted = fillFormAndSubmit(driver, startWindow, element, correctPlate, parameters)
+            else:
+                saveLocator = (By.XPATH, '//input[@value = "Save"]')
+                saveButton = findElementOnPage(driver, delay, saveLocator)
+                saveButton.click()
 
-            element = findElementOnPage(driver, delay, parameters['inputLpLocator'])
-            submitted = fillFormAndSubmit(driver, startWindow, element, plateString, parameters) # why so slow?
             time.sleep(1)  #page may not be there yet!  how long to wait?
-            pageLoaded = newPageElementFound(driver, delay, (By.XPATH, '//frame[@name="fraTOP"]'), parameters['pageLocator2'])
-
-            #while there is a violation to correct
-            while True:
-                foundFrame = findAndSelectFrame(driver, delay, "fraRL")
-                #time.sleep(1)  #text may not be there yet!  how long to wait?
-                text = getTextResults(driver, delay, plateString, parameters, "fraRL")
-                if text is not None and text != 0: # there's more to correct
-                    #click on the first record
-                    element = findElementOnPage(driver, delay, parameters['LpLocator'])
-                    element.click()
-                    #change the value
-                    handle = driver.current_window_handle
-                    driver.switch_to_window(handle)
-                    foundFrame = findAndSelectFrame(driver, delay, "fraVF")
-                    element = findElementOnPage(driver, delay, parameters['inputLpLocator'])
-                    submitted = fillFormAndSubmit(driver, startWindow, element, replacementString, parameters)
-                    #loop
-                    time.sleep(1)  #page may not be there yet!  how long to wait?
-                    handle = driver.current_window_handle
-                    driver.switch_to_window(handle)
-                    continue
-                break
             handle = driver.current_window_handle
             driver.switch_to_window(handle)
+            continue
+        break # go to next plate
+    return
+
+def changeStateOnly(driver, parameters):
+
+
+
+        n=1
+        vid=0
+        while True:
             foundFrame = findAndSelectFrame(driver, delay, "fraRL")
-            clicked = findAndClickButton(driver, delay, parameters)
+            #time.sleep(1)  #text may not be there yet!  how long to wait?
+            text = getTextResults(driver, delay, wrongPlate, parameters, "fraRL")
+            if text == 0: # finished with
+                print("VPS_LP_Change:common_code: Finished with ", wrongPlate, "No more records")
+                break
+            if text is not None: # there's more to correct
+                if n>text: break  #end of list
+                if n>10: # if end of page
+                    # click next button
+                    locator =  (By.XPATH, '//input[@value="Next"]')
+                    element = findElementOnPage(driver, delay, locator)
+                    element.click()
+                    n=1 # start over
+                    # continue loop
 
-                # click the query button.
-            #test with multiple plate changes
+                #click on the Nth record
+                locator =  (By.XPATH, '//td[@id = "LIC_PLATE_NBR'+str(n)+'"]')
+                element = findElementOnPage(driver, delay, locator)
+                element.click()
+                # get vID
+                vidLocator =  (By.XPATH, '//td[@id = "VIOLATION_ID'+str(n)+'"]')
+                vidElement = findElementOnPage(driver, delay, vidLocator)
+                vidUtext = vidElement.text
+                newVid = vidUtext.encode('ascii', 'ignore')
+                if newVid == vid:
+                    n+=1
+                vid = newVid
 
-    print "main: Finished with LP_correction file."
+                #change the value
+                handle = driver.current_window_handle
+                driver.switch_to_window(handle)
+                foundFrame = findAndSelectFrame(driver, delay, "fraVF")
 
-if __name__ == '__main__':
+                menuElement = findElementOnPage(driver, delay, parameters['inputStateLocator'])
+                Selector = Select(menuElement)
+                count = 0
+                while Selector is None:  # menu select is sometimes None, why ?
+                    count = count + 1
+                    print("retrying excusal menu selection. Count: ", count)
+                    Selector = Select(menuElement)
+                option = Selector.first_selected_option
+                # #print("VPS_LP_Change:common code: menu value is ", option.opt)  ### how to find selected value?
+                Selector.select_by_visible_text(correctState) # does this need to be instanciated each time?
+                if wrongPlate != correctPlate: # if the plate changed, update it.
+                    element = findElementOnPage(driver, delay, parameters['inputLpLocator'])
+                    submitted = fillFormAndSubmit(driver, startWindow, element, correctPlate, parameters)
+                else:
+                    saveLocator = (By.XPATH, '//input[@value = "Save"]')
+                    saveButton = findElementOnPage(driver, delay, saveLocator)
+                    saveButton.click()
 
-    parameters = violatorSearch()
-
-    findStartWindowDelay = 3
-    print parameters['operatorMessage']
-    regexPattens = loadRegExPatterns()
-    driver = openBrowser(parameters['url'])
-    dataIO(driver, parameters)
-    driver.close()
+                time.sleep(1)  #page may not be there yet!  how long to wait?
+                handle = driver.current_window_handle
+                driver.switch_to_window(handle)
+                continue
+            break
+        handle = driver.current_window_handle
+        driver.switch_to_window(handle)
+        foundFrame = findAndSelectFrame(driver, delay, "fraRL")
+        clicked = findAndClickButton(driver, delay, parameters)
 

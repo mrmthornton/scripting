@@ -24,6 +24,8 @@ import selenium.webdriver.support.expected_conditions as EC
 from VPS_LIB import fillFormAndSubmit, findAndSelectFrame, findElementOnPage, findTargetPage, getTextResults, newPageElementFound
 from UTIL_LIB import cleanUpString, openBrowser, waitForUser
 
+from VPS_State_Change import changeLP, changeStateOnly
+
 import re
 import io
 import csv
@@ -99,68 +101,12 @@ def common_code(driver, parameters, plates):
         time.sleep(1)  #page may not be there yet!  how long to wait?
         pageLoaded = newPageElementFound(driver, delay, (By.XPATH, '//frame[@name="fraTOP"]'), parameters['pageLocator2'])
 
-        #while there is a violation to correct
-        n=1
-        vid=0
-        while True:
-            foundFrame = findAndSelectFrame(driver, delay, "fraRL")
-            #time.sleep(1)  #text may not be there yet!  how long to wait?
-            text = getTextResults(driver, delay, wrongPlate, parameters, "fraRL")
-            if text == 0: # finished with
-                print("VPS_LP_Change:common_code: Finished with ", wrongPlate, "No more records")
-                break
-            if text is not None: # there's more to correct
-                if n>text: break  #end of list
-                if n>10: # if end of page
-                    # click next button
-                    locator =  (By.XPATH, '//input[@value="Next"]')
-                    element = findElementOnPage(driver, delay, locator)
-                    element.click()
-                    n=1 # start over
-                    # continue loop
+        if wrongPlate == correctPlate: # if the plate is the same, change only the state
+            changeStateOnly()
+        else:
+            changeLP(driver, delay, parameters, startWindow, wrongPlate, correctPlate, correctState)
 
-                #click on the Nth record
-                locator =  (By.XPATH, '//td[@id = "LIC_PLATE_NBR'+str(n)+'"]')
-                element = findElementOnPage(driver, delay, locator)
-                element.click()
-                # get vID
-                vidLocator =  (By.XPATH, '//td[@id = "VIOLATION_ID'+str(n)+'"]')
-                vidElement = findElementOnPage(driver, delay, vidLocator)
-                vidUtext = vidElement.text
-                newVid = vidUtext.encode('ascii', 'ignore')
-                if newVid == vid:
-                    n+=1
-                vid = newVid
-
-                #change the value
-                handle = driver.current_window_handle
-                driver.switch_to_window(handle)
-                foundFrame = findAndSelectFrame(driver, delay, "fraVF")
-
-                menuElement = findElementOnPage(driver, delay, parameters['inputStateLocator'])
-                Selector = Select(menuElement)
-                count = 0
-                while Selector is None:  # menu select is sometimes None, why ?
-                    count = count + 1
-                    print("retrying excusal menu selection. Count: ", count)
-                    Selector = Select(menuElement)
-                option = Selector.first_selected_option
-                # #print("VPS_LP_Change:common code: menu value is ", option.opt)  ### how to find selected value?
-                Selector.select_by_visible_text(correctState) # does this need to be instanciated each time?
-                if wrongPlate != correctPlate: # if the plate changed, update it.
-                    element = findElementOnPage(driver, delay, parameters['inputLpLocator'])
-                    submitted = fillFormAndSubmit(driver, startWindow, element, correctPlate, parameters)
-                else:
-                    saveLocator = (By.XPATH, '//input[@value = "Save"]')
-                    saveButton = findElementOnPage(driver, delay, saveLocator)
-                    saveButton.click()
-
-                time.sleep(1)  #page may not be there yet!  how long to wait?
-                handle = driver.current_window_handle
-                driver.switch_to_window(handle)
-                continue
-            break
-        handle = driver.current_window_handle
+        handle = driver.current_window_handle  # what do these four lines do?
         driver.switch_to_window(handle)
         foundFrame = findAndSelectFrame(driver, delay, "fraRL")
         clicked = findAndClickButton(driver, delay, parameters)
