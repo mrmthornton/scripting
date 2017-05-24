@@ -31,23 +31,23 @@ import time
 def changeLP(driver, delay, parameters, startWindow, wrongPlate, correctPlate, correctState):
     while True:
         foundFrame = findAndSelectFrame(driver, delay, "fraRL")
-        #time.sleep(1)  #text may not be there yet!  how long to wait?
         text = getTextResults(driver, delay, wrongPlate, parameters, "fraRL")
         if text == 0: # finished with
             print("VPS_LP_Change:common_code: Finished with ", wrongPlate, "No more records")
             break
         if text is not None: # there's more to correct
 
-            #click on the Nth record
+            #click on the first record
             locator =  (By.XPATH, '//td[@id = "LIC_PLATE_NBR1"]')
             element = findElementOnPage(driver, delay, locator)
             element.click()
 
-            #change the value
+            #change the to the form frame
             handle = driver.current_window_handle
             driver.switch_to_window(handle)
             foundFrame = findAndSelectFrame(driver, delay, "fraVF")
 
+            #change the STATE value and the LP value
             menuElement = findElementOnPage(driver, delay, parameters['inputStateLocator'])
             Selector = Select(menuElement)
             count = 0
@@ -66,22 +66,20 @@ def changeLP(driver, delay, parameters, startWindow, wrongPlate, correctPlate, c
                 saveButton = findElementOnPage(driver, delay, saveLocator)
                 saveButton.click()
 
-            time.sleep(1)  #page may not be there yet!  how long to wait?
+            time.sleep(1)  #page may not be there yet, wait.
             handle = driver.current_window_handle
             driver.switch_to_window(handle)
             continue
         break # go to next plate
     return
 
-def changeStateOnly(driver, parameters):
 
-
+def changeStateOnly(driver, delay, parameters, startWindow, wrongPlate, correctPlate, correctState):
 
         n=1
         vid=0
         while True:
             foundFrame = findAndSelectFrame(driver, delay, "fraRL")
-            #time.sleep(1)  #text may not be there yet!  how long to wait?
             text = getTextResults(driver, delay, wrongPlate, parameters, "fraRL")
             if text == 0: # finished with
                 print("VPS_LP_Change:common_code: Finished with ", wrongPlate, "No more records")

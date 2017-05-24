@@ -21,7 +21,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.select import Select
 import selenium.webdriver.support.expected_conditions as EC
 
-from VPS_LIB import fillFormAndSubmit, findAndSelectFrame, findElementOnPage, findTargetPage, getTextResults, newPageElementFound
+from VPS_LIB import fillFormAndSubmit, findAndClickButton, findAndSelectFrame, findElementOnPage, findTargetPage, getTextResults, newPageElementFound
 from UTIL_LIB import cleanUpString, openBrowser, waitForUser
 
 from VPS_State_Change import changeLP, changeStateOnly
@@ -84,7 +84,7 @@ def common_code(driver, parameters, plates):
         correctPlate = cleanUpString(correctPlate)
         correctState = cleanUpString(correctState)
 
-        #select from Violation Status menu
+        #select a type of violation from the Violation Status menu
         menuLocator = (By.XPATH, '//select[@name="P_L_VST_VIOL_STATUS_DESCR"]')
         menuElement = findElementOnPage(driver, delay, menuLocator)
         Selector = Select(menuElement)
@@ -102,7 +102,7 @@ def common_code(driver, parameters, plates):
         pageLoaded = newPageElementFound(driver, delay, (By.XPATH, '//frame[@name="fraTOP"]'), parameters['pageLocator2'])
 
         if wrongPlate == correctPlate: # if the plate is the same, change only the state
-            changeStateOnly()
+            changeStateOnly(driver, delay, parameters, startWindow, wrongPlate, correctPlate, correctState)
         else:
             changeLP(driver, delay, parameters, startWindow, wrongPlate, correctPlate, correctState)
 

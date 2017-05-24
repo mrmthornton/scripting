@@ -20,6 +20,9 @@ import tkMessageBox # python 2
 
 def cleanUpString(messyString):
     if messyString is None: return
+    if type(messyString) is float:
+        messyString = int(messyString)
+    messyString = str(messyString)
     cleanString = messyString.replace(' ' , '') # remove any spaces
     cleanString = cleanString.replace('"' , '') # remove any double quotes
     cleanString = cleanString.replace('\t' , '') # remove any tabs
@@ -27,6 +30,11 @@ def cleanUpString(messyString):
     for _ in range(10):            # replace multiple newlines with a single \n
         cleanString = cleanString.replace('\n\n' , '\n')
     return cleanString
+
+
+def testCleanUpString():
+    cleanUpString(1.0)
+
 
 
 def loadRegExPatterns():
@@ -161,6 +169,7 @@ def waitForUser(msg="enter login credentials"):
 
 
 if __name__ == '__main__':
+    testCleanUpString()
     testPermutaionPattern()
     testReturnSmallest()
     testReturnLargest()
