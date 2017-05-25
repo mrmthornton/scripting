@@ -43,8 +43,8 @@ import xlwings
 
 def setParameters():
     parameters = {
-    'delay' : 15,
-    'findStartWindowDelay' : 15,
+    'delay' : 3,
+    'findStartWindowDelay' : 9,
     'url' : 'https://lprod.scip.ntta.org/scip/jsp/SignIn.jsp', # initial URL
     'operatorMessage' : "Open VPS violator search window, and run to completion",
     'inputLpLocator' : (By.XPATH, '//input[@id = "P_LIC_PLATE_NBR"]'),
@@ -102,7 +102,8 @@ def common_code(driver, parameters, plates):
         pageLoaded = newPageElementFound(driver, delay, (By.XPATH, '//frame[@name="fraTOP"]'), parameters['pageLocator2'])
 
         if wrongPlate == correctPlate: # if the plate is the same, change only the state
-            changeStateOnly(driver, delay, parameters, startWindow, wrongPlate, correctPlate, correctState)
+            violations = findAllViolations(driver, delay, parameters, startWindow, wrongPlate, correctPlate, correctState)
+            changeStateOnly(driver, delay, parameters, violations, correctState)
         else:
             changeLP(driver, delay, parameters, startWindow, wrongPlate, correctPlate, correctState)
 
