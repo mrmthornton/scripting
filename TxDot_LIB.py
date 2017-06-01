@@ -224,16 +224,20 @@ def parseDealer(responseType, typeString): # TODO get expiration date
     dealerPattern = re.compile('DEALER[\s]+([\w]+)')
     header = dealerPattern.search(typeString)
     plate = header.group(1)
-    genNewStr = nextIndex(typeString)
-    shortenStr = genNewStr(header.end() + 1)
-    s = shortenStr(header.end() + 1)
-    print(s)
+    #skip the rest of this line
+    skipLine = linePattern.search(typeString)
+    typeString =  typeString[skipLine.end() + 1:]
+    ##genNewStr = nextIndex(typeString)
+    ##shortenStr = genNewStr(header.end() + 1)
+    ##s = shortenStr(header.end() + 1)
+    ##print(s)
     #skip next line
-    skipLine = linePattern.search(s)
-    print(genNewStr(skipLine.end() + 1))
-    ##typeString =  typeString[nextLine.end() + 1:]
+    skipLine = linePattern.search(typeString)
+    ###print(genNewStr(skipLine.end() + 1))
+    typeString =  typeString[skipLine.end() + 1:]
     # get name and remove next line
-    nextLine = linePattern.search(genNewStr(header.end() + 1))
+    ##nextLine = linePattern.search(genNewStr(header.end() + 1))
+    nextLine = linePattern.search(typeString)
     name = nextLine.group()
     print(typeString[header.end() + skipLine.end() + 1:])
     typeString =  typeString[nextLine.end() + 1:]
