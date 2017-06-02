@@ -442,7 +442,11 @@ def parsePermit(responseType, typeString):
         if found is not None:
             state, zipCode = found.group().split()
             city = addr2[:found.start()]
-    return [responseType, plate.strip(), name.strip(), addr.strip(), '', city.strip(), state, zipCode, '', '', '', issued,'','','','','']
+    #TODO  get year make style vin
+    #TODO interpret the make and model and  style ?
+
+    return [responseType, plate.strip(), name.strip(), addr.strip(), '', city.strip(), state, zipCode, '', '', '', issued,\
+             yr, mak, '', styl, vin]
 
 def parseTemporary(responseType, typeString):
     # find header and remove

@@ -83,6 +83,7 @@ def commonCode():
                     print("main() : Finished, no more LP's .")
                     break
                 plateString = str(row[0])
+                print("ToAccess:CommonCode: plate is ", plateString) # debug
 
                 #VPS section   *****************************************************************
                 if vpsBool:

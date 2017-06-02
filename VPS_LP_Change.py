@@ -150,7 +150,7 @@ def excelEntryPoint():
 
 
 # global costants
-NUMBERtoProcess = 20
+NUMBERtoProcess = 5
 vpsBool   = False # true when using VPS images
 txdotBool = False # true when using DMV records
 excelBool = False # true when using excel
