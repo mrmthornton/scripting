@@ -164,7 +164,10 @@ def insertCommas(strings):
 
 def make(stringText):
     makPattern = re.compile('(?<=MAK:)\w+')
-    return makPattern.search(stringText).group()
+    make = makPattern.search(stringText)
+    if make:
+        return make.group()
+    return ""
 
 
 def model(stringText):
@@ -173,6 +176,7 @@ def model(stringText):
     if modl:
         return modl.group()
     return ""
+
 
 
 # parseRecord() calls the appropriate 'parse<RESPONSETYPE>()' function,
@@ -295,6 +299,7 @@ def parseStandard(responseType, typeString):
     modl = model(typeString)
     styl = style(typeString)
     vin = vinNumber(typeString)
+
     # get owner and remove
     ownerPattern = re.compile('OWNER\s+')
     nextRemove = ownerPattern.search(typeString)
@@ -330,17 +335,22 @@ def parseStandard(responseType, typeString):
     nextRemove = renewalPattern.search(typeString)
     if nextRemove is not None:
         typeString = typeString[nextRemove.end():]
+        # get renewal name and remove
         nextCsv = csvPattern.search(typeString)
         Rname = nextCsv.group().replace(',' , '')
+        typeString = typeString[nextCsv.end():]
+        # get second  owner and remove
+        nextCsv = csvPattern.search(typeString)
+        Rname2 = nextCsv.group().replace(',' , '')
         typeString = typeString[nextCsv.end():]
         # get addr and remove
         nextCsv = csvPattern.search(typeString)
         Raddr = nextCsv.group().replace(',' , '')
         typeString = typeString[nextCsv.end():]
         # get addr2 and remove
-        nextCsv = csvPattern.search(typeString)
-        Raddr2 = nextCsv.group().replace(',' , '')
-        typeString = typeString[nextCsv.end():]
+        #nextCsv = csvPattern.search(typeString)
+        #Raddr2 = nextCsv.group().replace(',' , '')
+        #typeString = typeString[nextCsv.end():]
         # get city and remove
         nextCsv = csvPattern.search(typeString)
         Rcity = nextCsv.group().replace(',' , '')
@@ -356,10 +366,10 @@ def parseStandard(responseType, typeString):
         # if the renewal information exists.
         if Rname != '':
             name = Rname
-            name2 = ''
+            name2 = Rname2
         if Raddr != '':
             addr = Raddr
-            addr2 = Raddr2
+            #addr2 = Raddr2
             city = Rcity
             state = Rstate
             zipCode = Rzip
@@ -466,6 +476,18 @@ def parseTemporary(responseType, typeString):
     dateYearFirst = validDate.group()
     endDate = dateYearFirst[5:] + '/' + dateYearFirst[0:4]
     typeString = typeString[validDate.end():]
+
+    yr = year(typeString)
+    #yr = ''
+    mak = make(typeString)
+    #mak = ''
+    modl = model(typeString)
+    #modl = ''
+    styl = style(typeString)
+    #styl = ''
+    vin = vinNumber(typeString)
+    #vin = ''
+
     # find name and address, remove everything up to that point
     tempNamePattern = re.compile(r'NAME:\s+')
     junk = tempNamePattern.search(typeString)
@@ -498,7 +520,7 @@ def parseTemporary(responseType, typeString):
     nextWord = wordPattern.search(typeString)
     zipCode = nextWord.group()
     return [responseType, plate.strip(), name.strip(), addr.strip(), '', city.strip(), state.strip(), zipCode, '', startDate, endDate,
-            '','','','','','']
+            '',yr, mak, modl, styl, vin]
 
     # SPECIAL
 def parseSpecial(responseType, typeString):
@@ -614,7 +636,7 @@ def repairLineBreaks(fileString):
             fileStringMiddle = fileStringMiddle.replace(' ', '')
             fileStringEnd = fileString[broken.end():]
             fileString = fileStringBegin + fileStringMiddle + fileStringEnd
-            #print('TxDot_LIB:repairLineBreaks:words:' , fileStringMiddle) # debug
+            print('TxDot_LIB:repairLineBreaks:words:' , fileStringMiddle) # debug
         else:
             break
 
@@ -635,13 +657,16 @@ def repairLineBreaks(fileString):
             #    print('TxDot_LIB:repairLineBreaks:number:', fileStringMiddle) # debug
         else:
             break
-    #print 'TxDot_LIB:repairLineBreaks:\n' + fileString # debug
+    print 'TxDot_LIB:repairLineBreaks:\n' + fileString # debug
     return fileString
 
 
 def style(stringText):
     stylPattern = re.compile('(?<=STYL:)\w+')
-    return stylPattern.search(stringText).group()
+    styl = stylPattern.search(stringText)
+    if styl:
+        return styl.group()
+    return ""
 
 
 def timeout():
@@ -651,13 +676,18 @@ def timeout():
 
 def vinNumber(stringText):
     vinPattern = re.compile('(?<=VIN: )\w+')
-    return vinPattern.search(stringText).group()
+    vin = vinPattern.search(stringText)
+    if vin:
+        return vin.group()
+    return ""
 
 
 def year(stringText):
     yrPattern = re.compile('(?<=YR:)\d{4}')
-    return yrPattern.search(stringText).group()
-
+    yr = yrPattern.search(stringText)
+    if yr:
+        return yr.group()
+    return ""
 
 if __name__ == "__main__":
     print("TxDot_LIB: TESTING TxDot_LIB")
