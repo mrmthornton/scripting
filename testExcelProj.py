@@ -376,6 +376,7 @@ def commonCode(lpList):
                 # excel section   *****************************************************************
                 for singleList in recordList:
                     recordArray.append(singleList)
+                xlwings.Range((2,2)).value = recordArray
 
             if dbBool:
                 # Database section   *****************************************************************
@@ -438,7 +439,7 @@ def excelHook():
 
 
 # global costants
-NUMBERtoProcess = 25
+NUMBERtoProcess = 31
 vpsBool   = False # true when using VPS images
 txdotBool = True  # true when using DMV records
 excelBool = True  # true when using excel
