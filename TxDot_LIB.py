@@ -132,7 +132,7 @@ def findResponseType(plate, fileString):
 
     # TXIRP
     targetType = 'TXIRP'
-    startPattern = re.compile('LIC' + plate + ' EXPIRES')
+    startPattern = re.compile('LIC ' + plate + ' EXPIRES')
     endPattern = re.compile('REMARKS')
     startNum, endNum = findStartEnd(fileString,startPattern, endPattern)
     if startNum is not None:
