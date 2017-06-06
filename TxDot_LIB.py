@@ -49,7 +49,8 @@ def repairLineBreaks(fileString):
 
     # broken address lines ?  TODO
 
-    wordBreakPattern = re.compile(r'[A-Z]+ *\n\s+[A-Z]+(,|\.|-)',re.MULTILINE) # find broken words
+    wordBreakPattern = re.compile(r'[A-Z]+ *\n\s*[A-Z]+(,|\.|-)',re.MULTILINE) # find broken words
+    #wordBreakPattern = re.compile(r'[A-Z]+ *\n\s+[A-Z]+(,|\.|-)',re.MULTILINE) # find broken words
     while True:
         broken = wordBreakPattern.search(fileString)
         if broken is not None:

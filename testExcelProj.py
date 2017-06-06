@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 #-------------------------------------------------------------------------------
 # Name:        testExcelProj.py
-# Purpose:     demostrate the feasibilty of some process automation
+# Purpose:     demonstrate the feasibilty of some process automation
 #
 # Author:      mthornton
 #
@@ -23,6 +23,7 @@ import tkFileDialog
 from Tkinter import Tk
 from TxDot_LIB import query, repairLineBreaks, findResponseType, parseRecord
 from UTIL_LIB import openBrowser
+from VPS_LIB import getTextResults
 import xlwings
 
 def setParameters():
