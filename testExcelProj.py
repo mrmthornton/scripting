@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 #-------------------------------------------------------------------------------
 # Name:        testExcelProj.py
-# Purpose:     demostrate the feasibilty of some process automation
+# Purpose:     demonstrate the feasibilty of some process automation
 #
 # Author:      mthornton
 #
@@ -23,6 +23,7 @@ import tkFileDialog
 from Tkinter import Tk
 from TxDot_LIB import query, repairLineBreaks, findResponseType, parseRecord
 from UTIL_LIB import openBrowser
+from VPS_LIB import getTextResults
 import xlwings
 
 def setParameters():
@@ -376,6 +377,7 @@ def commonCode(lpList):
                 # excel section   *****************************************************************
                 for singleList in recordList:
                     recordArray.append(singleList)
+                xlwings.Range((2,2)).value = recordArray
 
             if dbBool:
                 # Database section   *****************************************************************
@@ -438,7 +440,7 @@ def excelHook():
 
 
 # global costants
-NUMBERtoProcess = 25
+NUMBERtoProcess = 55
 vpsBool   = False # true when using VPS images
 txdotBool = True  # true when using DMV records
 excelBool = True  # true when using excel

@@ -49,7 +49,8 @@ def repairLineBreaks(fileString):
 
     # broken address lines ?  TODO
 
-    wordBreakPattern = re.compile(r'[A-Z]+ *\n\s+[A-Z]+(,|\.|-)',re.MULTILINE) # find broken words
+    wordBreakPattern = re.compile(r'[A-Z]+ *\n\s*[A-Z]+(,|\.|-)',re.MULTILINE) # find broken words
+    #wordBreakPattern = re.compile(r'[A-Z]+ *\n\s+[A-Z]+(,|\.|-)',re.MULTILINE) # find broken words
     while True:
         broken = wordBreakPattern.search(fileString)
         if broken is not None:
@@ -131,7 +132,7 @@ def findResponseType(plate, fileString):
 
     # TXIRP
     targetType = 'TXIRP'
-    startPattern = re.compile('LIC' + plate + ' EXPIRES')
+    startPattern = re.compile('LIC ' + plate + ' EXPIRES')
     endPattern = re.compile('REMARKS')
     startNum, endNum = findStartEnd(fileString,startPattern, endPattern)
     if startNum is not None:

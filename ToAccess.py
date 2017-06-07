@@ -55,7 +55,7 @@ def setParameters():
 
 if __name__ == '__main__':
 
-    NUMBERtoProcess = 3
+    NUMBERtoProcess = 20
     vpsBool = False
     txBool = True
     dbBool = True
@@ -76,7 +76,7 @@ if __name__ == '__main__':
             dbConnect, dbcursor = ConnectToAccess()
             #for row in dbcursor.columns(table='Sheet1'): # debug
             #    print(row.column_name)                   # debug
-            dbcursor.execute("SELECT plate FROM [list of plate 8 without matching sheet1]") # (1),4,8,9,10, '11'  ,12
+            dbcursor.execute("SELECT plate FROM [list of plate 9 without matching sheet1]") # (1),4,8,9,10, '11'  ,12
             #dbcursor.execute("SELECT plate FROM [list of plates 5 without matching sheet1]") # 2,3,5,6,7
             lpList = []
             loopCount = 0
@@ -185,7 +185,7 @@ if __name__ == '__main__':
                         #print(dbRecord) # for debug
                         duplicateFound = duplicateKey(dbcursor, "Sheet1", "Plate", dbRecord["plate"])
                         if duplicateFound:
-                            print("ToAccess:main: DUPLICATE FOUND")
+                            print("ToAccess:main: DUPLICATE FOUND for ", dbRecord["plate"])
                             continue
                         sqlString = makeSqlString(dbRecord)
                         #print(sqlString) # for debug
