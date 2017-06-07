@@ -55,9 +55,9 @@ def setParameters():
 
 if __name__ == '__main__':
 
-    NUMBERtoProcess = 4
+    NUMBERtoProcess = 3
     vpsBool = False
-    txBool = False
+    txBool = True
     dbBool = True
     delay=10
     SLEEPTIME = 1 # seconds 180 for standard time delay
