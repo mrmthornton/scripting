@@ -440,7 +440,7 @@ def excelHook():
 
 
 # global costants
-NUMBERtoProcess = 31
+NUMBERtoProcess = 55
 vpsBool   = False # true when using VPS images
 txdotBool = True  # true when using DMV records
 excelBool = True  # true when using excel
