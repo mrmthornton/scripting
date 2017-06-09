@@ -2,16 +2,17 @@
 #-------------------------------------------------------------------------------
 # Name:        ToAccess.py
 #              do one loop every N min to simulate human interaction
-# Purpose:     Read LP from a DB, extract and parse TX DMV info, if any,
-#              and combine with other input to form a complete record
-#              Write record to the DB.
+# Purpose:     Read LP from a DB, gather TxDot info, if any, and combine with
+#              other input to form a complete record, write record to the DB.
 #              Commit a record before gathering more info.
 #
 # Author:      mthornton
 #
 # Created:     2016 AUG 12
-# Update:      2017 JUN 08
+# Update:      2017 APR 26
 # Copyright:   (c) mthornton 2016, 2017
+# educational snippits thanks to Tim Greening-Jackson
+# (timATgreening-jackson.com)
 #-------------------------------------------------------------------------------
 
 
@@ -214,7 +215,7 @@ if __name__ == '__main__':
 
     NUMBERtoProcess = 10
     vpsBool = False
-    txBool = True
+    txBool = False
     dbBool = True
     delay=10
     SLEEPTIME = 1 # seconds 180 for standard time delay
