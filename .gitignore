@@ -16,6 +16,7 @@
 *.zip
 How To Read a TXDOT.pdf
 temp*
+Thumbs.db
 7zip/
 .atom/
 .idea/
