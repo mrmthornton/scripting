@@ -142,20 +142,17 @@ def commonCode(lpList):
 
 def excelHook():
     indexList = range(2,NUMBERtoProcess)
-    rawPlatesCol = [str( xlwings.Range((i,7)).value)[9:] for i in indexList] # skip the non-lp chars
-    #plates = []
-    #[plates.append(plate) for plate  in rawPlatesCol if plate != 'None' and plate != ""]
-    plates = [plate for plate  in rawPlatesCol if plate != 'None' and plate != ""]
-    #l = len(plates)
-    #print l, plates
+    rawPlatesCol = [str( xlwings.Range((i,7)).value) for i in indexList] # skip the non-lp chars
+    plates = [plate[9:] for plate  in rawPlatesCol if plate != 'None' and plate != ""]
+    #l = len(plates); #print l, plates
     excelRecord = commonCode(plates) # common code is used by all modules (in theory), with switches for VPS, TXDOT, Excel, database(db).
-    print("excelHook, full record: ", excelRecord)
+    #print("excelHook, full record: ", excelRecord) # for debug
     # field name-> type, plate, combined_name, address, city, state, zip, ownedStartDate, start_date, end_date
     ##xlwings.Range((2,2)).value = excelRecord
 
 
 # global costants
-NUMBERtoProcess = 20
+NUMBERtoProcess = 140
 vpsBool   = False # true when using VPS images
 txdotBool = True  # true when using DMV records
 excelBool = True  # true when using excel
@@ -173,35 +170,3 @@ if __name__ == '__main__':
     #commonCode(['ccy0042','dsv9060','notReal','letterO']) # for test purposes
 
 
-# 'd' Signed integer decimal.
-# 'i' Signed integer decimal.
-# 'o' Signed octal value.
-# 'u' Obsolete type – it is identical to 'd'.
-# 'x' Signed hexadecimal (lowercase).
-# 'X' Signed hexadecimal (uppercase).
-# 'e' Floating point exponential format (lowercase).
-# 'E' Floating point exponential format (uppercase).
-# 'f' Floating point decimal format.
-# 'F' Floating point decimal format.
-# 'g' Floating point format. Uses lowercase exponential format or decimal format
-# 'G' Floating point format. Uses uppercase exponential format or decimal format
-# 'c' Single character (accepts integer or single character string).
-# 'r' String (converts any Python object using repr()).
-# 's' String (converts any Python object using str()).
-# '%' No argument is converted, results in a '%' character in the result.
-
-
-'''
-params = [filter(lambda x: x in string.printable, item.text)
-          for item in row.find_all('td')]
-'''
-
-#Iterating over strings is unfortunately rather slow in Python.
-#Regular expressions are over an order of magnitude faster.
-'''
-control_chars = ''.join(map(unichr, range(0,32) + range(127,160)))
-control_char_re = re.compile('[%s]' % re.escape(control_chars))
-
-def remove_control_chars(s):
-    return control_char_re.sub('', s)
-'''
