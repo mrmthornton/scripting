@@ -22,7 +22,7 @@ import time
 import tkFileDialog
 from Tkinter import Tk
 from TxDot_LIB import query, repairLineBreaks, findResponseType, parseRecord
-from UTIL_LIB import openBrowser
+from UTIL_LIB import openBrowser, waitForUser
 from VPS_LIB import getTextResults
 import xlwings
 
@@ -48,228 +48,17 @@ def setParameters():
     return parameters
 
 
-def printDbColumnNames():
-    rowcount = 0
-    while True:
-        row = dbcursor.fetchone()
-        if row is None:
-            break
-        rowcount += 1
-        print "Plate {}".format(row[0])
-        #print "entire row -->", row
-    print rowcount
-
-    for column in dbcursor.columns(table='US State'):
-        print column.column_name
-    dbcursor.execute('''SELECT Field1
-                        FROM [US State]''')
-    while True:
-        row = dbcursor.fetchone()
-        if row is None:
-            break
-        print "entire row -->{}".format(row[0])
-
-
-def ConnectToAccessFile():
-    #Prompt the user for db, create connection and cursor.
-    root = Tk()
-    dbname = tkFileDialog.askopenfilename(parent=root, title="Select database",
-                filetypes=[('locked', '*.accde'), ('normal', '*.accdb')])
-    root.destroy()
-    # Connect to the Access database
-    connectedDB = pyodbc.connect("Driver={Microsoft Access Driver (*.mdb, *.accdb)};DBQ="+dbname+";")
-    dbcursor=connectedDB.cursor()
-    print("ConnectToAccessFile: Connected to {}".format(dbname))
-    return connectedDB, dbcursor
-
-
-def waitForUser(msg="enter login credentials"):
-    #Wait for user input
-    root = Tk()
-    tkMessageBox.askokcancel(message=msg)
-    root.destroy()
-
-
-def makeSqlString(dictStruct):
-    sql = []
-    sval = []
-    sql.append("INSERT INTO Sheet1 (Plate, Plate_St, [Combined Name], Address, City, State")
-    sval.append(" VALUES ( '{plate}', '{plate_st}', '{combined_name}', '{address}', '{city}', '{state}'")
-    if dictStruct["zip"]!= 0:
-        sql.append(", ZipCode")
-        sval.append(", {zip}")
-    if dictStruct["title_date"]!= '':
-        sql.append(", [Title Date]")
-        sval.append(", '{title_date}'")
-    if dictStruct["start_date"]!='':
-        sql.append(", [Start Date], [End Date]")
-        sval.append(", '{start_date}', '{end_date}'")
-        sql.append(", [Vehicle Make], [Vehicle Model], [Vehicle Body]")
-        sval.append(", '{make}', '{model}', '{body}'")
-    if dictStruct["vehicle_year"]!=0:
-        sql.append(", [Vehicle Year]")
-        sval.append(", {vehicle_year}")
-    sql.append(", [Total Image Reviewed], [Total Image corrected], Reason, \
-[Time_Stamp], [Agent Initial], \
-[Sent to Collections Agency],  Multiple, Unassign, [Completed: Yes / No Record], \
-[E-Tags (Temporary Plates)], [Dealer Plates] )")
-    sval.append(", '{images_reviewed}', '{images_corrected}', '{reason}', \
-'{time_stamp}', '{agent}', \
-{collections}, {multiple}, {unassign}, '{completed}', \
-{temp_plate}, {dealer_plate} )")
-    SQL = "".join(sql)
-    SVAL = "".join(sval)
-    return SQL + SVAL
-
-
-def recordInit():
-    recordDictionary = {
-        "plate":'', "plate_st":'',
-        "combined_name":'',
-        "address":'', "city":'', "state":'', "zip":0,
-        "title_date":'', "start_date":'', "end_date":'',
-        "make":'' , "model":'' , "body":'' , "vehicle_year":0 ,
-        "images_reviewed":0, "images_corrected":0, "reason":'',
-        "time_stamp":'', "agent":'',
-        "title_month":'', "title_day":'', "title_year":'',
-        "collections":0, "multiple":0, "unassign":0,
-        "completed":'', "temp_plate":0, "dealer_plate":0
-        }
-    return recordDictionary
-
-
-def excelDataInit():
-    recordDictionary = {
-        "type":'',
-        "plate":'', "plate_st":'',
-        "combined_name":'',
-        "address":'', "city":'', "state":'', "zip":'',
-        "ownedStartDate":'', "title_date":'', "start_date":'', "end_date":'' ,
-        "make":'' , "model":'', "body":'', "vehicle_year":''
-        }
-    return recordDictionary
-
-
-def excelDataFill(recordDictionary, csvRecord):
+def excelDataFill(csvRecord):
     #       0          1     2     3    4   5      6     7         8             9         10      11
     # responseType, plate, name, addr, '', city, state, zip, ownedStartDate, startDate, endDate, issued
-        recordDictionary["type"]= csvRecord[0]
-        recordDictionary["plate"]= csvRecord[1]
-        recordDictionary["plate_st"]= 'TX'
-        recordDictionary["combined_name"] = csvRecord[2]
-        recordDictionary["address"]= csvRecord[3]
-        recordDictionary["city"]= csvRecord[5]
-        recordDictionary["state"]= csvRecord[6]
-        recordDictionary["zip"]= csvRecord[7]
-        recordDictionary['ownedStartDate']= csvRecord[8]
-        recordDictionary["start_date"]= csvRecord[9]
-        recordDictionary["end_date"]= csvRecord[10]
-        #recordDictionary["title_date"]=
-        #recordDictionary["make"]= csvRecord[x1]
-        #recordDictionary["model"]= csvRecord[x1]
-        #recordDictionary["body"]= csvRecord[x1]
-        recordDictionary["vehicle_year"]= 0
-        #recordDictionary["images_reviewed"]= csvRecord[x1]
-        #recordDictionary["images_corrected"]= csvRecord[x1]
-        #recordDictionary["reason"]= csvRecord[x1]
-        #recordDictionary["time_stamp"]= csvRecord[x1]
-        #recordDictionary["agent"]= csvRecord[x1]
-        #recordDictionary["title_month"]= csvRecord[x1]
-        #recordDictionary["title_day"]= csvRecord[x1]
-        #recordDictionary["title_year"]= csvRecord[x1]
-        #recordDictionary["collections"]= 0
-        #recordDictionary["multiple"]=
-        #recordDictionary["unassign"]=
-        #recordDictionary["completed"]=
-        #recordDictionary["temp_plate"]= csvRecord[x1]
-        #recordDictionary["dealer_plate"]= csvRecord[x1]
-        return recordDictionary
-
-
-def txDotDataInit():
-    recordDictionary = {
-        "type":'',
-        "plate":'', "plate_st":'',
-        "combined_name":'',
-        "address":'', "city":'', "state":'', "zip":'',
-        "ownedStartDate":'', "title_date":'', "start_date":'', "end_date":'' ,
-        "make":'' , "model":'', "body":'', "vehicle_year":''
-        }
-    return recordDictionary
-
-
-def txDotDataFill(recordDictionary, csvRecord):
-#      index-> 0          1     2     3    4   5      6     7         8             9         10      11
-# from txdot-> responseType, plate, name, addr, '', city, state, zip, ownedStartDate, startDate, endDate, issued
-# field name-> type, plate, combined_name, address, city, state, zip, ownedStartDate, start_date, end_date
-        recordDictionary["type"]= csvRecord[0]
-        recordDictionary["plate"]= csvRecord[1]
-        recordDictionary["plate_st"]= 'TX'
-        recordDictionary["combined_name"] = csvRecord[2]
-        recordDictionary["address"]= csvRecord[3]
-        recordDictionary["city"]= csvRecord[5]
-        recordDictionary["state"]= csvRecord[6]
-        recordDictionary["zip"]= csvRecord[7]
-        recordDictionary['ownedStartDate']= csvRecord[8]
-        recordDictionary["start_date"]= csvRecord[9]
-        recordDictionary["end_date"]= csvRecord[10]
-        #recordDictionary["title_date"]=
-        #recordDictionary["make"]= csvRecord[x1]
-        #recordDictionary["model"]= csvRecord[x1]
-        #recordDictionary["body"]= csvRecord[x1]
-        recordDictionary["vehicle_year"]= 0
-        #recordDictionary["images_reviewed"]= csvRecord[x1]
-        #recordDictionary["images_corrected"]= csvRecord[x1]
-        #recordDictionary["reason"]= csvRecord[x1]
-        #recordDictionary["time_stamp"]= csvRecord[x1]
-        #recordDictionary["agent"]= csvRecord[x1]
-        #recordDictionary["title_month"]= csvRecord[x1]
-        #recordDictionary["title_day"]= csvRecord[x1]
-        #recordDictionary["title_year"]= csvRecord[x1]
-        #recordDictionary["collections"]= 0
-        #recordDictionary["multiple"]=
-        #recordDictionary["unassign"]=
-        #recordDictionary["completed"]=
-        #recordDictionary["temp_plate"]= csvRecord[x1]
-        #recordDictionary["dealer_plate"]= csvRecord[x1]
-        return recordDictionary
-
-
-def txDotToDbRecord(txDotRec, db):
-    if txDotRec["type"]=='NORECORD': db["completed"]='NO RECORD'
-    else: db["completed"]='YES'
-    db["plate"] = txDotRec["plate"]
-    db["plate_st"] = txDotRec["plate_st"]
-    db["combined_name"] = txDotRec["combined_name"]
-    db["address"] = txDotRec["address"]
-    db["city"] = txDotRec["city"]
-    db["state"]= txDotRec["state"]
-    if txDotRec["zip"]!='': db["zip"] = int(txDotRec["zip"])
-    #db["title_date"] = txDotRec["title_date"]
-    db["title_date"] = ''
-    if txDotRec["start_date"]!='': db["start_date"] = txDotRec["start_date"]
-    if txDotRec["end_date"]!='': db["end_date"] = txDotRec["end_date"]
-    #db["make"] = txDotRec["make"]
-    #db["model"] = txDotRec["model"]
-    #db["body"] = txDotRec["body"]
-    #db["vehicle_year"] = txDotRec["vehicle_year"]
-    #db["images_reviewed"] = txDotRec["images_reviewed"]
-    #db["images_corrected"] = txDotRec["images_corrected"]
-    #db["reason"] = txDotRec["reason"]
-    db["time_stamp"] = time.strftime("%m/%d/%Y %I:%M:%S %p") # month, day, long year, 12 hr, AM/PM
-    #db["time_stamp"] = '9/13/2016 4:53:47 PM'
-    db["agent"] = "mthornton"
-    #db["title_month"] = txDotRec["title_month"]
-    #db["title_day"] = txDotRec["title_day"]
-    #db["title_year"] = txDotRec["title_year"]
-    #db["collections"] = txDotRec["collections"]
-    #db["multiple"] = txDotRec["multiple"]
-    #db["unassign"] = txDotRec["unassign"]
-    #db["completed"] = txDotRec["completed"]
-    if txDotRec["type"]=='TEMPORARY': db["temp_plate"]= 1
-    if txDotRec["type"]=='DEALER': db["dealer_plate"]= 1
-
-    return db
+        return [
+            'first',
+            csvRecord[2],
+            csvRecord[3],
+            csvRecord[5],
+            csvRecord[6],
+            csvRecord[7],
+            ]
 
 
 def commonCode(lpList):
@@ -330,7 +119,8 @@ def commonCode(lpList):
             if excelBool:
                 # excel section   *****************************************************************
                 for singleList in recordList:
-                    recordArray.append(singleList)
+                    excelVector = excelDataFill(singleList)
+                    recordArray.append(excelVector)
                 xlwings.Range((2,1)).value = recordArray
 
 
@@ -351,10 +141,11 @@ def commonCode(lpList):
 
 
 def excelHook():
-    indexList = range(1,NUMBERtoProcess)
+    indexList = range(2,NUMBERtoProcess)
     rawPlatesCol = [str( xlwings.Range((i,7)).value)[9:] for i in indexList] # skip the non-lp chars
-    plates = []
-    [plates.append(plate) for plate  in rawPlatesCol if plate != 'None' and plate != ""]
+    #plates = []
+    #[plates.append(plate) for plate  in rawPlatesCol if plate != 'None' and plate != ""]
+    plates = [plate for plate  in rawPlatesCol if plate != 'None' and plate != ""]
     #l = len(plates)
     #print l, plates
     excelRecord = commonCode(plates) # common code is used by all modules (in theory), with switches for VPS, TXDOT, Excel, database(db).
@@ -364,7 +155,7 @@ def excelHook():
 
 
 # global costants
-NUMBERtoProcess = 55
+NUMBERtoProcess = 20
 vpsBool   = False # true when using VPS images
 txdotBool = True  # true when using DMV records
 excelBool = True  # true when using excel

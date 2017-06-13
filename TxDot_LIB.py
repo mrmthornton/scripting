@@ -636,7 +636,7 @@ def repairLineBreaks(fileString):
             fileStringMiddle = fileStringMiddle.replace(' ', '')
             fileStringEnd = fileString[broken.end():]
             fileString = fileStringBegin + fileStringMiddle + fileStringEnd
-            print('TxDot_LIB:repairLineBreaks:words:' , fileStringMiddle) # debug
+            #print('TxDot_LIB:repairLineBreaks:words:' , fileStringMiddle) # debug
         else:
             break
 
@@ -657,7 +657,7 @@ def repairLineBreaks(fileString):
             #    print('TxDot_LIB:repairLineBreaks:number:', fileStringMiddle) # debug
         else:
             break
-    print 'TxDot_LIB:repairLineBreaks:\n' + fileString # debug
+    #print 'TxDot_LIB:repairLineBreaks:\n' + fileString # debug
     return fileString
 
 

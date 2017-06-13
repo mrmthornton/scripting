@@ -105,7 +105,7 @@ def permutationPattern(lp):
     l.append(')')
     i = iter(l)
     regexString = "".join(i)
-    print("UTIL_LIB:permutatinPattern:regexString: ", regexString) # for debug
+    #print("UTIL_LIB:permutatinPattern:regexString: ", regexString) # for debug
     return re.compile(regexString)
 
 
