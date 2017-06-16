@@ -12,8 +12,7 @@
 *.pyc
 *.txt
 *.vbs
-*.xlsx
-*.xlsm
+*.xls*
 *.zip
 How To Read a TXDOT.pdf
 temp*
@@ -21,6 +20,7 @@ temp*
 .atom/
 .idea/
 .metadata/
+Anaconda3/
 Atom/
 cntlm/
 comtypes-1.1.3/
