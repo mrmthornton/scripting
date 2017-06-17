@@ -153,7 +153,7 @@ def ToDbRecord(txDotRec, db):
     db["time_stamp"] = time.strftime("%m/%d/%Y %I:%M:%S %p") # example: '9/13/2016 4:53:47 PM'
     db["agent"] = "mthornton"
     #db["VIN"] = txDotRec["VIN"]  # TODO
-    db["comment"] = "test"
+    #db["comment"] = "test"
 
     '''
     Plate is correct

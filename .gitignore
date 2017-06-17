@@ -12,8 +12,7 @@
 *.pyc
 *.txt
 *.vbs
-*.xlsx
-*.xlsm
+*.xls*
 *.zip
 How To Read a TXDOT.pdf
 temp*

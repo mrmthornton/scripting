@@ -2,17 +2,16 @@
 #-------------------------------------------------------------------------------
 # Name:        ToAccess.py
 #              do one loop every N min to simulate human interaction
-# Purpose:     Read LP from a DB, gather TxDot info, if any, and combine with
-#              other input to form a complete record, write record to the DB.
+# Purpose:     Read LP from a DB, extract and parse TX DMV info, if any,
+#              and combine with other input to form a complete record
+#              Write record to the DB.
 #              Commit a record before gathering more info.
 #
 # Author:      mthornton
 #
 # Created:     2016 AUG 12
-# Update:      2017 APR 26
+# Update:      2017 JUN 08
 # Copyright:   (c) mthornton 2016, 2017
-# educational snippits thanks to Tim Greening-Jackson
-# (timATgreening-jackson.com)
 #-------------------------------------------------------------------------------
 
 
@@ -66,7 +65,7 @@ def commonCode():
             dbConnect, dbcursor = ConnectToAccess()
             #for row in dbcursor.columns(table='Sheet1'): # debug
             #    print(row.column_name)                   # debug
-            dbcursor.execute("SELECT plate FROM [list of plate 8 without matching sheet1]") # (1),4,8,9,10, '11'  ,12
+            dbcursor.execute("SELECT plate FROM [list of plate 9 without matching sheet1]") # (1),4,8,9,10, '11'  ,12
             #dbcursor.execute("SELECT plate FROM [list of plates 5 without matching sheet1]") # 2,3,5,6,7
             lpList = []
             loopCount = 0
@@ -83,6 +82,7 @@ def commonCode():
                     print("main() : Finished, no more LP's .")
                     break
                 plateString = str(row[0])
+                print("ToAccess:CommonCode: plate is ", plateString) # debug
 
                 #VPS section   *****************************************************************
                 if vpsBool:
@@ -150,7 +150,7 @@ def commonCode():
                             #print('main:', responseType, startNum, endNum) # for debug
                             typeString = fileString[startNum:endNum + 1]
                             #print(typeString) # for debug
-                            fileString = fileString[:startNum] + fileString[endNum + 1:] # what is this for ?
+                            fileString = fileString[:startNum] + fileString[endNum + 1:] # there may be other records
                             listData = parseRecord(responseType, typeString)
                             assert(len(listData)==17)
                             listData.append(plateString) # send the original plate for comparison and comment
@@ -172,7 +172,9 @@ def commonCode():
                     for csvRecord in recordList:
                         #print(recordList) # for debug
                         txDotRecord = txDotDataFill(txDotDataInit(), csvRecord)
-                        dbRecord = ToDbRecord(txDotRecord, recordInit())
+                        newRecords = recordInit()
+                        newRecords["comment"] = "using TxDot = " + str(txBool)
+                        dbRecord = ToDbRecord(txDotRecord, newRecords)
                         #print(dbRecord) # for debug
                         duplicateFound = duplicateKey(dbcursor, "Sheet1", "Plate", dbRecord["plate"])
                         if duplicateFound:
@@ -210,9 +212,9 @@ def commonCode():
 
 if __name__ == '__main__':
 
-    NUMBERtoProcess = 1
+    NUMBERtoProcess = 10
     vpsBool = False
-    txBool = False
+    txBool = True
     dbBool = True
     delay=10
     SLEEPTIME = 1 # seconds 180 for standard time delay

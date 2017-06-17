@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 #-------------------------------------------------------------------------------
 # Name:        testExcelProj.py
-# Purpose:     demostrate the feasibilty of some process automation
+# Purpose:     demonstrate the feasibilty of some process automation
 #
 # Author:      mthornton
 #
