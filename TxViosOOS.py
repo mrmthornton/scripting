@@ -1,12 +1,12 @@
 # -*- coding: UTF-8 -*-
 #-------------------------------------------------------------------------------
 # Name:        TxViosOOS.py
-# Purpose:
+# Purpose:     Share Texas DMV information with out of state Toll Authorities.
 #
 # Author:      mthornton
 #
 # Created:     2017 JUN 08
-# Modified:    2017 JUN 12
+# Modified:    2017 JUN 16
 # Copyright:   (c) mthornton 2017
 #-------------------------------------------------------------------------------
 
@@ -141,7 +141,8 @@ def commonCode(lpList):
 
 
 def excelHook():
-    indexList = range(2,NUMBERtoProcess)
+    firstRow = 2
+    indexList = range(firstRow, NUMBERtoProcess + firstRow)
     rawPlatesCol = [str( xlwings.Range((i,7)).value) for i in indexList] # skip the non-lp chars
     plates = [plate[9:] for plate  in rawPlatesCol if plate != 'None' and plate != ""]
     #l = len(plates); #print l, plates
@@ -152,7 +153,7 @@ def excelHook():
 
 
 # global costants
-NUMBERtoProcess = 140
+NUMBERtoProcess = 5
 vpsBool   = False # true when using VPS images
 txdotBool = True  # true when using DMV records
 excelBool = True  # true when using excel
