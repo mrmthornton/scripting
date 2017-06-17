@@ -99,8 +99,9 @@ def commonCode(lpList):
                         responseType = None
                         if foundCurrentPlate == False:
                             print plateString, DMVplate, 'commonCode: Plate/DMVplate not found. Unable to resolve record type.'
-                            time.sleep(3)
-                        break
+                            recordList.append("unknown record type",'','','','','','','','','','','','','','','','')
+                            #time.sleep(3)
+                        #break
                     if responseType != None: # there must be a valid text record to process
                         foundCurrentPlate = True
                         #print 'main:', responseType, startNum, endNum # for debug
