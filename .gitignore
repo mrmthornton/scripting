@@ -16,7 +16,6 @@
 *.zip
 How To Read a TXDOT.pdf
 temp*
-Thumbs.db
 7zip/
 .atom/
 .idea/
@@ -25,6 +24,7 @@ Anaconda3/
 Atom/
 cntlm/
 comtypes-1.1.3/
+downloads/
 ETCinvoices/
 fiddler/
 IEDriverServer_x64_2.44.0/
