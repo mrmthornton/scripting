@@ -37,7 +37,7 @@ def excelHook(n):
 #        print stringText
 #        ouputFileHandle.write(stringText)
 
-    rawNameCol = [filter(lambda x: x in aString.printable, xlwings.Range((i,1)).value) for i in indexList] # get the first column
+    rawNameCol = [filter(lambda x: x in string.printable, xlwings.Range((i,1)).value) for i in indexList] # get the first column
     #rawNameCol = [str( xlwings.Range((i,1)).value) for i in indexList] # get the first column
     combinedName = [name for name  in rawNameCol if name != 'None' and name != ""]
     l = len(combinedName); print l, combinedName
@@ -47,7 +47,7 @@ def excelHook(n):
 
 
 # global costants
-NUMBERtoProcess = 5
+NUMBERtoProcess = 50
 
 if __name__ == '__main__':
 
