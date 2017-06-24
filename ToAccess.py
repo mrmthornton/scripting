@@ -212,7 +212,7 @@ def commonCode():
 
 if __name__ == '__main__':
 
-    NUMBERtoProcess = 10
+    NUMBERtoProcess = 100
     vpsBool = False
     txBool = True
     dbBool = True
