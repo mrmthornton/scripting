@@ -412,7 +412,7 @@ def parseTxirp(responseType, typeString):
 
 def parsePermit(responseType, typeString):
     # find header and remove
-    permitHeaderPattern = re.compile(r'(ONE TRIP PERMIT:|30 DAY PERMIT:|144-HOUR PERMIT:)\s+')
+    permitHeaderPattern = re.compile(r'(ONE TRIP PERMIT:|30 DAY [\w ]*PERMIT:|144-HOUR PERMIT:)\s+')
     header = permitHeaderPattern.search(typeString)
     typeString = typeString[header.end():]
     # find plate
@@ -452,7 +452,14 @@ def parsePermit(responseType, typeString):
         if found is not None:
             state, zipCode = found.group().split()
             city = addr2[:found.start()]
-    #TODO  get year make style vin
+    #get year make style vin  '(\d{4})\s+(\w+)\s+([\d\w]{2,})'
+    yearMakeStylePattern = re.compile('(\d{4})\s+(\w+)\s+([\d\w]{2,})')
+    found = yearMakeStylePattern.search(typeString)
+    if found:
+        yr = found.group(1)
+        mak = found.group(2)
+        styl = found.group(3)
+    vin = vinNumber(typeString)
     #TODO interpret the make and model and  style ?
 
     return [responseType, plate.strip(), name.strip(), addr.strip(), '', city.strip(), state, zipCode, '', '', '', issued,\

@@ -20,8 +20,8 @@ def ConnectToAccess():
         #Prompt the user for db, create connection and cursor.
         root = Tk()
         dbname = tkFileDialog.askopenfilename(parent=root, title="Select database",
-                    filetypes=[('locked', '*.accde')])
-                    #filetypes=[('locked', '*.accde'), ('normal', '*.accdb')])
+                    #filetypes=[('locked', '*.accde')])
+                    filetypes=[('all files', '*'), ('locked', '*.accde'), ('normal', '*.accdb')])
         root.destroy()
         # Connect to the Access database
         dbConnection = pyodbc.connect("Driver={Microsoft Access Driver (*.mdb, *.accdb)};DBQ="+dbname+";")
